@@ -5,7 +5,7 @@ import routes from './routes';
 
 Vue.use(VueRouter);
 
-const Router = new VueRouter({
+Vue.router = new VueRouter({
   /*
    * NOTE! Change Vue Router mode from quasar.conf.js -> build -> vueRouterMode
    *
@@ -21,4 +21,4 @@ const Router = new VueRouter({
   routes,
 });
 
-export default Router;
+export default Vue.router;

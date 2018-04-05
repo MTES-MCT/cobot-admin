@@ -1,16 +1,19 @@
 // Configuration for your app
 
-module.exports = function (ctx) {
+module.exports = function config(ctx) {
   return {
     // app plugins (/src/plugins)
     plugins: [
+      'i18n',
+      'axios',
+      'vueAuth',
     ],
     css: [
-      'app.styl'
+      'app.styl',
     ],
     extras: [
       ctx.theme.mat ? 'roboto-font' : null,
-      'material-icons'
+      'material-icons',
       // 'ionicons',
       // 'mdi',
       // 'fontawesome'
@@ -18,28 +21,31 @@ module.exports = function (ctx) {
     supportIE: true,
     vendor: {
       add: [],
-      remove: []
+      remove: [],
     },
     build: {
+      env: {
+        API_URL: JSON.stringify(process.env.API_URL),
+      },
       scopeHoisting: true,
-      vueRouterMode: 'history',
+      vueRouterMode: 'hash',
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
       // useNotifier: false,
-      extendWebpack (cfg) {
+      extendWebpack(cfg) {
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules|quasar)/
-        })
-      }
+          exclude: /(node_modules|quasar)/,
+        });
+      },
     },
     devServer: {
       // https: true,
       // port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!
     framework: {
@@ -57,15 +63,23 @@ module.exports = function (ctx) {
         'QListHeader',
         'QItem',
         'QItemMain',
-        'QItemSide'
+        'QItemSide',
+        'QField',
+        'QInput',
+        'QTable',
+        'QTh',
+        'QTr',
+        'QTd',
+        'QTableColumns',
+        'QSearch',
       ],
       directives: [
-        'Ripple'
+        'Ripple',
       ],
       // Quasar plugins
       plugins: [
-        'Notify'
-      ]
+        'Notify',
+      ],
     },
     // animations: 'all' --- includes all animations
     animations: [
@@ -113,7 +127,7 @@ module.exports = function (ctx) {
       // id: 'org.cordova.quasar.app'
     },
     electron: {
-      extendWebpack (cfg) {
+      extendWebpack(cfg) {
         // do something with cfg
       },
       packager: {
@@ -125,10 +139,10 @@ module.exports = function (ctx) {
 
         // Window only
         // win32metadata: { ... }
-      }
+      },
     },
 
     // leave this here for Quasar CLI
-    starterKit: '1.0.2'
-  }
-}
+    starterKit: '1.0.2',
+  };
+};
