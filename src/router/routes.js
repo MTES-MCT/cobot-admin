@@ -3,6 +3,7 @@ export default [
   {
     path: '/',
     component: () => import('layouts/default'),
+    redirect: { name: 'crud.list' },
     meta: {
       auth: {
         roles: [80, 100],
@@ -11,9 +12,21 @@ export default [
     },
     children: [
       {
-        name: 'dashboard',
-        path: '',
-        component: () => import('pages/dashboard'),
+        name: 'crud.list',
+        path: 'crud',
+        component: () => import('pages/crud/index'),
+        children: [
+          {
+            path: '',
+            name: 'crud.list',
+            component: () => import('pages/crud/list'),
+          },
+          {
+            path: ':id',
+            name: 'crud.edit',
+            component: () => import('pages/crud/edit'),
+          },
+        ],
       },
     ],
   },

@@ -33,6 +33,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
 
     'no-console': 0,
+    'no-underscore-dangle': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }
