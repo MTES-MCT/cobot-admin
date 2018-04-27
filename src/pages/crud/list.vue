@@ -57,6 +57,7 @@ export default {
           field: row => row.text[0].text,
           align: 'left',
           sortable: true,
+          style: '{ whiteSpace: "normal" }',
         },
         {
           name: 'action',

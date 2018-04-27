@@ -16,6 +16,10 @@
         class="col-6"
       />
     </template>
+    <q-td :style="{whiteSpace: 'normal'}"
+          class="text-left" slot="body-cell-text" slot-scope="props">
+      {{ props.value }}
+    </q-td>
     <q-td class="text-right" slot="body-cell-action" slot-scope="props">
       <q-btn v-for="(action, index) in actions" :key="index"
              style="margin-right: 10px;"
@@ -67,10 +71,6 @@ export default {
           }).catch((error) => {
             console.log(error);
           });
-          // console.log(props.row[action.id]);
-          // console.log(action);
-          // this.datas.splice(props.row.__index, 1);
-          // this.$q.notify('Agreed!');
         }).catch(() => {
         });
       }

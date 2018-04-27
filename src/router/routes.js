@@ -3,7 +3,7 @@ export default [
   {
     path: '/',
     component: () => import('layouts/default'),
-    redirect: { name: 'crud.list' },
+    redirect: { name: 'dashboard' },
     meta: {
       auth: {
         roles: [80, 100],
@@ -11,6 +11,11 @@ export default [
       },
     },
     children: [
+      {
+        name: 'dashboard',
+        path: 'dashboard',
+        component: () => import('pages/dashboard'),
+      },
       {
         name: 'crud.list',
         path: 'crud',

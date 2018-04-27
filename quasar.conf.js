@@ -73,6 +73,7 @@ module.exports = function config(ctx) {
         'QTd',
         'QTableColumns',
         'QSearch',
+        'QChipsInput',
       ],
       directives: [
         'Ripple',

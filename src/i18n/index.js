@@ -12,6 +12,7 @@ const i18n = {
       edit: 'modifier',
       delete: 'supprimer',
       confirm: 'Confirmation',
+      updateDone: 'mise à jour effectuée',
     },
     auth: {
       login: 'm\'identifier à l\'aide de mon adresse email',
@@ -22,9 +23,27 @@ const i18n = {
     cobot: {
       title: 'Messages du Cobot',
       name: 'nom',
+      texts: 'Textes',
+      btnAddText: 'ajouter un text',
+      interactions: 'Interactions',
+      interactionsHelper: 'Pour utilisateur avancé',
+      api: 'API',
+      apiTarget: 'API cible',
+      image: 'Image',
+      imageUrl: 'URL de l\'image',
+      actions: 'Boutons d\'action',
+      btnAddAction: 'ajouter un bouton d\'action',
       message: 'message',
+      newMessage: 'nouveau message',
+      dialog: {
+        actions: {
+          title: 'Ajouter un bouton d\'action',
+          message: 'sélectionnez le bouton que vous souhaitez ajouter',
+        },
+      },
       confirm: {
         delete: 'Etes-vous sûr de vouloir supprimer ce message ?',
+        deleteAction: 'Etes-vous sûr de vouloir supprimer cette action ?',
       },
     },
   },
