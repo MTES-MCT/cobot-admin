@@ -7,6 +7,7 @@ module.exports = function config(ctx) {
       'i18n',
       'axios',
       'vueAuth',
+      'apollo',
     ],
     css: [
       'app.styl',
@@ -72,6 +73,7 @@ module.exports = function config(ctx) {
         'QTd',
         'QTableColumns',
         'QSearch',
+        'QChipsInput',
       ],
       directives: [
         'Ripple',
@@ -79,6 +81,7 @@ module.exports = function config(ctx) {
       // Quasar plugins
       plugins: [
         'Notify',
+        'Dialog',
       ],
     },
     // animations: 'all' --- includes all animations
