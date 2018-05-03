@@ -313,7 +313,7 @@ export default {
     padding 15px
   .main-card
     border-radius 2px
-    width 80vw
+    width 65vw
     max-width 1200px
   .title
     color: $tertiary

@@ -74,6 +74,12 @@ module.exports = function config(ctx) {
         'QTableColumns',
         'QSearch',
         'QChipsInput',
+        'QCard',
+        'QCardTitle',
+        'QCardMain',
+        'QCardSeparator',
+        'QCardActions',
+        'QCollapsible',
       ],
       directives: [
         'Ripple',

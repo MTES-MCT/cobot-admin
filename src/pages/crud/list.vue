@@ -96,8 +96,9 @@ export default {
 <style lang="stylus">
   @import '~variables'
   .main-card
+    padding-top 40px
     border-radius 2px
-    width 80vw
+    width 65vw
     max-width 1200px
   .title
     color: $tertiary

@@ -8,6 +8,29 @@ export const ACTIONS_QUERY = gql`query actions {
   }
 }`;
 
+export const DATASET_QUERY = gql`query getDataSet($source: String!) {
+  DataSetBySource(source: $source) {
+    _id,
+    file,
+    numAnswers,
+    usersAnswers {
+      answers
+    }
+  }
+}`;
+
+export const DATASET_STATS_QUERY = gql`query getDataSetStats($source: String!) {
+  DataSetStats(source: $source) {
+    datas
+    contributions
+    achievement
+    contributionsGraph {
+      createdAt
+      numAnswers
+    }
+  }
+}`;
+
 export const MESSAGES_QUERY = gql`query getMessages {
   Messages {
     id
