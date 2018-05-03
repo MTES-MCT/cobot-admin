@@ -14,7 +14,7 @@
               <q-icon name="collections" color="primary"/>
             </div>
             <div class="mention">
-              <h4>815</h4>
+              <h4>{{ statistics.datas }}</h4>
             </div>
           </div>
         </q-card-main>
@@ -36,7 +36,7 @@
               <q-icon name="public" color="warning"/>
             </div>
             <div class="mention">
-              <h4>1315</h4>
+              <h4>{{ statistics.contributions }}</h4>
             </div>
           </div>
         </q-card-main>
@@ -44,6 +44,7 @@
           <q-btn flat size="sm"
                   align="right"
                   icon-right="arrow_forward"
+                  @click="goTo('dashboard.contributions', '1234-5678-9101')"
                   label="accèder au détail"/>
         </q-card-actions>
       </q-card>
@@ -58,7 +59,7 @@
               <q-icon name="track_changes" color="info"/>
             </div>
             <div class="mention">
-              <h4>30%</h4>
+              <h4>{{ statistics.achievement }}%</h4>
             </div>
           </div>
         </q-card-main>
@@ -70,44 +71,57 @@
         </q-card-actions>
       </q-card>
     </div>
-
-    <canvas id="contribution-chart" class="chart"></canvas>
-
+    <div class="Chart">
+      <contributions-chart-data v-if="chart.data.labels.length > 0"
+                                :datas="chart"></contributions-chart-data>
+    </div>
   </div>
 </template>
 
-<style>
-</style>
-
 <script>
-import Chart from 'chart.js';
-import { planetChartData } from '../constants/data-chart.js';
+import { DATASET_STATS_QUERY } from '../../constants/graphql';
+import _ from 'lodash';
+import contributionsChartData from '../../constants/contributions-chart.js';
 
 export default {
   name: 'DashboardIndex',
+  components: {
+    contributionsChartData,
+  },
   data: () => ({
-    datacollection: {
-      labels: ['January', 'February'],
-      datasets: [
-        {
-          label: 'Data One',
-          backgroundColor: '#f87979',
-          data: [40, 20],
-        },
-      ],
+    chart: {
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+        }],
+      },
+    },
+    statistics: {
+      datas: 0,
+      contributions: 0,
+      achievement: 0,
     },
   }),
-  mounted() {
-    this.createChart('contribution-chart', planetChartData);
-  },
   methods: {
-    createChart(chartId, chartData) {
-      const ctx = document.getElementById(chartId);
-      return new Chart(ctx, {
-        type: chartData.type,
-        data: chartData.data,
-        options: chartData.options,
-      });
+    goTo(to, id) {
+      this.$router.push({ name: to, params: { id } });
+    },
+  },
+  apollo: {
+    statistics: {
+      query: DATASET_STATS_QUERY,
+      variables: {
+        source: 'opensolarmap',
+      },
+      pollInterval: 5000,
+      update(data) {
+        const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
+        const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
+        this.chart.data.labels = graphX;
+        this.chart.data.datasets[0].data = graphY;
+        return data.DataSetStats;
+      },
     },
   },
 };
@@ -119,7 +133,7 @@ export default {
     border-radius 2px
     width 65vw
     max-width 1200px
-  .chart
+  .Chart
     background-color $neutral
     margin-top 20px
     width 100%

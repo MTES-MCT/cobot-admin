@@ -13,6 +13,7 @@ const i18n = {
       delete: 'supprimer',
       confirm: 'Confirmation',
       updateDone: 'mise à jour effectuée',
+      logout: 'me déconnecter',
     },
     auth: {
       login: 'm\'identifier à l\'aide de mon adresse email',
@@ -45,6 +46,14 @@ const i18n = {
         delete: 'Etes-vous sûr de vouloir supprimer ce message ?',
         deleteAction: 'Etes-vous sûr de vouloir supprimer cette action ?',
       },
+    },
+    contributions: {
+      title: 'Détails des contributions',
+      file: 'nom du fichier',
+      image: 'image',
+      numUserAnswers: 'nombre de réponse',
+      userAnswers: 'réponses',
+      more: 'voir les autres réponses',
     },
   },
 };

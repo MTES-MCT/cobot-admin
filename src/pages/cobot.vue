@@ -15,9 +15,6 @@
   </div>
 </template>
 
-<style>
-</style>
-
 <script>
 import { clone } from 'quasar';
 import { MESSAGES_QUERY, MESSAGE_DELETE } from '../constants/graphql';

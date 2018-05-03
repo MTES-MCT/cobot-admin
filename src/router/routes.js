@@ -12,12 +12,24 @@ export default [
     },
     children: [
       {
-        name: 'dashboard',
+        name: '',
         path: 'dashboard',
-        component: () => import('pages/dashboard'),
+        component: () => import('pages/dashboard/index'),
+        children: [
+          {
+            path: ':name',
+            name: 'dashboard',
+            component: () => import('pages/dashboard/dashboard'),
+          },
+          {
+            path: 'contributions/:id',
+            name: 'dashboard.contributions',
+            component: () => import('pages/dashboard/contributions'),
+          },
+        ],
       },
       {
-        name: 'crud.list',
+        name: '',
         path: 'crud',
         component: () => import('pages/crud/index'),
         children: [

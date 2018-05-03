@@ -34,10 +34,10 @@
         separator
       >
         <q-collapsible indent icon="mail" label="mes projets" opened>
-          <q-item>
+          <q-item link @click.native="goTo('/dashboard/opensolarmap')">
             <q-item-main label="Opensolar Map" sublabel="1 283 contributions" />
           </q-item>
-          <q-item>
+          <q-item link>
             <q-item-main label="A bicyclette !" sublabel="projet non démarré" />
           </q-item>
           <q-item>
@@ -46,7 +46,10 @@
                    label="ajouter un projet" />
           </q-item>
         </q-collapsible>
-
+        <q-item @click.native="goTo('/crud')">
+          <q-item-side icon="language" />
+          <q-item-main label="Messages de Cobot" />
+        </q-item>
         <q-item>
           <q-item-side icon="people" />
           <q-item-main label="Mon compte" />
@@ -100,7 +103,6 @@
 
 <script>
 import CcHeaderUser from 'components/cc-header-user';
-import { openURL } from 'quasar';
 
 export default {
   name: 'LayoutDefault',
@@ -113,7 +115,9 @@ export default {
     };
   },
   methods: {
-    openURL,
+    goTo(to) {
+      this.$router.push(to);
+    },
   },
 };
 </script>

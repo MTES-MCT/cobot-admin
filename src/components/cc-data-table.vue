@@ -37,16 +37,12 @@
 export default {
   name: 'CcDataTable',
   props: ['datas', 'columns', 'actions', 'config', 'filter'],
-  mounted() {
-    console.log(this.datas);
-  },
   methods: {
     setCTAColor(name) {
       return (name === 'global.delete') ? 'negative' : 'primary';
     },
     executeAction(action, props) {
       if (action.goto) {
-        console.log(action.goto);
         this.$router.push({ name: action.goto, params: { id: props.row[action.id] } });
       } else if (action.confirm) {
         this.$q.dialog({
