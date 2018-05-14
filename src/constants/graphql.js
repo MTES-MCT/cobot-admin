@@ -31,6 +31,13 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($source: String!) {
   }
 }`;
 
+export const DATASET_STATS_SUB = gql`subscription subContribution($source: String!) {
+  contributionAdded(source: $source) {
+    createdAt
+    source
+  }
+}`;
+
 export const MESSAGES_QUERY = gql`query getMessages {
   Messages {
     id

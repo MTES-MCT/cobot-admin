@@ -79,8 +79,10 @@
 </template>
 
 <script>
-import { DATASET_STATS_QUERY } from '../../constants/graphql';
+import { clone } from 'quasar';
+import moment from 'moment';
 import _ from 'lodash';
+import { DATASET_STATS_QUERY, DATASET_STATS_SUB } from '../../constants/graphql';
 import contributionsChartData from '../../constants/contributions-chart.js';
 
 export default {
@@ -109,17 +111,44 @@ export default {
     },
   },
   apollo: {
-    statistics: {
+    gqlStatistics: {
       query: DATASET_STATS_QUERY,
+      subscribeToMore: {
+        document: DATASET_STATS_SUB,
+        variables() {
+          return {
+            source: 'opensolarmap',
+          };
+        },
+        updateQuery(data, { subscriptionData }) {
+          this.statistics = clone(data.DataSetStats);
+          this.statistics.contributions += 1;
+          const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
+          const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
+          if (graphX[graphX.length - 1] !== moment(subscriptionData.data.createdAt).format('YYYY-MM-DD')) {
+            graphX.push(moment(subscriptionData.data.createdAt).format('YYYY-MM-DD'));
+            graphY.push(1);
+          } else {
+            graphY[graphY.length - 1] = parseInt(graphY[graphY.length - 1], 10) + 1;
+          }
+          this.chart.data.labels = graphX;
+          this.chart.data.datasets[0].data = graphY;
+          return data;
+        },
+      },
       variables: {
         source: 'opensolarmap',
       },
-      pollInterval: 5000,
       update(data) {
         const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
         const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
         this.chart.data.labels = graphX;
         this.chart.data.datasets[0].data = graphY;
+        this.statistics = {
+          achievement: data.DataSetStats.achievement,
+          contributions: data.DataSetStats.contributions,
+          datas: data.DataSetStats.datas,
+        };
         return data.DataSetStats;
       },
     },
