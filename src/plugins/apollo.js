@@ -2,10 +2,21 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { setContext } from 'apollo-link-context';
+import { split } from 'apollo-link';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 import VueApollo from 'vue-apollo';
 
 const httpLink = new HttpLink({
   uri: `${process.env.API_URL}/graphql`,
+});
+
+const wsLink = new WebSocketLink({
+  uri: `${process.env.API_URL.replace('http', 'ws')}/subscriptions`,
+  options: {
+    reconnect: true,
+    timeout: 30000,
+  },
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -18,8 +29,18 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const link = split(
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === 'OperationDefinition' &&
+      operation === 'subscription';
+  },
+  wsLink,
+  authLink.concat(httpLink),
+);
+
 const apolloClient = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link,
   cache: new InMemoryCache(),
   connectToDevTools: true,
   onError: (e) => { console.log(e.graphQLErrors); }, // Works
