@@ -1,6 +1,6 @@
 <template>
   <div class="CsHeader">
-    <div style="text-align:right">{{ firstname }} {{ lastname }}</div>
+    <div style="text-align:right">{{ name }}</div>
     <div style="text-align:right">
       <router-link to="">
         <span v-on:click="logout">{{ $t('global.logout') }}</span>
@@ -12,7 +12,7 @@
 <script>
 export default {
   name: 'CcHeaderUser',
-  props: ['firstname', 'lastname'],
+  props: ['name'],
   methods: {
     logout() {
       this.$q.dialog({

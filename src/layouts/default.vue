@@ -19,7 +19,7 @@
         <q-toolbar-title>
           Co-Construisons > Dashboard
         </q-toolbar-title>
-        <cc-header-user firstname="Stéphane" lastname="LEGOUFFE"></cc-header-user>
+        <cc-header-user :name="$auth.user().name"></cc-header-user>
       </q-toolbar>
     </q-layout-header>
 
