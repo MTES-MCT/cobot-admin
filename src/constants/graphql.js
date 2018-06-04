@@ -38,6 +38,17 @@ export const DATASET_STATS_SUB = gql`subscription subContribution($source: Strin
   }
 }`;
 
+export const ME_QUERY = gql`query user {
+  Me {
+    id
+    name
+    projects {
+      id
+      name
+    }
+  }
+}`;
+
 export const MESSAGES_QUERY = gql`query getMessages {
   Messages {
     id

@@ -76,19 +76,19 @@
             style="padding-top: 35px">
               <div v-for="(text, index) in attachment.text" :key="index">
                 <q-input :prefix=inputNumber(index)
-                        v-model="text.text"
-                        :placeholder="$t('cobot.newMessage')"
-                        @blur="update"
-                        :after="[
-                          {
-                            icon: 'remove_circle',
-                            content: true,
-                            handler() {
-                              onClearAttachmentText(attachmentsIndex, index);
+                          v-model="text.text"
+                          :placeholder="$t('cobot.newMessage')"
+                          @blur="update"
+                          :after="[
+                            {
+                              icon: 'remove_circle',
+                              content: true,
+                              handler() {
+                                onClearAttachmentText(attachmentsIndex, index);
+                              }
                             }
-                          }
-                        ]"
-                        style="padding-top: 20px;"/>
+                          ]"
+                          style="padding-top: 20px;"/>
               </div>
               <q-btn icon="create"
                     color="secondary"

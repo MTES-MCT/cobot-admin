@@ -17,14 +17,41 @@ export default [
         component: () => import('pages/dashboard/index'),
         children: [
           {
-            path: ':name',
+            path: ':name?',
             name: 'dashboard',
             component: () => import('pages/dashboard/dashboard'),
           },
           {
-            path: 'contributions/:id',
+            path: 'contributions/:name',
             name: 'dashboard.contributions',
             component: () => import('pages/dashboard/contributions'),
+          },
+        ],
+      },
+      {
+        name: '',
+        path: 'project',
+        component: () => import('pages/project/index'),
+        children: [
+          {
+            path: '',
+            name: 'project.add',
+            component: () => import('pages/project/add'),
+          },
+          {
+            path: ':id',
+            name: 'project.edit',
+            component: () => import('pages/project/edit'),
+          },
+          {
+            path: ':id',
+            name: 'project.general',
+            component: () => import('pages/project/general'),
+          },
+          {
+            path: ':id',
+            name: 'project.edit',
+            component: () => import('pages/project/datas'),
           },
         ],
       },
