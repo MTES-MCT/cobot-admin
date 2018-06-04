@@ -62,6 +62,14 @@ export default {
           sortable: true,
         },
         {
+          name: 'map',
+          required: true,
+          label: this.$t('contributions.map'),
+          align: 'left',
+          field: 'metadata',
+          sortable: true,
+        },
+        {
           name: 'numAnswers',
           label: this.$t('contributions.numUserAnswers'),
           field: 'numAnswers',

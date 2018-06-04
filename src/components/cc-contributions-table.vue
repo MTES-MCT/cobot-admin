@@ -18,6 +18,26 @@
       <q-td class="text-left" slot="body-cell-file" slot-scope="props">
         <img :src="getImgUrl(props.value)" style="width: 300px;"/>
       </q-td>
+      <q-td v-if="props.value.geoData" class="text-left" slot="body-cell-map" slot-scope="props">
+        <GmapMap
+          :center="{
+            lat: props.value.geoData.location.coordinates[0],
+            lng: props.value.geoData.location.coordinates[1]
+          }"
+          :zoom="16"
+          map-type-id="terrain"
+          style="width: 300px; height: 230px"
+        >
+          <GmapMarker
+            :position="{
+              lat: props.value.geoData.location.coordinates[0],
+              lng: props.value.geoData.location.coordinates[1]
+            }"
+            :clickable="false"
+            :draggable="false"
+          />
+        </GmapMap>
+      </q-td>
       <q-td class="text-center" slot="body-cell-numAnswers" slot-scope="props">
         <h3>{{ props.value }} </h3>
       </q-td>

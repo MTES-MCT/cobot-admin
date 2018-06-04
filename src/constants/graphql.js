@@ -13,6 +13,14 @@ export const DATASET_QUERY = gql`query getDataSet($source: String!) {
     _id,
     file,
     numAnswers,
+    metadata {
+      geoData {
+        speed
+        location {
+          coordinates
+        }
+      }
+    }
     usersAnswers {
       answers
     }
