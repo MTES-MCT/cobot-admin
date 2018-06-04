@@ -8,6 +8,7 @@ module.exports = function config(ctx) {
       'axios',
       'vueAuth',
       'apollo',
+      'localStorage',
     ],
     css: [
       'app.styl',
@@ -80,6 +81,10 @@ module.exports = function config(ctx) {
         'QCardSeparator',
         'QCardActions',
         'QCollapsible',
+        'QTabs',
+        'QTab',
+        'QTabPane',
+        'QRouteTab',
       ],
       directives: [
         'Ripple',

@@ -1,7 +1,7 @@
 <template>
   <div class="main-card row justify-center">
     <div style="text-align: center">
-      <h2>Contribution - Opensolar Map</h2>
+      <h2>Contribution - {{ projectName }}</h2>
     </div>
     <div class="row no-wrap">
       <div class="col bg-white">
@@ -31,6 +31,8 @@ export default {
   data() {
     return {
       dataset: [],
+      project: this.$route.params.name,
+      projectName: this.$localStorage.get('projectName'),
       tableConfig: {
         title: this.$t('contributions.title'),
         columnPicker: false,
@@ -90,8 +92,10 @@ export default {
   apollo: {
     dataset: {
       query: DATASET_QUERY,
-      variables: {
-        source: 'opensolarmap',
+      variables() {
+        return {
+          source: this.project,
+        };
       },
       update(data) {
         return clone(data.DataSetBySource);

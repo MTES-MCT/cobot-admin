@@ -1,7 +1,7 @@
 <template>
   <div class="main-card row justify-center">
     <div style="text-align: center">
-      <h2>Opensolar Map</h2>
+      <h2>{{ projectName }}</h2>
     </div>
     <div>
       <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
@@ -44,7 +44,7 @@
           <q-btn flat size="sm"
                   align="right"
                   icon-right="arrow_forward"
-                  @click="goTo('dashboard.contributions', '1234-5678-9101')"
+                  @click="goTo('dashboard.contributions', $route.params.name)"
                   label="accèder au détail"/>
         </q-card-actions>
       </q-card>
@@ -90,21 +90,25 @@ export default {
   components: {
     contributionsChartData,
   },
-  data: () => ({
-    chart: {
-      data: {
-        labels: [],
-        datasets: [{
-          data: [],
-        }],
+  data() {
+    return {
+      project: this.$route.params.name,
+      projectName: this.$localStorage.get('projectName'),
+      chart: {
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+          }],
+        },
       },
-    },
-    statistics: {
-      datas: 0,
-      contributions: 0,
-      achievement: 0,
-    },
-  }),
+      statistics: {
+        datas: 0,
+        contributions: 0,
+        achievement: 0,
+      },
+    };
+  },
   methods: {
     goTo(to, id) {
       this.$router.push({ name: to, params: { id } });
@@ -117,7 +121,7 @@ export default {
         document: DATASET_STATS_SUB,
         variables() {
           return {
-            source: 'opensolarmap',
+            source: this.project,
           };
         },
         updateQuery(data, { subscriptionData }) {
@@ -136,8 +140,10 @@ export default {
           return data;
         },
       },
-      variables: {
-        source: 'opensolarmap',
+      variables() {
+        return {
+          source: this.project,
+        };
       },
       update(data) {
         const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
@@ -156,7 +162,7 @@ export default {
 };
 </script>
 
-<style lang="stylus">
+<style scopped lang="stylus">
   @import '~variables'
   .main-card
     border-radius 2px
