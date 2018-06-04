@@ -40,8 +40,8 @@ export default {
       loading: false,
       isWrongCredentials: false,
       credentials: {
-        email: 'slegouffe@gmail.com',
-        password: 'apasaz75',
+        email: '',
+        password: '',
       },
     };
   },
