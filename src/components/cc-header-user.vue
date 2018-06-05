@@ -27,6 +27,7 @@ export default {
         },
         preventClose: true,
       }).then(() => {
+        this.$localStorage.remove('projectName');
         this.$auth.logout({
           makeRequest: false,
           redirect: '/auth/login',

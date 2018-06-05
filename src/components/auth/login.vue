@@ -27,11 +27,14 @@
 </template>
 
 <script>
+import { ME_QUERY } from '../../constants/graphql';
+
 export default {
   name: 'login',
   data() {
     return {
       loading: false,
+      skipQuery: true,
       isWrongCredentials: false,
       credentials: {
         email: '',
@@ -44,11 +47,14 @@ export default {
       this.loading = true;
       this.$auth.login({
         data: this.credentials,
-        redirect: { name: 'dashboard' },
+        redirect: null,
         rememberMe: true,
         fetchUser: true,
       }).then(() => {
         this.loading = false;
+        this.$apollo.queries.Me.skip = false;
+        this.$apollo.queries.Me.refetch();
+        // { name: 'dashboard' }
       }, () => {
         this.isWrongCredentials = true;
         this.loading = false;
@@ -58,6 +64,18 @@ export default {
       if (event.key === 'Enter') {
         this.doLogin(null, null);
       }
+    },
+  },
+  apollo: {
+    Me: {
+      query: ME_QUERY,
+      update(data) {
+        this.$router.push(`/dashboard/${data.Me.projects[0].name.replace(/\s/g, '').toLowerCase()}`);
+        this.$localStorage.set('projectName', data.Me.projects[0].name);
+      },
+      skip() {
+        return this.skipQuery;
+      },
     },
   },
 };
