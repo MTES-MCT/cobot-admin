@@ -79,7 +79,6 @@
 </template>
 
 <script>
-import { clone } from 'quasar';
 import moment from 'moment';
 import _ from 'lodash';
 import { DATASET_STATS_QUERY, DATASET_STATS_SUB } from '../../constants/graphql';
@@ -125,7 +124,6 @@ export default {
           };
         },
         updateQuery(data, { subscriptionData }) {
-          this.statistics = clone(data.DataSetStats);
           this.statistics.contributions += 1;
           const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
           const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');

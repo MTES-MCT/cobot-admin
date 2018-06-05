@@ -8,12 +8,17 @@
     <q-collapsible indent icon="mail" label="mes projets" opened>
       <q-item v-for="project in Me.projects"
               :key="project.id"
-              link
-              @click.native="goToDashboard(project.name)">
-        <q-item-main :label="project.name" />
-        <!-- sublabel="1 283 contributions"  -->
+              link>
+        <q-item-main>
+          <q-item-tile
+            @click.native="goToDashboard(project.name)"
+            label>{{ project.name }}</q-item-tile>
+          <q-item-tile
+            @click.native="goToEditProject(project.id)"
+            sublabel>Edit</q-item-tile>
+        </q-item-main>
       </q-item>
-      <q-item @click.native="goToNewProject()">
+      <q-item v-if="$auth.check(120)" @click.native="goToNewProject()">
         <q-btn outline
                 color="primary"
                 label="ajouter un projet" />
@@ -31,6 +36,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+import { clone } from 'quasar';
 import { ME_QUERY } from '../constants/graphql';
 
 export default {
@@ -42,6 +49,14 @@ export default {
       },
     };
   },
+  created() {
+    this.$root.$on('projectUpdated', (project) => {
+      const projectKey = _.findKey(this.Me.projects, {
+        id: project.id,
+      });
+      this.Me.projects[projectKey].name = project.name;
+    });
+  },
   methods: {
     slug(name) {
       return name.replace(/\s/g, '').toLowerCase();
@@ -50,6 +65,9 @@ export default {
       const projectSlug = this.slug(project);
       this.$localStorage.set('projectName', project);
       this.$router.push(`/dashboard/${projectSlug}`);
+    },
+    goToEditProject(id) {
+      this.$router.push(`/project/${id}`);
     },
     goToNewProject() {
       this.$router.push('/project');
@@ -62,7 +80,7 @@ export default {
     Me: {
       query: ME_QUERY,
       update(data) {
-        return data.Me;
+        return clone(data.Me);
       },
     },
   },

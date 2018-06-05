@@ -1,9 +1,6 @@
 <template>
   <div class="container">
     <div class="row layout-padding">
-      <!-- <div class="col-12 logo">
-        <img src="~assets/quasar-logo-full.svg">
-      </div> -->
       <div class="col-12">
         <q-input v-model="credentials.email" :stack-label="$t('auth.login')" color="primary" />
       </div>
@@ -25,9 +22,6 @@
           </span>
         </q-btn>
       </div>
-      <!-- <div class="col-6 forgot-password">
-        <router-link to="auth/forgot-password">{{ $t("forgotPwd") }}</router-link>
-      </div> -->
     </div>
   </div>
 </template>

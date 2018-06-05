@@ -54,6 +54,7 @@ const i18n = {
       numUserAnswers: 'nombre de réponse',
       userAnswers: 'réponses',
       more: 'voir les autres réponses',
+      map: 'carte',
     },
   },
 };
