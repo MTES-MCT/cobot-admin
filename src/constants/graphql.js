@@ -121,3 +121,20 @@ export const MESSAGE_DELETE = gql`mutation removeMessage($id: ID!) {
 }`;
 
 export const MESSAGE_MUTATION = '';
+
+export const PROJECT_QUERY = gql`query getProject($id: ID!) {
+  Project(id: $id) {
+    name
+    question
+    answers{
+      text
+      order
+    }
+  }
+}`;
+
+export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String, $question: String, $answers: [AnswerInput]) {
+  updateProject(id: $id, name: $name, question: $question, answers: $answers) {
+    name
+  }
+}`;

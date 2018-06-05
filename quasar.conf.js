@@ -67,6 +67,7 @@ module.exports = function config(ctx) {
         'QItem',
         'QItemMain',
         'QItemSide',
+        'QItemTile',
         'QField',
         'QInput',
         'QTable',
