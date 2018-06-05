@@ -54,7 +54,6 @@ export default {
         this.loading = false;
         this.$apollo.queries.Me.skip = false;
         this.$apollo.queries.Me.refetch();
-        // { name: 'dashboard' }
       }, () => {
         this.isWrongCredentials = true;
         this.loading = false;
