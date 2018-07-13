@@ -106,18 +106,4 @@ export default {
 </script>
 
 <style lang="stylus">
-// @import '~variables'
-// .q-data-table
-//   .q-data-table-toolbar
-//     &.upper-toolbar
-//       .q-select
-//         display none
-//   table {
-//     tbody tr:nth-child(odd) {
-//       td, th {
-//         background: $table-odd;
-//       }
-//     }
-//   }
-// }
 </style>

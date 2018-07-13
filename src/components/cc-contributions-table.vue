@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     getImgUrl(file) {
-      return `https://dev-cc-api.wawy.io/img/${file}`;
+      return `${process.env.API_URL}/img/${file}`;
     },
     otherResults: (results) => {
       let output = '';
