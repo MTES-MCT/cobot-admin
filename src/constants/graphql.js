@@ -138,3 +138,14 @@ export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String
     name
   }
 }`;
+
+export const PROJECT_CREATE = gql`mutation createProject($name: String) {
+  createProject(name: $name) {
+    id
+    name
+  }
+}`;
+
+export const PROJECT_DELETE = gql`mutation deleteProject($id: ID!) {
+  deleteProject(id: $id)
+}`;

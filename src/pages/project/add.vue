@@ -16,99 +16,90 @@
             </q-field>
             </div>
           </div>
-        </q-card-main>
-        <q-card-actions class="row justify-end actions">
-          <q-btn  outline
-                  color="primary"
-                  align="right"
-                  icon="save"
-                  label="enregistrer"/>
-        </q-card-actions>
-      </q-card>
-    </div>
-    <div class="col-12 padding">
-      <q-card indent style="background-color: white;">
-        <q-card-title>
-          <strong>Question et réponses</strong>
-        </q-card-title>
-        <q-card-main>
           <div class="row">
-            <div class="col-12">
+            <div class="col padding">
               <q-field>
-                <q-input stack-label="Question" v-model="project.question" />
-              </q-field>
-            </div>
-            <div v-for="(answer, index) in project.answers" :key="index"
-                 class="col-12 padding">
-              <q-field>
-                <q-input :stack-label="`réponse ${index+1}`" v-model="answer.text" />
-              </q-field>
+                <q-input v-model="project.description"
+                          type="textarea"
+                          stack-label="Descriptif"
+                          :max-height="50"
+                          rows="4" />
+            </q-field>
             </div>
           </div>
         </q-card-main>
         <q-card-actions class="row justify-end actions">
           <q-btn  outline
+                  @click="saveProject"
                   color="primary"
                   align="right"
                   icon="save"
                   label="enregistrer"/>
         </q-card-actions>
-      </q-card>
-    </div>
-    <div class="col-12 padding">
-      <q-card style="background-color: white;">
-        <q-card-title>
-          <strong>Jeux de données à qualifier</strong>
-        </q-card-title>
-        <q-card-main>
-          <div class="row justify-around">
-            <div>
-              <q-btn color="primary" icon="cloud" label="Importer depuis mon compte Dropbox" />
-            </div>
-            <div>
-              <q-btn color="primary"
-                     icon="important_devices"
-                     label="Importer depuis mon ordinateur" />
-            </div>
-          </div>
-        </q-card-main>
       </q-card>
     </div>
   </div>
 </template>
 
 <script>
+import { PROJECT_CREATE } from '../../constants/graphql';
+
 export default {
-  name: 'ProjectEdit',
+  name: 'ProjectAdd',
   data() {
     return {
+      upldoadFromDesktop: false,
       project: {
-        name: 'Open Solar Map',
-        question: 'Dans quel sens est orienté ce toit ?',
+        id: null,
+        name: '',
+        description: '',
+        question: '',
         answers: [
           {
-            text: 'le milieu du toit est horizontal',
+            text: '',
             order: 0,
           },
           {
-            text: 'le milieu du toit est vertical',
+            text: '',
             order: 1,
           },
           {
-            text: 'ce toit est plat',
+            text: '',
             order: 2,
           },
           {
-            text: 'je ne sais pas',
+            text: '',
             order: 3,
           },
           {
-            text: 'ce n\'est pas un toit',
+            text: '',
             order: 4,
           },
         ],
       },
     };
+  },
+  methods: {
+    async saveProject() {
+      try {
+        const newProject = await this.$apollo.mutate({
+          mutation: PROJECT_CREATE,
+          variables: {
+            name: this.project.name,
+          },
+        });
+        if (newProject) {
+          const { id } = newProject.data.createProject;
+          this.$root.$emit('newProject', {
+            id,
+            name: this.project.name,
+          });
+          this.$router.push({ name: 'project.edit', params: { id } });
+        }
+      } catch (error) {
+        this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
+      }
+    },
   },
 };
 </script>

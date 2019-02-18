@@ -1,0 +1,71 @@
+<template>
+  <q-modal v-model="opened">
+    <h4>Importer un jeu de donnée</h4>
+    <q-uploader stack-label="Selectionnez les fichiers à importer"
+                :url="url"
+                :headers="setHeaders()"
+                :additional-fields="setBody()"
+                name="file"
+                multiple
+                @fail="fail"/>
+    <div class="padding">
+    <q-btn color="primary"
+           @click="opened = false"
+           label="annuler" />
+    </div>
+  </q-modal>
+</template>
+
+<script>
+export default {
+  name: 'CcUploadFromDesktop',
+  props: ['projectId', 'projectName', 'question', 'answers', 'opened'],
+  data() {
+    return {
+      url: `${process.env.API_URL}/upload`,
+    };
+  },
+  mounted() {
+    console.log(this.projectId);
+  },
+  methods: {
+    setHeaders() {
+      return { Authorization: `Bearer ${this.$localStorage.get('default_auth_token')}` };
+    },
+    setBody() {
+      return [
+        {
+          name: 'id',
+          value: this.projectId,
+        },
+        {
+          name: 'projectName',
+          value: this.projectName,
+        },
+        {
+          name: 'question',
+          value: this.question,
+        },
+        {
+          name: 'answers',
+          value: this.answers,
+        },
+      ];
+    },
+    fail(file, xhr) {
+      console.log('Fail: ', file);
+      console.log('Fail: ', xhr);
+    },
+  },
+};
+</script>
+
+<style scopped lang="stylus">
+  .padding
+    padding-top: 15px;
+  .modal-content
+    padding 20px
+    h4
+      -webkit-margin-before: 0
+      -webkit-margin-after: 1
+</style>

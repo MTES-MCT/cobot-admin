@@ -13,6 +13,7 @@ const i18n = {
       delete: 'supprimer',
       confirm: 'Confirmation',
       updateDone: 'mise à jour effectuée',
+      error: 'une erreur est survenue',
       logout: 'me déconnecter',
     },
     auth: {
@@ -55,6 +56,10 @@ const i18n = {
       userAnswers: 'réponses',
       more: 'voir les autres réponses',
       map: 'carte',
+    },
+    project: {
+      created: 'Le projet a bien été créé !',
+      delete: 'Ce projet a été supprimé.',
     },
   },
 };

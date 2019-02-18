@@ -87,6 +87,11 @@ module.exports = function config(ctx) {
         'QTab',
         'QTabPane',
         'QRouteTab',
+        'QUploader',
+        'QModal',
+        'QStepper',
+        'QStep',
+        'QStepperNavigation',
       ],
       directives: [
         'Ripple',

@@ -18,7 +18,7 @@
             sublabel>Edit</q-item-tile>
         </q-item-main>
       </q-item>
-      <q-item v-if="$auth.check(120)" @click.native="goToNewProject()">
+      <q-item v-if="$auth.check(100)" @click.native="goToNewProject()">
         <q-btn outline
                 color="primary"
                 label="ajouter un projet" />
@@ -55,6 +55,12 @@ export default {
         id: project.id,
       });
       this.Me.projects[projectKey].name = project.name;
+    });
+    this.$root.$on('projectDeleted', (deletedProject) => {
+      this.Me.projects = _.filter(this.Me.projects, (project => project.id !== deletedProject.id));
+    });
+    this.$root.$on('newProject', (project) => {
+      this.Me.projects.push(project);
     });
   },
   methods: {
