@@ -51,10 +51,10 @@ export default {
         this.url = this.url.replace(/\?dl=0/, '?dl=1');
         const result = await this.axios.post('/dropbox', {
           url: this.url,
-          id: this.projectId,
+          projectId: this.projectId,
           projectName: this.projectName,
           question: this.question,
-          answers: this.answers,
+          answers: JSON.stringify(this.answers),
         });
         if (result && result.data) {
           this.isLoading = false;

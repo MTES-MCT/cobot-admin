@@ -25,6 +25,9 @@ export default {
       url: `${process.env.API_URL}/upload`,
     };
   },
+  mounted() {
+    console.log(this.answers);
+  },
   methods: {
     setHeaders() {
       return { Authorization: `Bearer ${this.$localStorage.get('default_auth_token')}` };
@@ -32,7 +35,7 @@ export default {
     setBody() {
       return [
         {
-          name: 'id',
+          name: 'projectId',
           value: this.projectId,
         },
         {
@@ -45,7 +48,7 @@ export default {
         },
         {
           name: 'answers',
-          value: this.answers,
+          value: JSON.stringify(this.answers),
         },
       ];
     },

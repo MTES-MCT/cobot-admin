@@ -51,13 +51,13 @@
           </q-card-main>
         </q-card>
       </div>
-      <CcUploadFromDesktop v-if="id"
+      <CcUploadFromDesktop v-if="project.name"
                            :projectId="id"
                            :projectName="project.name"
                            :question="project.question"
                            :answers="project.answers"
                            :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
-      <CcUploadFromDropbox v-if="id"
+      <CcUploadFromDropbox v-if="project.name"
                            :projectId="id"
                            :projectName="project.name"
                            :question="project.question"
@@ -136,7 +136,7 @@ export default {
       deleted: false,
       projectNotFound: false,
       project: {
-        name: '',
+        name: null,
         description: '',
         question: '',
         answers: [
