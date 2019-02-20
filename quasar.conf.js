@@ -92,6 +92,8 @@ module.exports = function config(ctx) {
         'QStepper',
         'QStep',
         'QStepperNavigation',
+        'QInnerLoading',
+        'QSpinnerGears',
       ],
       directives: [
         'Ripple',

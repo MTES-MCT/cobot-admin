@@ -19,7 +19,8 @@
           </div>
         </q-card-main>
         <q-card-actions class="row justify-end actions">
-          <q-btn flat size="sm"
+          <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
+                  flat size="sm"
                   align="right"
                   icon-right="arrow_forward"
                   label="Gérer ma collection"/>

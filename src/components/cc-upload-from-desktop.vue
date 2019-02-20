@@ -9,9 +9,9 @@
                 multiple
                 @fail="fail"/>
     <div class="padding">
-    <q-btn color="primary"
-           @click="opened = false"
-           label="annuler" />
+      <q-btn color="primary"
+             @click="$emit('update:opened', false)"
+             label="annuler" />
     </div>
   </q-modal>
 </template>
@@ -24,9 +24,6 @@ export default {
     return {
       url: `${process.env.API_URL}/upload`,
     };
-  },
-  mounted() {
-    console.log(this.projectId);
   },
   methods: {
     setHeaders() {

@@ -36,7 +36,10 @@
           <q-card-main>
             <div class="row justify-around">
               <div>
-                <q-btn color="primary" icon="cloud" label="Importer depuis mon compte Dropbox" />
+                <q-btn @click="upldoadFromDropbox = true"
+                       color="primary"
+                       icon="cloud_download"
+                       label="Importer depuis mon compte Dropbox" />
               </div>
               <div>
                 <q-btn @click="upldoadFromDesktop = true"
@@ -53,7 +56,13 @@
                            :projectName="project.name"
                            :question="project.question"
                            :answers="project.answers"
-                           :opened="upldoadFromDesktop"></CcUploadFromDesktop>
+                           :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
+      <CcUploadFromDropbox v-if="id"
+                           :projectId="id"
+                           :projectName="project.name"
+                           :question="project.question"
+                           :answers="project.answers"
+                           :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
       <div class="col-12 padding">
         <q-card indent style="background-color: white;">
           <q-card-title>
@@ -110,16 +119,19 @@
 import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 import CcUploadFromDesktop from 'components/cc-upload-from-desktop';
+import CcUploadFromDropbox from 'components/cc-upload-from-dropbox';
 import { PROJECT_QUERY, PROJECT_UPDATE, PROJECT_DELETE } from '../../constants/graphql';
 
 export default {
   name: 'ProjectEdit',
   components: {
     CcUploadFromDesktop,
+    CcUploadFromDropbox,
   },
   data() {
     return {
       upldoadFromDesktop: false,
+      upldoadFromDropbox: false,
       id: this.$route.params.id,
       deleted: false,
       projectNotFound: false,
