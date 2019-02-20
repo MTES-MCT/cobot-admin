@@ -25,9 +25,6 @@ export default {
       url: `${process.env.API_URL}/upload`,
     };
   },
-  mounted() {
-    console.log(this.answers);
-  },
   methods: {
     setHeaders() {
       return { Authorization: `Bearer ${this.$localStorage.get('default_auth_token')}` };
