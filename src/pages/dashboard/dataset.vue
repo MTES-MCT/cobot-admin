@@ -11,7 +11,7 @@ export default {
   name: 'Dataset',
   data() {
     return {
-      project: this.$route.params.name,
+      projectId: this.$route.params.id,
       projectName: this.$localStorage.get('projectName'),
     };
   },

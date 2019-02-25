@@ -65,7 +65,7 @@ import _ from 'lodash';
 
 export default {
   name: 'CcContributionsTable',
-  props: ['datas', 'columns', 'actions', 'config', 'filter'],
+  props: ['projectId', 'datas', 'columns', 'actions', 'config', 'filter'],
   data() {
     return {
       userAnswersResults: [],
@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     getImgUrl(file) {
-      return `${process.env.API_URL}/img/${file}`;
+      return `${process.env.API_URL}/img/${this.projectId}/${file}`;
     },
     otherResults: (results) => {
       let output = '';

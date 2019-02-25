@@ -22,12 +22,12 @@ export default [
             component: () => import('pages/dashboard/dashboard'),
           },
           {
-            path: 'contributions/:name',
+            path: 'contributions/:id',
             name: 'dashboard.contributions',
             component: () => import('pages/dashboard/contributions'),
           },
           {
-            path: 'dataset/:name',
+            path: 'dataset/:id',
             name: 'dashboard.dataset',
             component: () => import('pages/dashboard/dataset'),
           },

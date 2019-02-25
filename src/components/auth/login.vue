@@ -69,7 +69,7 @@ export default {
     Me: {
       query: ME_QUERY,
       update(data) {
-        this.$router.push(`/dashboard/${data.Me.projects[0].name.replace(/\s/g, '').toLowerCase()}`);
+        this.$router.push(`/dashboard/${data.Me.projects[0].id}`);
         this.$localStorage.set('projects', JSON.stringify(data.Me.projects));
         this.$localStorage.set('projectName', data.Me.projects[0].name);
       },

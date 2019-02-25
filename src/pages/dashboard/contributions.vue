@@ -8,6 +8,7 @@
         <cc-contributions-table
           style=""
           v-if="dataset.length > 0"
+          :projectId="projectId"
           :config="tableConfig"
           :columns="columns"
           :datas="dataset"
@@ -31,7 +32,7 @@ export default {
   data() {
     return {
       dataset: [],
-      project: this.$route.params.name,
+      projectId: this.$route.params.id,
       projectName: this.$localStorage.get('projectName'),
       tableConfig: {
         title: this.$t('contributions.title'),
@@ -102,7 +103,7 @@ export default {
       query: DATASET_QUERY,
       variables() {
         return {
-          source: this.project,
+          id: this.projectId,
         };
       },
       update(data) {

@@ -8,8 +8,8 @@ export const ACTIONS_QUERY = gql`query actions {
   }
 }`;
 
-export const DATASET_QUERY = gql`query getDataSet($source: String!) {
-  DataSetBySource(source: $source) {
+export const DATASET_QUERY = gql`query getDataSet($id: ID!) {
+  DataSetBySource(id: $id) {
     _id,
     file,
     numAnswers,

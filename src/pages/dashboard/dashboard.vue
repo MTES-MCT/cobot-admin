@@ -20,7 +20,7 @@
             </div>
           </q-card-main>
           <q-card-actions class="row justify-end actions">
-            <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
+            <q-btn  @click="goTo('dashboard.dataset', $route.params.id)"
                     flat size="sm"
                     align="right"
                     icon-right="arrow_forward"
@@ -44,7 +44,7 @@
             </div>
           </q-card-main>
           <q-card-actions class="row justify-end actions">
-            <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
+            <q-btn  @click="goTo('dashboard.dataset', $route.params.id)"
                     flat size="sm"
                     align="right"
                     icon-right="arrow_forward"
@@ -71,7 +71,7 @@
             <q-btn flat size="sm"
                     align="right"
                     icon-right="arrow_forward"
-                    @click="goTo('dashboard.contributions', $route.params.name)"
+                    @click="goTo('dashboard.contributions', $route.params.id)"
                     label="accèder au détail"/>
           </q-card-actions>
         </q-card>
@@ -153,18 +153,21 @@ export default {
           };
         },
         updateQuery(data, { subscriptionData }) {
-          this.statistics.contributions += 1;
-          const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
-          const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
-          if (graphX[graphX.length - 1] !== moment(subscriptionData.data.createdAt).format('YYYY-MM-DD')) {
-            graphX.push(moment(subscriptionData.data.createdAt).format('YYYY-MM-DD'));
-            graphY.push(1);
-          } else {
-            graphY[graphY.length - 1] = parseInt(graphY[graphY.length - 1], 10) + 1;
+          if (data.DataSetStats && data.DataSetStats.contributionsGraph.length > 0) {
+            this.statistics.contributions += 1;
+            const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
+            const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
+            if (graphX[graphX.length - 1] !== moment(subscriptionData.data.createdAt).format('YYYY-MM-DD')) {
+              graphX.push(moment(subscriptionData.data.createdAt).format('YYYY-MM-DD'));
+              graphY.push(1);
+            } else {
+              graphY[graphY.length - 1] = parseInt(graphY[graphY.length - 1], 10) + 1;
+            }
+            this.chart.data.labels = graphX;
+            this.chart.data.datasets[0].data = graphY;
+            return data;
           }
-          this.chart.data.labels = graphX;
-          this.chart.data.datasets[0].data = graphY;
-          return data;
+          return [];
         },
       },
       variables() {
@@ -173,17 +176,20 @@ export default {
         };
       },
       update(data) {
-        const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
-        const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
-        this.chart.data.labels = graphX;
-        this.chart.data.datasets[0].data = graphY;
         this.statistics = {
           achievement: data.DataSetStats.achievement,
           contributors: data.DataSetStats.contributors,
           contributions: data.DataSetStats.contributions,
           datas: data.DataSetStats.datas,
         };
-        return data.DataSetStats;
+        if (data.DataSetStats && data.DataSetStats.contributionsGraph) {
+          const graphX = _.map(data.DataSetStats.contributionsGraph, 'createdAt');
+          const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
+          this.chart.data.labels = graphX;
+          this.chart.data.datasets[0].data = graphY;
+          return data.DataSetStats;
+        }
+        return [];
       },
     },
   },
