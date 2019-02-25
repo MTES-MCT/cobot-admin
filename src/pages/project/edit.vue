@@ -94,7 +94,7 @@
         </q-card>
       </div>
       <div class="row">
-        <div class="col-12 padding">
+        <div class="col-12 padding" style="margin-bottom: 15px;">
           <q-btn  @click="confirmDelete"
                   color="negative"
                   icon="delete"

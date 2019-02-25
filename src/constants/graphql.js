@@ -27,9 +27,10 @@ export const DATASET_QUERY = gql`query getDataSet($source: String!) {
   }
 }`;
 
-export const DATASET_STATS_QUERY = gql`query getDataSetStats($source: String!) {
-  DataSetStats(source: $source) {
+export const DATASET_STATS_QUERY = gql`query getDataSetStats($id: ID!) {
+  DataSetStats(id: $id) {
     datas
+    contributors
     contributions
     achievement
     contributionsGraph {
@@ -39,8 +40,8 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($source: String!) {
   }
 }`;
 
-export const DATASET_STATS_SUB = gql`subscription subContribution($source: String!) {
-  contributionAdded(source: $source) {
+export const DATASET_STATS_SUB = gql`subscription subContribution($id: ID!) {
+  contributionAdded(id: $ID) {
     createdAt
     source
   }
@@ -53,6 +54,7 @@ export const ME_QUERY = gql`query user {
     projects {
       id
       name
+      role
     }
   }
 }`;

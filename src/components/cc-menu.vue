@@ -11,7 +11,7 @@
               link>
         <q-item-main>
           <q-item-tile
-            @click.native="goToDashboard(project.name)"
+            @click.native="goToDashboard(project.name, project.id)"
             label>{{ project.name }}</q-item-tile>
           <q-item-tile
             @click.native="goToEditProject(project.id)"
@@ -67,10 +67,10 @@ export default {
     slug(name) {
       return name.replace(/\s/g, '').toLowerCase();
     },
-    goToDashboard(project) {
-      const projectSlug = this.slug(project);
+    goToDashboard(project, id) {
+      // const projectSlug = this.slug(project);
       this.$localStorage.set('projectName', project);
-      this.$router.push(`/dashboard/${projectSlug}`);
+      this.$router.push(`/dashboard/${id}`);
     },
     goToEditProject(id) {
       this.$router.push(`/project/${id}`);

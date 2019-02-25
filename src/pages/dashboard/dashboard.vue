@@ -1,76 +1,104 @@
 <template>
   <div class="main-card row justify-center">
-    <div style="text-align: center">
+    <div class="col-12" style="text-align: center">
       <h2>{{ projectName }}</h2>
     </div>
-    <div>
-      <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-        <q-card-main>
-          <q-card-title>
-            <strong>PHOTOS</strong>
-          </q-card-title>
-          <div class="row justify-center">
-            <div class="picto">
-              <q-icon name="collections" color="primary"/>
+    <div class="row justify-center">
+      <div class="col-md-6 col-sm-12" style="text-align: center;">
+        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+          <q-card-main>
+            <q-card-title>
+              <strong>CONTRIBUTEURS</strong>
+            </q-card-title>
+            <div class="row justify-center">
+              <div class="picto">
+                <q-icon name="supervised_user_circle" color="primary"/>
+              </div>
+              <div class="mention">
+                <h4>{{ statistics.contributors }}</h4>
+              </div>
             </div>
-            <div class="mention">
-              <h4>{{ statistics.datas }}</h4>
+          </q-card-main>
+          <q-card-actions class="row justify-end actions">
+            <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
+                    flat size="sm"
+                    align="right"
+                    icon-right="arrow_forward"
+                    label="Gérer mes contributeurs"/>
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="col-md-6 col-sm-12" style="text-align: center;">
+        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+          <q-card-main>
+            <q-card-title>
+              <strong>PHOTOS</strong>
+            </q-card-title>
+            <div class="row justify-center">
+              <div class="picto">
+                <q-icon name="collections" color="primary"/>
+              </div>
+              <div class="mention">
+                <h4>{{ statistics.datas }}</h4>
+              </div>
             </div>
-          </div>
-        </q-card-main>
-        <q-card-actions class="row justify-end actions">
-          <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
-                  flat size="sm"
-                  align="right"
-                  icon-right="arrow_forward"
-                  label="Gérer ma collection"/>
-        </q-card-actions>
-      </q-card>
-
-      <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-        <q-card-main>
-          <q-card-title>
-            <strong>CONTRIBUTIONS</strong>
-          </q-card-title>
-          <div class="row justify-center">
-            <div class="picto">
-              <q-icon name="public" color="warning"/>
+          </q-card-main>
+          <q-card-actions class="row justify-end actions">
+            <q-btn  @click="goTo('dashboard.dataset', $route.params.name)"
+                    flat size="sm"
+                    align="right"
+                    icon-right="arrow_forward"
+                    label="Gérer ma collection"/>
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="col-md-6 col-sm-12" style="text-align: center;">
+        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+          <q-card-main>
+            <q-card-title>
+              <strong>CONTRIBUTIONS</strong>
+            </q-card-title>
+            <div class="row justify-center">
+              <div class="picto">
+                <q-icon name="public" color="warning"/>
+              </div>
+              <div class="mention">
+                <h4>{{ statistics.contributions }}</h4>
+              </div>
             </div>
-            <div class="mention">
-              <h4>{{ statistics.contributions }}</h4>
+          </q-card-main>
+          <q-card-actions class="row justify-end actions">
+            <q-btn flat size="sm"
+                    align="right"
+                    icon-right="arrow_forward"
+                    @click="goTo('dashboard.contributions', $route.params.name)"
+                    label="accèder au détail"/>
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="col-md-6 col-sm-12" style="text-align: center;">
+        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+          <q-card-main>
+            <q-card-title>
+              <strong>ACHEVEMENT</strong>
+            </q-card-title>
+            <div class="row justify-center">
+              <div class="picto">
+                <q-icon name="track_changes" color="info"/>
+              </div>
+              <div class="mention">
+                <h4>{{ statistics.achievement }}%</h4>
+              </div>
             </div>
-          </div>
-        </q-card-main>
-        <q-card-actions class="row justify-end actions">
-          <q-btn flat size="sm"
-                  align="right"
-                  icon-right="arrow_forward"
-                  @click="goTo('dashboard.contributions', $route.params.name)"
-                  label="accèder au détail"/>
-        </q-card-actions>
-      </q-card>
-
-      <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-        <q-card-main>
-          <q-card-title>
-            <strong>ACHEVEMENT</strong>
-          </q-card-title>
-          <div class="row justify-center">
-            <div class="picto">
-              <q-icon name="track_changes" color="info"/>
-            </div>
-            <div class="mention">
-              <h4>{{ statistics.achievement }}%</h4>
-            </div>
-          </div>
-        </q-card-main>
-        <q-card-actions class="row justify-end actions">
-          <q-btn flat size="sm"
-                  align="right"
-                  icon-right="arrow_forward"
-                  label="accèder au détail"/>
-        </q-card-actions>
-      </q-card>
+          </q-card-main>
+          <q-card-actions class="row justify-end actions">
+            <q-btn flat size="sm"
+                    align="right"
+                    icon-right="arrow_forward"
+                    label="accèder au détail"/>
+          </q-card-actions>
+        </q-card>
+      </div>
     </div>
     <div class="Chart">
       <contributions-chart-data v-if="chart.data.labels.length > 0"
@@ -92,7 +120,7 @@ export default {
   },
   data() {
     return {
-      project: this.$route.params.name,
+      projectId: this.$route.params.id,
       projectName: this.$localStorage.get('projectName'),
       chart: {
         data: {
@@ -121,7 +149,7 @@ export default {
         document: DATASET_STATS_SUB,
         variables() {
           return {
-            source: this.project,
+            source: this.projectId,
           };
         },
         updateQuery(data, { subscriptionData }) {
@@ -141,7 +169,7 @@ export default {
       },
       variables() {
         return {
-          source: this.project,
+          id: this.projectId,
         };
       },
       update(data) {
@@ -151,6 +179,7 @@ export default {
         this.chart.data.datasets[0].data = graphY;
         this.statistics = {
           achievement: data.DataSetStats.achievement,
+          contributors: data.DataSetStats.contributors,
           contributions: data.DataSetStats.contributions,
           datas: data.DataSetStats.datas,
         };
