@@ -135,6 +135,46 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
   }
 }`;
 
+export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
+  ProjectContributors(id: $id) {
+    email
+    projects {
+      role
+    }
+  }
+}`;
+
+export const PROJECT_CREATE_CONTRIBUTOR = gql`mutation createProjectContributor($id: ID!, $email: String!, $role: Int!) {
+  createProjectContributor(id: $id, email: $email, role: $role) {
+    name
+    email
+    projects {
+      id
+      role
+    }
+  }
+}`;
+
+export const PROJECT_UPDATE_CONTRIBUTOR_ROLE = gql`mutation updateUserProjectsRole($email: String!, $projects: UserProjectsInput!) {
+  updateUserProjectsRole(email: $email, projects: $projects) {
+    email
+    projects {
+      id
+      role
+    }
+  }
+}`;
+
+export const DELETE_PROJECT_CONTRIBUTOR = gql`mutation deleteProjectContributor($id: ID!, $email: String) {
+  deleteProjectContributor(id: $id, email: $email) {
+    name
+    projects {
+      id
+      role
+    }
+  }
+}`;
+
 export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String, $question: String, $answers: [AnswerInput]) {
   updateProject(id: $id, name: $name, question: $question, answers: $answers) {
     name

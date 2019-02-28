@@ -48,6 +48,9 @@ const i18n = {
         deleteAction: 'Etes-vous sûr de vouloir supprimer cette action ?',
       },
     },
+    contributors: {
+      revoke: 'retirer',
+    },
     contributions: {
       title: 'Détails des contributions',
       file: 'nom du fichier',

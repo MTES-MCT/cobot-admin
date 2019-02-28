@@ -20,7 +20,7 @@
             </div>
           </q-card-main>
           <q-card-actions class="row justify-end actions">
-            <q-btn  @click="goTo('dashboard.dataset', $route.params.id)"
+            <q-btn  @click="goTo('dashboard.contributors', $route.params.id)"
                     flat size="sm"
                     align="right"
                     icon-right="arrow_forward"

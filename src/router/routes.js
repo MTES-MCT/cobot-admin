@@ -27,6 +27,11 @@ export default [
             component: () => import('pages/dashboard/contributions'),
           },
           {
+            path: 'contributors/:id',
+            name: 'dashboard.contributors',
+            component: () => import('pages/dashboard/contributors'),
+          },
+          {
             path: 'dataset/:id',
             name: 'dashboard.dataset',
             component: () => import('pages/dashboard/dataset'),
