@@ -19,7 +19,9 @@ const i18n = {
     auth: {
       login: 'm\'identifier à l\'aide de mon adresse email',
       password: 'mot de passe',
+      confirmPassword: 'confirmer le mot de passe',
       btnLogin: 'm\'identifier',
+      btnCreatePassword: 'créer le mot de passe',
       error: 'Les identifiants sont incorects',
     },
     cobot: {

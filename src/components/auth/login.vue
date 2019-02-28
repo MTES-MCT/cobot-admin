@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row layout-padding">
+    <div v-if="!email || notAllowed" class="row layout-padding">
       <div class="col-12">
         <q-input v-model="credentials.email" :stack-label="$t('auth.login')" color="primary" />
       </div>
@@ -23,24 +23,66 @@
         </q-btn>
       </div>
     </div>
+    <div v-if="setNewPassword && !notAllowed" class="row layout-padding">
+      <div class="col-12">
+          <h3>Bienvenue !</h3>
+          <p>Pour accéder à votre espace, merci de créer votre mot de passe</p>
+        </div>
+        <div class="col-12">
+          <q-input v-model="credentials.password"
+                   :stack-label="$t('auth.password')"
+                   color="primary"
+                   type="password" />
+        </div>
+        <div class="col-12" style="margin-top:20px;">
+          <q-field :error="isWrongCredentials" :error-label="$t('auth.error')">
+            <q-input
+              @keyup="onKeyUp"
+              v-model="credentials.confirmPassword"
+              :stack-label="$t('auth.confirmPassword')"
+              color="primary"
+              type="password" />
+          </q-field>
+        </div>
+        <div class="col-6" style="margin-top:20px;">
+          <q-btn :disable="isDisabledPasswordBtn()"
+                 :loading="loading" @click="createPassword" full-width default color="primary">
+            {{ $t("auth.btnCreatePassword") }}
+            <span slot="loading">
+              <div> {{ $t("global.connecting") }}</div>
+            </span>
+          </q-btn>
+        </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ME_QUERY } from '../../constants/graphql';
+// USER_PASSWORD_UPDATE
+import { ME_QUERY, AUTOLOGIN, USER_PASSWORD_UPDATE } from '../../constants/graphql';
 
 export default {
   name: 'login',
   data() {
     return {
+      email: this.$route.params.email,
+      setNewPassword: false,
+      notAllowed: false,
       loading: false,
+      skipAutoLoginQuery: true,
       skipQuery: true,
       isWrongCredentials: false,
       credentials: {
+        id: '',
         email: '',
         password: '',
       },
     };
+  },
+  mounted() {
+    if (this.email) {
+      this.autologin();
+    }
   },
   methods: {
     doLogin() {
@@ -64,6 +106,29 @@ export default {
         this.doLogin(null, null);
       }
     },
+    autologin() {
+      this.$apollo.queries.Autologin.skip = false;
+      this.$apollo.queries.Autologin.refetch();
+    },
+    isDisabledPasswordBtn() {
+      return !this.credentials.password;
+    },
+    async createPassword() {
+      if (this.credentials.password === this.credentials.confirmPassword) {
+        try {
+          await this.$apollo.mutate({
+            mutation: USER_PASSWORD_UPDATE,
+            variables: {
+              id: this.credentials.id,
+              password: this.credentials.password,
+            },
+          });
+          this.doLogin();
+        } catch (error) {
+          this.$q.notify({ message: this.$t('global.error'), type: 'danger' });
+        }
+      }
+    },
   },
   apollo: {
     Me: {
@@ -75,6 +140,30 @@ export default {
       },
       skip() {
         return this.skipQuery;
+      },
+    },
+    Autologin: {
+      query: AUTOLOGIN,
+      variables() {
+        return {
+          email: this.email,
+        };
+      },
+      update(data) {
+        if (data && data.AutoLogin) {
+          if (!data.AutoLogin.lastConnection) {
+            this.credentials = {
+              id: data.AutoLogin.id,
+              email: data.AutoLogin.email,
+            };
+            this.setNewPassword = true;
+          }
+        } else {
+          this.notAllowed = true;
+        }
+      },
+      skip() {
+        return this.skipAutoLoginQuery;
       },
     },
   },

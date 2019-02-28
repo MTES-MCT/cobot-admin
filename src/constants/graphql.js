@@ -8,6 +8,14 @@ export const ACTIONS_QUERY = gql`query actions {
   }
 }`;
 
+export const AUTOLOGIN = gql`query AutoLogin($email: String!) {
+  AutoLogin(email: $email) {
+    id
+    email
+    lastConnection
+  }
+}`;
+
 export const DATASET_QUERY = gql`query getDataSet($id: ID!) {
   DataSetBySource(id: $id) {
     _id,
@@ -111,6 +119,12 @@ export const MESSAGE_QUERY = gql`query getMessage($id: ID) {
         value
       }
     }
+  }
+}`;
+
+export const USER_PASSWORD_UPDATE = gql`mutation updateUserPassword($id: ID!, $password: String!) {
+  updateUserPassword(id: $id, password: $password) {
+    email
   }
 }`;
 
