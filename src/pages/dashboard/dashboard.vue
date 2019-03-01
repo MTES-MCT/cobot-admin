@@ -4,7 +4,9 @@
       <h2>{{ projectName }}</h2>
     </div>
     <div class="row justify-center">
-      <div class="col-md-6 col-sm-12" style="text-align: center;">
+      <div v-if="$auth.check([80, 100])"
+          class="col-md-6 col-sm-12"
+          style="text-align: center;">
         <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
           <q-card-main>
             <q-card-title>
@@ -28,7 +30,9 @@
           </q-card-actions>
         </q-card>
       </div>
-      <div class="col-md-6 col-sm-12" style="text-align: center;">
+      <div v-if="$auth.check([80, 100])"
+           class="col-md-6 col-sm-12"
+           style="text-align: center;">
         <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
           <q-card-main>
             <q-card-title>
@@ -71,7 +75,7 @@
             <q-btn flat size="sm"
                     align="right"
                     icon-right="arrow_forward"
-                    @click="goTo('dashboard.contributions', $route.params.id)"
+                    @click="goTo('dashboard.contribute.object', $route.params.id)"
                     label="accèder au détail"/>
           </q-card-actions>
         </q-card>
@@ -149,7 +153,7 @@ export default {
         document: DATASET_STATS_SUB,
         variables() {
           return {
-            source: this.projectId,
+            id: this.projectId,
           };
         },
         updateQuery(data, { subscriptionData }) {

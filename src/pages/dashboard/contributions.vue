@@ -22,7 +22,7 @@
 <script>
 import { clone } from 'quasar';
 import CcContributionsTable from 'components/cc-contributions-table';
-import { DATASET_QUERY } from '../../constants/graphql';
+import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
 export default {
   name: 'DashboardIndex',
@@ -100,7 +100,7 @@ export default {
   },
   apollo: {
     dataset: {
-      query: DATASET_QUERY,
+      query: DATASET_BY_SOURCE_QUERY,
       variables() {
         return {
           id: this.projectId,

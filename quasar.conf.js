@@ -89,6 +89,7 @@ module.exports = function config(ctx) {
         'QRouteTab',
         'QUploader',
         'QModal',
+        'QModalLayout',
         'QStepper',
         'QStep',
         'QStepperNavigation',

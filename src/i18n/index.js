@@ -50,6 +50,12 @@ const i18n = {
         deleteAction: 'Etes-vous sûr de vouloir supprimer cette action ?',
       },
     },
+    labelbot: {
+      skip: 'passer',
+      help: 'aide',
+      send: 'envoyer',
+      answerSaved: 'merci pour votre contribution !',
+    },
     contributors: {
       revoke: 'retirer',
     },

@@ -14,6 +14,7 @@
             @click.native="goToDashboard(project.name, project.id)"
             label>{{ project.name }}</q-item-tile>
           <q-item-tile
+            v-if="$auth.check([80, 100])"
             @click.native="goToEditProject(project.id)"
             sublabel>Edit</q-item-tile>
         </q-item-main>

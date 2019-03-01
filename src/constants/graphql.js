@@ -16,8 +16,36 @@ export const AUTOLOGIN = gql`query AutoLogin($email: String!) {
   }
 }`;
 
-export const DATASET_QUERY = gql`query getDataSet($id: ID!) {
+export const DATASET_ANSWERS = gql`mutation dataSetAnswers($id: ID!, $answer: String!) {
+  dataSetAnswers(id: $id, answer: $answer) {
+    activity {
+      lastAnswersAt
+      numAnswers
+    }
+  }
+}`;
+
+export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
   DataSetBySource(id: $id) {
+    _id,
+    file,
+    numAnswers,
+    metadata {
+      geoData {
+        speed
+        location {
+          coordinates
+        }
+      }
+    }
+    usersAnswers {
+      answers
+    }
+  }
+}`;
+
+export const DATASET_QUERY = gql`query DataSet($id: ID!) {
+  DataSet(id: $id) {
     _id,
     file,
     numAnswers,
@@ -49,7 +77,7 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($id: ID!) {
 }`;
 
 export const DATASET_STATS_SUB = gql`subscription subContribution($id: ID!) {
-  contributionAdded(id: $ID) {
+  contributionAdded(id: $id) {
     createdAt
     source
   }
