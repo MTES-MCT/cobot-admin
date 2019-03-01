@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "dev": "API_URL=http://localhost:3040 quasar dev",
-    "build": "API_URL=https://dev-cc-api.wawy.io quasar build",
+    "build": "API_URL=https://api.co-construisons.beta.gouv.fr quasar build",
+    "deploy": "npm run build && rsync -avz ./dist coconstruisons@91.121.77.104:/home/coconstruisons/console --delete-after",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
   },
