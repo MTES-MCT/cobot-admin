@@ -6,11 +6,6 @@ export default {
   mounted() {
     this.createGraph();
   },
-  watch: {
-    datas() {
-      console.log('je passe watch');
-    },
-  },
   methods: {
     createGraph() {
       this.renderChart(

@@ -106,6 +106,7 @@
     </div>
     <div class="Chart">
       <contributions-chart-data v-if="chart.data.labels.length > 0"
+                                ref="chart"
                                 :datas="chart"></contributions-chart-data>
     </div>
   </div>
@@ -165,10 +166,12 @@ export default {
               graphX.push(moment(subscriptionData.data.createdAt).format('YYYY-MM-DD'));
               graphY.push(1);
             } else {
-              graphY[graphY.length - 1] = parseInt(graphY[graphY.length - 1], 10) + 1;
+              const val = parseInt(graphY[graphY.length - 1], 10) + 1;
+              graphY[graphY.length - 1] = val.toString();
             }
             this.chart.data.labels = graphX;
             this.chart.data.datasets[0].data = graphY;
+            this.$refs.chart.createGraph();
             return data;
           }
           return [];
@@ -191,6 +194,7 @@ export default {
           const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
           this.chart.data.labels = graphX;
           this.chart.data.datasets[0].data = graphY;
+          console.log(this.chart.data);
           return data.DataSetStats;
         }
         return [];
