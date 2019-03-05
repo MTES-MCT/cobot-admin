@@ -134,8 +134,6 @@ export default {
       } catch (error) {
         this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
       }
-      // PROJECT_UPDATE_CONTRIBUTOR_ROLE
-      // console.log(user);
     },
     isEmailValid(email) {
       return this.reg.test(email);
@@ -170,7 +168,6 @@ export default {
         };
       },
       update(data) {
-        console.log(data.ProjectContributors);
         return clone(data.ProjectContributors);
       },
     },

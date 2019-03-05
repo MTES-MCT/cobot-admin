@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="!email || notAllowed" class="row layout-padding">
+    <div v-if="!setNewPassword || notAllowed" class="row layout-padding">
       <div class="col-12">
         <q-input v-model="credentials.email" :stack-label="$t('auth.login')" color="primary" />
       </div>
@@ -150,6 +150,7 @@ export default {
         };
       },
       update(data) {
+        console.log(data);
         if (data && data.AutoLogin) {
           if (!data.AutoLogin.lastConnection) {
             this.credentials = {
@@ -157,6 +158,8 @@ export default {
               email: data.AutoLogin.email,
             };
             this.setNewPassword = true;
+          } else {
+            this.credentials.email = this.email;
           }
         } else {
           this.notAllowed = true;
