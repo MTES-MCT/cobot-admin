@@ -24,8 +24,10 @@ export default ({ router, app, Vue }) => {
       enabled: true,
     },
     parseUserData: (data) => {
-      const currentProject = _.filter(data.projects, (project => project.id === app.projectId));
-      data.role = currentProject[0].role;
+      if (app.projectId) {
+        const currentProject = _.filter(data.projects, (project => project.id === app.projectId));
+        data.role = currentProject[0].role;
+      }
       return data;
     },
     tokenExpired: false,
