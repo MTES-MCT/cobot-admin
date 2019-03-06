@@ -39,6 +39,7 @@ export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
       }
     }
     usersAnswers {
+      userId
       answers
     }
   }

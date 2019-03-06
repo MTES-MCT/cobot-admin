@@ -91,6 +91,7 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
+      file: this.$route.params.file,
       dataSetId: null,
       answer: null,
       label: null,

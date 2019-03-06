@@ -37,7 +37,7 @@ export default [
             component: () => import('pages/dashboard/contribute'),
             children: [
               {
-                path: 'object/:id',
+                path: 'object/:id/:dataset?',
                 name: 'dashboard.contribute.object',
                 component: () => import('pages/dashboard/contribute/object'),
               },

@@ -194,7 +194,6 @@ export default {
           const graphY = _.map(data.DataSetStats.contributionsGraph, 'numAnswers');
           this.chart.data.labels = graphX;
           this.chart.data.datasets[0].data = graphY;
-          console.log(this.chart.data);
           return data.DataSetStats;
         }
         return [];

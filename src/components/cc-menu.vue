@@ -6,6 +6,11 @@
     separator
   >
     <q-collapsible indent icon="mail" label="mes projets" opened>
+      <!-- <q-collapsible v-for="project in Me.projects"
+                     :key="project.id"
+                     :label="project.name"
+                     sublabel="Edit"
+                     icon="receipt"> -->
       <q-item v-for="project in Me.projects"
               :key="project.id"
               link>
@@ -19,16 +24,18 @@
             sublabel>Edit</q-item-tile>
         </q-item-main>
       </q-item>
+       <!-- </q-collapsible> -->
+
       <q-item v-if="$auth.check(100)" @click.native="goToNewProject()">
         <q-btn outline
                 color="primary"
                 label="ajouter un projet" />
       </q-item>
     </q-collapsible>
-    <q-item>
+    <!-- <q-item>
       <q-item-side icon="people" />
       <q-item-main label="Mon compte" />
-    </q-item>
+    </q-item> -->
     <q-item v-if="$auth.check(100)" @click.native="goToCobot()">
       <q-item-side icon="language" />
       <q-item-main label="Messages de Cobot" />
