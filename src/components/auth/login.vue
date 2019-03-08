@@ -134,9 +134,14 @@ export default {
     Me: {
       query: ME_QUERY,
       update(data) {
-        this.$router.push(`/dashboard/${data.Me.projects[0].id}`);
         this.$localStorage.set('projects', JSON.stringify(data.Me.projects));
-        this.$localStorage.set('project', JSON.stringify(data.Me.projects[0]));
+        const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
+        if (lastProjectOpened) {
+          this.$router.push(`/dashboard/${lastProjectOpened.id}`);
+        } else {
+          this.$localStorage.set('project', JSON.stringify(data.Me.projects[0]));
+          this.$router.push(`/dashboard/${data.Me.projects[0].id}`);
+        }
       },
       skip() {
         return this.skipQuery;

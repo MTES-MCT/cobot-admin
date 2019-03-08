@@ -56,12 +56,18 @@ export default {
 
     };
   },
+  created() {
+    this.$root.$on('projectChanged', (project) => {
+      console.log(project);
+      this.projectId = project.id;
+      this.$apollo.queries.Dataset.refresh();
+    });
+  },
   methods: {
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
     },
     contribute(projectId, datasetId) {
-      console.log(projectId, datasetId);
       this.$router.push(`/dashboard/contribute/${projectId}/${datasetId}`);
     },
   },
