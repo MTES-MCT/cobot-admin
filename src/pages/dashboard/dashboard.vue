@@ -1,7 +1,7 @@
 <template>
   <div class="main-card row justify-center">
     <div class="col-12" style="text-align: center">
-      <h2>{{ projectName }}</h2>
+      <h4>{{ projectName }}</h4>
     </div>
     <div class="row justify-center">
       <div v-if="$auth.check([80, 100])"
@@ -126,7 +126,7 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
-      projectName: this.$localStorage.get('projectName'),
+      projectName: null,
       chart: {
         data: {
           labels: [],
@@ -141,6 +141,16 @@ export default {
         achievement: 0,
       },
     };
+  },
+  mounted() {
+    const project = JSON.parse(this.$localStorage.get('project'));
+    if (!this.projectId) {
+      if (project) {
+        this.$router.push({ name: 'dashboard', params: { id: project.id } });
+      }
+    } else {
+      this.projectName = project.name;
+    }
   },
   methods: {
     goTo(to, id) {

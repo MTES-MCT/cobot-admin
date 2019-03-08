@@ -1,8 +1,7 @@
 <template>
-  <div class="main-card row justify-center"
-       style="padding-top: 20px;">
+  <div class="main-card row justify-center">
     <div>
-      <h2>Identification d'éléments dans l'image</h2>
+      <h4>Identification d'éléments dans l'image</h4>
     </div>
     <div class="row">
       <div>

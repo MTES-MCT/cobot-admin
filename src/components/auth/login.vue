@@ -136,7 +136,7 @@ export default {
       update(data) {
         this.$router.push(`/dashboard/${data.Me.projects[0].id}`);
         this.$localStorage.set('projects', JSON.stringify(data.Me.projects));
-        this.$localStorage.set('projectName', data.Me.projects[0].name);
+        this.$localStorage.set('project', JSON.stringify(data.Me.projects[0]));
       },
       skip() {
         return this.skipQuery;

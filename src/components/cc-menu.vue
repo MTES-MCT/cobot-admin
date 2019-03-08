@@ -4,6 +4,7 @@
     link
     inset-delimiter
     separator
+    style="height: calc(100vh - 55px);"
   >
     <q-collapsible indent icon="mail" label="mes projets" opened>
       <!-- <q-collapsible v-for="project in Me.projects"
@@ -16,7 +17,7 @@
               link>
         <q-item-main>
           <q-item-tile
-            @click.native="goToDashboard(project.name, project.id)"
+            @click.native="goToDashboard(project)"
             label>{{ project.name }}</q-item-tile>
           <q-item-tile
             v-if="$auth.check([80, 100])"
@@ -75,10 +76,10 @@ export default {
     slug(name) {
       return name.replace(/\s/g, '').toLowerCase();
     },
-    goToDashboard(project, id) {
-      // const projectSlug = this.slug(project);
-      this.$localStorage.set('projectName', project);
-      this.$router.push(`/dashboard/${id}`);
+    goToDashboard(project) {
+      this.$store.commit('project/updateProjectState', project);
+      this.$localStorage.set('project', JSON.stringify(project));
+      this.$router.push(`/dashboard/${project.id}`);
     },
     goToEditProject(id) {
       this.$router.push(`/project/${id}`);

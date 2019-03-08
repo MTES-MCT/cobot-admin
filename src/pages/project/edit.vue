@@ -175,7 +175,7 @@ export default {
           answers: this.project.answers,
         },
       }).then(() => {
-        this.$localStorage.set('projectName', this.project.name);
+        this.$localStorage.set('project', this.project);
         this.$root.$emit('projectUpdated', {
           id: this.id,
           name: this.project.name,

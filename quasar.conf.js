@@ -6,9 +6,9 @@ module.exports = function config(ctx) {
     plugins: [
       'i18n',
       'axios',
+      'localStorage',
       'vueAuth',
       'apollo',
-      'localStorage',
       'googleMap',
     ],
     css: [

@@ -1,15 +1,19 @@
 <template>
-  <q-list v-if="dataset" highlight style="height: 100%">
+  <q-list v-if="dataset" highlight style="position: fixed; width:25%; height: 100vh;">
     <q-list-header>
       <div class="row justify-around">
         <div class="active">
-          <a href="">contributions</a>
+          <a href="">à qualifier</a>
         </div>
         <div>
           <a href="">mes contributions</a>
         </div>
       </div>
     </q-list-header>
+    <q-item v-if="toContribe.length === 0">
+      <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
+    </q-item>
+    <div style="height: calc(100vh - 130px); overflow-y: auto;">
     <q-item v-for="data in toContribe"
             :key="data._id"
             @@click.native="contribute(data._id, data._id)"
@@ -22,6 +26,7 @@
       <q-item-main :label="data.file"
                    :sublabel="`${data.numAnswers} contributions`" />
     </q-item>
+    </div>
     <!-- <q-list-header>Contribuées</q-list-header>
     <q-item v-for="data in contributed"
             :key="data._id">>
@@ -82,6 +87,8 @@ export default {
             } else {
               toContribe.push(data);
             }
+          } else {
+            toContribe.push(data);
           }
         });
         this.contributed = contributed;

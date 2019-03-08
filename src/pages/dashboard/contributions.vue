@@ -33,7 +33,7 @@ export default {
     return {
       dataset: [],
       projectId: this.$route.params.id,
-      projectName: this.$localStorage.get('projectName'),
+      projectName: this.$localStorage.get('project').name,
       tableConfig: {
         title: this.$t('contributions.title'),
         columnPicker: false,

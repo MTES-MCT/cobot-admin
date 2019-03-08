@@ -1,7 +1,7 @@
 <template>
   <div class="main-card row justify-center">
     <div class="col-12" style="text-align: center">
-      <h2>Contributeurs - {{ projectName }}</h2>
+      <h4>Contributeurs - {{ projectName }}</h4>
     </div>
     <div class="col-12 bg-white">
       <cc-contributors-table
@@ -59,7 +59,7 @@ export default {
       reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
       opened: false,
       projectId: this.$route.params.id,
-      projectName: this.$localStorage.get('projectName'),
+      projectName: null,
       tableConfig: {
         title: '',
         columnPicker: false,
@@ -107,6 +107,10 @@ export default {
       ],
       filter: '',
     };
+  },
+  mounted() {
+    const project = JSON.parse(this.$localStorage.get('project'));
+    this.projectName = project.name;
   },
   methods: {
     addContributors() {

@@ -9,7 +9,7 @@
           <div class="row">
             <div class="col-3">
               <div class="logo">
-                <span style="padding-right: 75%;">COBOT</span>
+                <span style="padding-right: calc(100% - 100px)">COBOT</span>
                 <q-btn
                   flat
                   dense

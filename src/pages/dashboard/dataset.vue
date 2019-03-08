@@ -12,7 +12,7 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
-      projectName: this.$localStorage.get('projectName'),
+      projectName: this.$localStorage.get('project').name,
     };
   },
 };
