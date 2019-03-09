@@ -8,14 +8,14 @@
       :filter="filter"
       :pagination.sync="config.pagination"
       hide-bottom>
-      <template slot="top-right" slot-scope="props">
+      <!-- <template slot="top-right" slot-scope="props">
         <q-search
           hide-underline
           color="secondary"
           v-model="filter"
           class="col-6"
         />
-      </template>
+      </template> -->
       <q-td :style="{whiteSpace: 'normal'}"
             class="text-left" slot="body-cell-role" slot-scope="props">
          <q-select

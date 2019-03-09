@@ -1,7 +1,7 @@
 <template>
   <q-list v-if="dataset" highlight style="position: fixed; width:25%; height: 100vh;">
     <q-list-header>
-      <div class="row justify-around">
+      <div class="row justify-around tabs">
         <div class="active">
           <a href="">à qualifier</a>
         </div>
@@ -13,7 +13,7 @@
     <q-item v-if="toContribe.length === 0">
       <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
     </q-item>
-    <div style="height: calc(100vh - 140px); overflow-y: auto;">
+    <div style="height: calc(100vh - 217px); overflow-y: auto;">
       <q-item v-for="data in toContribe"
               :key="data._id"
               @click.native="contribute(data._id)"
@@ -109,16 +109,16 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .q-list
-    box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)
+  // .q-list
+  //   box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)
   .q-list-header
-    height 53px
+    height 60px
     margin-bottom 10px
     border-bottom 1px solid #e0e0e0
-  .q-item-label
-    font-size 12px
   .item
     cursor pointer
+  .tabs
+    margin-top 7px
   a
     position relative
     font-weight bold

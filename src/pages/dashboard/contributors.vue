@@ -11,12 +11,12 @@
         :actions="actions"
         :filter="filter"/>
     </div>
-    <div class="col-12" style="text-align: center;">
+    <!-- <div class="col-12" style="text-align: center;">
         <q-btn color="primary"
                label="créer l'accès à de nouveaux contributeurs"
                @click="opened = true"
                style="margin-top: 20px;"/>
-    </div>
+    </div> -->
     <q-modal v-model="opened">
       <h4>Créer des contributeurs</h4>
       <p>Ajouter des adresses email séparées par des ";" pour créer de nouveaux contributeurs.</p>
@@ -104,6 +104,11 @@ export default {
       ],
       filter: '',
     };
+  },
+  mounted() {
+    this.$root.$on('onAddUser', () => {
+      this.opened = true;
+    });
   },
   methods: {
     addContributors() {

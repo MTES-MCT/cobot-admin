@@ -25,7 +25,6 @@
               </div>
             </div>
             <div class="col-9" style="padding-left: 50px;">
-              <!-- <span>Dashboard</span> -->
               <q-btn @click="goTo('dashboard', $route.params.id)"
                      flat icon="dashboard" label="Dashboard" />
               <q-btn @click="goTo('dashboard.contributors', $route.params.id)"
@@ -48,9 +47,12 @@
     </q-layout-drawer>
 
     <q-page-container>
-      <div class="row">
+      <cc-subheader-label v-if="activeLeftPanel === 'CcLeftPanelLabel'"/>
+      <cc-subheader-user v-if="activeLeftPanel === 'CcLeftPanelUser'"/>
+      <div class="row main">
         <div class="col-3">
-          <cc-left-panel />
+          <cc-left-panel-user v-if="activeLeftPanel === 'CcLeftPanelUser'" />
+          <cc-left-panel-label v-if="activeLeftPanel === 'CcLeftPanelLabel'" />
         </div>
         <div class="col-9 col-right">
           <div class="column items-center no-wrap">
@@ -65,22 +67,36 @@
 <script>
 import CcHeaderUser from 'components/cc-header-user';
 import CcMenu from 'components/cc-menu';
-import CcLeftPanel from 'components/cc-left-panel';
+import CcLeftPanelLabel from 'components/cc-left-panel-label';
+import CcSubheaderLabel from 'components/cc-subheader-label';
+import CcLeftPanelUser from 'components/cc-left-panel-user';
+import CcSubheaderUser from 'components/cc-subheader-user';
 
 export default {
   name: 'LayoutDefault',
   components: {
     CcHeaderUser,
     CcMenu,
-    CcLeftPanel,
+    CcLeftPanelLabel,
+    CcSubheaderLabel,
+    CcLeftPanelUser,
+    CcSubheaderUser,
   },
   data() {
     return {
       leftDrawerOpen: this.$q.platform.is.desktop,
       projectName: null,
+      activeLeftPanel: null,
     };
   },
+  watch: {
+    $route(to) {
+      this.setPanel(to.name);
+    },
+  },
   mounted() {
+    console.log(this.$route);
+    this.setPanel(this.$route.name);
     this.$root.$on('projectChanged', () => {
       this.getProjectName();
     });
@@ -91,6 +107,24 @@ export default {
       const project = JSON.parse(this.$localStorage.get('project'));
       if (project) {
         this.projectName = project.name;
+      }
+    },
+    setPanel(name) {
+      switch (name) {
+        case 'dashboard':
+          this.activeLeftPanel = 'CcLeftPanelDashboard';
+          break;
+        case 'dashboard.dataset':
+          this.activeLeftPanel = 'CcLeftPanelDataset';
+          break;
+        case 'dashboard.contributors':
+          this.activeLeftPanel = 'CcLeftPanelUser';
+          break;
+        case 'dashboard.contribute.object':
+          this.activeLeftPanel = 'CcLeftPanelLabel';
+          break;
+        default:
+          this.activeLeftPanel = null;
       }
     },
     goTo(to, id) {
@@ -105,7 +139,9 @@ export default {
   .q-toolbar
     height 70px
   .col-right
-    // background-color #FFF
+    background-color #FFF
+  .main
+    padding-top 67px
   .logo
     position absolute
     top 0

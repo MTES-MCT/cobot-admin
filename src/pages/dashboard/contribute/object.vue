@@ -1,10 +1,7 @@
 <template>
   <div class="main-card row justify-center">
-    <div>
-      <h4>Identification d'éléments dans l'image</h4>
-    </div>
     <div class="row">
-      <div>
+      <div class="col-12">
        <l-map
           ref="map"
           :min-zoom="minZoom"
@@ -15,27 +12,49 @@
             :bounds="bounds"/>
         </l-map>
       </div>
-    </div>
-    <div class="row">
-      <div style="padding-top: 10px">
-        <q-btn  @click="onSend()"
-                :disable="!canSend"
+      <div class="col-12">
+        <div style="padding-top: 10px">
+          <q-btn  @click="onSend()"
+                  :disable="!canSend"
+                  default
+                  color="primary"
+                  style="margin-right: 10px;">
+            {{ $t("labelbot.send") }}
+          </q-btn>
+          <q-btn @click="onSkip()"
                 default
                 color="primary"
                 style="margin-right: 10px;">
-          {{ $t("labelbot.send") }}
-        </q-btn>
-        <q-btn @click="onSkip()"
-              default
-              color="primary"
-              style="margin-right: 10px;">
-          {{ $t("labelbot.skip") }}
-        </q-btn>
-        <q-btn @click="onHelp()" default color="negative">
-          {{ $t("labelbot.help") }}
-        </q-btn>
+            {{ $t("labelbot.skip") }}
+          </q-btn>
+          <!-- <q-btn @click="onHelp()" default color="negative">
+            {{ $t("labelbot.help") }}
+          </q-btn> -->
+        </div>
       </div>
-     </div>
+    </div>
+    <!-- <div class="row">
+      <div class="col-12">
+        <div style="padding-top: 10px">
+          <q-btn  @click="onSend()"
+                  :disable="!canSend"
+                  default
+                  color="primary"
+                  style="margin-right: 10px;">
+            {{ $t("labelbot.send") }}
+          </q-btn>
+          <q-btn @click="onSkip()"
+                default
+                color="primary"
+                style="margin-right: 10px;">
+            {{ $t("labelbot.skip") }}
+          </q-btn>
+          <q-btn @click="onHelp()" default color="negative">
+            {{ $t("labelbot.help") }}
+          </q-btn>
+        </div>
+      </div>
+     </div> -->
     <q-modal v-model="openLabelBox"
              minimized>
       <q-modal-layout>
@@ -272,7 +291,7 @@ export default {
     border-radius 2px
     width 65vw
     max-width 1200px
-    margin-bottom 40px
+    margin 20px 0 40px 0
   .leaflet-control-attribution
     display none
   .toolTip_rectangle
