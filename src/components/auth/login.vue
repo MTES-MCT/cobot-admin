@@ -137,10 +137,10 @@ export default {
         this.$localStorage.set('projects', JSON.stringify(data.Me.projects));
         const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
         if (lastProjectOpened) {
-          this.$router.push(`/dashboard/${lastProjectOpened.id}`);
+          this.$router.push({ name: 'dashboard.contribute.object', params: { id: lastProjectOpened.id } });
         } else {
           this.$localStorage.set('project', JSON.stringify(data.Me.projects[0]));
-          this.$router.push(`/dashboard/${data.Me.projects[0].id}`);
+          this.$router.push({ name: 'dashboard.contribute.object', params: { id: data.Me.projects[0].id } });
         }
       },
       skip() {

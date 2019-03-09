@@ -95,7 +95,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$route);
     this.setPanel(this.$route.name);
     this.$root.$on('projectChanged', () => {
       this.getProjectName();
@@ -136,6 +135,8 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
+  .q-layout-drawer
+    z-index 6200
   .q-toolbar
     height 70px
   .col-right
