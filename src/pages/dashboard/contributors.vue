@@ -1,8 +1,5 @@
 <template>
   <div class="main-card row justify-center">
-    <div class="col-12" style="text-align: center">
-      <h4>Contributeurs - {{ projectName }}</h4>
-    </div>
     <div class="col-12 bg-white">
       <cc-contributors-table
         style=""
@@ -108,10 +105,6 @@ export default {
       filter: '',
     };
   },
-  mounted() {
-    const project = JSON.parse(this.$localStorage.get('project'));
-    this.projectName = project.name;
-  },
   methods: {
     addContributors() {
       const emails = this.contributorsEmail.split(';');
@@ -185,7 +178,7 @@ export default {
     border-radius 2px
     width 65vw
     max-width 1200px
-    margin-bottom: 40px;
+    margin 20px 0 40px 0
   .padding
     padding-top 20px
   .modal-content

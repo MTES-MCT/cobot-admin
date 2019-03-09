@@ -41,14 +41,16 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .CsHeader {
-    a {
-      color: $neutral;
-      font-size: 70%;
-      text-decoration: underline;
-      &:hover {
-        color: $neutral;
-      }
-    }
-  }
+  .CsHeader
+    background: $cc-dark;
+    position: absolute;
+    padding: 17px;
+    right: 0px;
+    box-shadow inset 0px 0px 5px 0px rgba(0,0,0,0.75)
+    a
+      color $neutral;
+      font-size 70%;
+      text-decoration underline;
+      &:hover
+        color $neutral;
 </style>

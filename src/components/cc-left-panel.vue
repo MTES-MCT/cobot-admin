@@ -13,7 +13,7 @@
     <q-item v-if="toContribe.length === 0">
       <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
     </q-item>
-    <div style="height: calc(100vh - 130px); overflow-y: auto;">
+    <div style="height: calc(100vh - 140px); overflow-y: auto;">
       <q-item v-for="data in toContribe"
               :key="data._id"
               @click.native="contribute(data._id)"
@@ -24,7 +24,7 @@
           </q-item-tile>
         </q-item-side>
         <q-item-main :label="data.file"
-                    :sublabel="`${data.numAnswers} contributions`" />
+                     :sublabel="`${data.numAnswers} contributions`" />
       </q-item>
     </div>
     <!-- <q-list-header>Contribuées</q-list-header>
@@ -58,9 +58,10 @@ export default {
   },
   created() {
     this.$root.$on('projectChanged', (project) => {
-      console.log(project);
       this.projectId = project.id;
-      this.$apollo.queries.Dataset.refresh();
+      setTimeout(() => {
+        this.$apollo.queries.Dataset.refresh();
+      }, 300);
     });
   },
   methods: {
@@ -106,7 +107,7 @@ export default {
 };
 </script>
 
-<style scopped lang="stylus">
+<style lang="stylus">
   @import '~variables'
   .q-list
     box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)
@@ -114,6 +115,8 @@ export default {
     height 53px
     margin-bottom 10px
     border-bottom 1px solid #e0e0e0
+  .q-item-label
+    font-size 12px
   .item
     cursor pointer
   a

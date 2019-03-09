@@ -1,7 +1,7 @@
 <template>
   <div class="main-card row justify-center">
     <div style="text-align: center">
-      <h2>Dataset - {{ projectName }}</h2>
+      <h2>Dataset</h2>
     </div>
   </div>
 </template>

@@ -20,7 +20,7 @@
     font-family: 'Shartoll';
     color: $neutral;
     font-size: 5rem;
-    background-color: $primary;
+    background-color: $cc-dark;
     display: flex;
     justify-content: center;
     align-items: center;

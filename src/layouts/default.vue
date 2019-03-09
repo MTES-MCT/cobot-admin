@@ -2,26 +2,36 @@
 <q-layout view="lHh Lpr lFf">
     <q-layout-header>
       <q-toolbar
-        color="primary"
-        :glossy="$q.theme === 'mat'"
-        :inverted="$q.theme === 'ios'" >
+        color="cc-dark-light">
         <q-toolbar-title>
           <div class="row">
             <div class="col-3">
               <div class="logo">
-                <span style="padding-right: calc(100% - 100px)">COBOT</span>
-                <q-btn
-                  flat
-                  dense
-                  round
-                  @click="leftDrawerOpen = !leftDrawerOpen"
-                  aria-label="Menu" >
-                  <q-icon name="menu" />
-                </q-btn>
+                <div class="row">
+                  <div class="col-10">
+                    <span>COBOT</span>
+                    <p><small>{{ projectName }}</small></p>
+                  </div>
+                  <div class="col-2" style="padding-top: 10px;">
+                    <q-btn flat
+                           dense
+                           round
+                           @click="leftDrawerOpen = !leftDrawerOpen"
+                           aria-label="Menu" >
+                      <q-icon name="menu" />
+                    </q-btn>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-9" style="padding-left: 50px;">
-              <span>Co-Construisons > Dashboard</span>
+              <!-- <span>Dashboard</span> -->
+              <q-btn @click="goTo('dashboard', $route.params.id)"
+                     flat icon="dashboard" label="Dashboard" />
+              <q-btn @click="goTo('dashboard.contributors', $route.params.id)"
+                    flat icon="group" label="Contributeurs" />
+              <q-btn @click="goTo('dashboard.dataset', $route.params.id)"
+                     flat icon="ballot" label="Jeu de donnée" />
             </div>
           </div>
         </q-toolbar-title>
@@ -42,7 +52,7 @@
         <div class="col-3">
           <cc-left-panel />
         </div>
-        <div class="col-9">
+        <div class="col-9 col-right">
           <div class="column items-center no-wrap">
             <router-view />
           </div>
@@ -67,9 +77,25 @@ export default {
   data() {
     return {
       leftDrawerOpen: this.$q.platform.is.desktop,
+      projectName: null,
     };
   },
+  mounted() {
+    this.$root.$on('projectChanged', () => {
+      this.getProjectName();
+    });
+    this.getProjectName();
+  },
   methods: {
+    getProjectName() {
+      const project = JSON.parse(this.$localStorage.get('project'));
+      if (project) {
+        this.projectName = project.name;
+      }
+    },
+    goTo(to, id) {
+      this.$router.push({ name: to, params: { id } });
+    },
   },
 };
 </script>
@@ -77,15 +103,17 @@ export default {
 <style lang="stylus">
   @import '~variables'
   .q-toolbar
-    min-height 55px
+    height 70px
+  .col-right
+    // background-color #FFF
   .logo
     position absolute
     top 0
     left 0
     width 25%
     height 100%
-    background-color grey
-    box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)
+    background-color $cc-dark
+    box-shadow inset 0px 0px 5px 0px rgba(0,0,0,0.75)
     padding 10px 0 0 15px
   .breadcrumb-container
     width 80vw

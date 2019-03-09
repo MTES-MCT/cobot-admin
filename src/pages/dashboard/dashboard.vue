@@ -1,8 +1,5 @@
 <template>
   <div class="main-card row justify-center">
-    <div class="col-12" style="text-align: center">
-      <h4>{{ projectName }}</h4>
-    </div>
     <div class="row justify-center">
       <div v-if="$auth.check([80, 100])"
           class="col-md-6 col-sm-12"
@@ -142,16 +139,6 @@ export default {
       },
     };
   },
-  mounted() {
-    const project = JSON.parse(this.$localStorage.get('project'));
-    if (!this.projectId) {
-      if (project) {
-        this.$router.push({ name: 'dashboard', params: { id: project.id } });
-      }
-    } else {
-      this.projectName = project.name;
-    }
-  },
   methods: {
     goTo(to, id) {
       this.$router.push({ name: to, params: { id } });
@@ -218,6 +205,7 @@ export default {
   .main-card
     border-radius 2px
     width 65vw
+    margin 20px 0 40px 0
     max-width 1200px
   .Chart
     background-color $neutral
