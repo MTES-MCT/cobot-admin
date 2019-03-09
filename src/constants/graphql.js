@@ -45,8 +45,8 @@ export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
   }
 }`;
 
-export const DATASET_QUERY = gql`query DataSet($id: ID!) {
-  DataSet(id: $id) {
+export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID) {
+  DataSet(projectId: $projectId, id: $id) {
     _id,
     file,
     numAnswers,

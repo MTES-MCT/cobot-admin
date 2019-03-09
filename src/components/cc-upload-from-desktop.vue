@@ -1,6 +1,7 @@
 <template>
   <q-modal v-model="opened">
     <h4>Importer un jeu de donnée</h4>
+    <!-- :upload-factory="uploadFile" -->
     <q-uploader stack-label="Selectionnez les fichiers à importer"
                 :url="url"
                 :headers="setHeaders()"
@@ -17,6 +18,9 @@
 </template>
 
 <script>
+import * as loadImage from 'blueimp-load-image';
+import dms2dec from 'dms2dec';
+
 export default {
   name: 'CcUploadFromDesktop',
   props: ['projectId', 'projectName', 'question', 'answers', 'opened'],
@@ -28,6 +32,31 @@ export default {
   methods: {
     setHeaders() {
       return { Authorization: `Bearer ${this.$localStorage.get('default_auth_token')}` };
+    },
+    uploadFile(file, updateProgress) {
+      loadImage.parseMetaData(
+        file,
+        (data) => {
+          if (data.exif) {
+            const exif = data.exif.getAll();
+            const GPSLatitude = this.parseGpsData(exif.GPSLatitude);
+            const { GPSLatitudeRef } = exif;
+            const GPSLongitude = this.parseGpsData(exif.GPSLongitude);
+            const { GPSLongitudeRef } = exif;
+            const dec = dms2dec(GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef);
+            console.log(dec);
+          }
+        },
+      );
+      console.log(updateProgress);
+    },
+    parseGpsData(data) {
+      const aData = data.split(',');
+      aData[0] = `${parseInt(aData[0], 10)}/1`;
+      aData[1] = `${parseInt(aData[1], 10)}/1`;
+      const second = aData[2].split('.');
+      aData[2] = `${parseInt(second[0], 10)}/${parseInt(second[1], 10)}`;
+      return aData.join(',');
     },
     setBody() {
       return [

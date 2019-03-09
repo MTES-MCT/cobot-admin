@@ -90,8 +90,7 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
-      file: this.$route.params.file,
-      dataSetId: null,
+      dataSetId: this.$route.params.dataset,
       answer: null,
       label: null,
       skipQuery: true,
@@ -256,7 +255,8 @@ export default {
       fetchPolicy: 'no-cache',
       variables() {
         return {
-          id: this.projectId,
+          projectId: this.projectId,
+          id: this.dataSetId,
         };
       },
       update(data) {

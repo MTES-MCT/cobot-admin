@@ -14,18 +14,18 @@
       <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
     </q-item>
     <div style="height: calc(100vh - 130px); overflow-y: auto;">
-    <q-item v-for="data in toContribe"
-            :key="data._id"
-            @@click.native="contribute(data._id, data._id)"
-            class="item">
-      <q-item-side>
-        <q-item-tile class="image">
-          <img :src="setImg(data.file)">
-        </q-item-tile>
-      </q-item-side>
-      <q-item-main :label="data.file"
-                   :sublabel="`${data.numAnswers} contributions`" />
-    </q-item>
+      <q-item v-for="data in toContribe"
+              :key="data._id"
+              @click.native="contribute(data._id)"
+              class="item">
+        <q-item-side>
+          <q-item-tile class="image">
+            <img :src="setImg(data.file)">
+          </q-item-tile>
+        </q-item-side>
+        <q-item-main :label="data.file"
+                    :sublabel="`${data.numAnswers} contributions`" />
+      </q-item>
     </div>
     <!-- <q-list-header>Contribuées</q-list-header>
     <q-item v-for="data in contributed"
@@ -67,8 +67,8 @@ export default {
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
     },
-    contribute(projectId, datasetId) {
-      this.$router.push(`/dashboard/contribute/${projectId}/${datasetId}`);
+    contribute(datasetId) {
+      this.$router.push(`/dashboard/contribute/object/${this.projectId}/${datasetId}`);
     },
   },
   apollo: {
