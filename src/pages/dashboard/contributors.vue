@@ -41,6 +41,7 @@
 /* eslint no-useless-escape: 0 */
 import { clone } from 'quasar';
 import _ from 'lodash';
+import moment from 'moment';
 import CcContributorsTable from 'components/cc-contributors-table';
 import { PROJECT_CONTRIBUTORS, DELETE_PROJECT_CONTRIBUTOR, PROJECT_CREATE_CONTRIBUTOR, PROJECT_UPDATE_CONTRIBUTOR_ROLE } from '../../constants/graphql';
 
@@ -86,6 +87,27 @@ export default {
           field: row => row.projects[0].role,
           sortable: true,
         },
+        {
+          name: 'lastConnection',
+          required: true,
+          label: 'Dernière connexion',
+          align: 'left',
+          field: (row) => {
+            if (row.lastConnection) {
+              return moment(row.lastConnection).format('DD.MM.YY');
+            }
+            return '-';
+          },
+          sortable: true,
+        },
+        // {
+        //   name: 'contribution',
+        //   required: true,
+        //   label: 'Contribution',
+        //   align: 'left',
+        //   field: () => '10 contributions',
+        //   sortable: true,
+        // },
         {
           name: 'action',
           align: 'right',
@@ -181,9 +203,9 @@ export default {
   @import '~variables'
   .main-card
     border-radius 2px
-    width 65vw
+    width 100%
     max-width 1200px
-    margin 20px 0 40px 0
+    padding 20px
   .padding
     padding-top 20px
   .modal-content

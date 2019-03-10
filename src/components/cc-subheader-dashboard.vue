@@ -2,8 +2,8 @@
   <div class="row subHeader">
     <div class="col-12">
       <div class="title row col items-center">
-        <q-icon name="group" color="pink" size="32px"/>
-        <span class="on-right">CONTRIBUTEURS</span>
+        <q-icon name="dashboard" color="pink" size="32px"/>
+        <span class="on-right">DASHBOARD</span>
       </div>
     </div>
     <!-- <div class="col-3" style="text-align: right; padding-top: 15px;">
@@ -37,6 +37,4 @@ export default {
         font-weight 600
         padding-top 18px
         padding-left 10px
-
-
 </style>

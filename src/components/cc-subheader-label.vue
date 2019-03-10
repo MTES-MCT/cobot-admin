@@ -1,8 +1,9 @@
 <template>
   <div class="row subHeader">
     <div class="col-9">
-      <div class="title">
-        <q-icon name="ballot" color="pink" size="32px"/> JEU DE DONNEE
+      <div class="title row col items-center">
+         <q-icon name="ballot" color="pink" size="32px"/>
+        <span class="on-right">JEU DE DONNEE</span>
       </div>
     </div>
     <div class="col-3" style="text-align: right; padding-top: 15px;">

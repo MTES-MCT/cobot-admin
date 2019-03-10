@@ -97,6 +97,7 @@ module.exports = function config(ctx) {
         'QInnerLoading',
         'QSpinnerGears',
         'QSelect',
+        'QWindowResizeObservable',
       ],
       directives: [
         'Ripple',

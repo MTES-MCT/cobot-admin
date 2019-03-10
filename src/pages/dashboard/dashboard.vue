@@ -139,6 +139,22 @@ export default {
       },
     };
   },
+  mounted() {
+    if (this.projectId) {
+      this.$router.push({ name: 'dashboard', params: { id: this.projectId } });
+    } else {
+      const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
+      if (lastProjectOpened) {
+        this.$router.push({ name: 'dashboard', params: { id: lastProjectOpened.id } });
+      } else {
+        this.$localStorage.remove('projects');
+        this.$auth.logout({
+          makeRequest: false,
+          redirect: '/auth/login',
+        });
+      }
+    }
+  },
   methods: {
     goTo(to, id) {
       this.$router.push({ name: to, params: { id } });

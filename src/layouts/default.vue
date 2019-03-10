@@ -49,10 +49,12 @@
     <q-page-container>
       <cc-subheader-label v-if="activeLeftPanel === 'CcLeftPanelLabel'"/>
       <cc-subheader-user v-if="activeLeftPanel === 'CcLeftPanelUser'"/>
+      <cc-subheader-dashboard v-if="activeLeftPanel === 'CcLeftPanelDashboard'"/>
       <div class="row main">
         <div class="col-3">
           <cc-left-panel-user v-if="activeLeftPanel === 'CcLeftPanelUser'" />
           <cc-left-panel-label v-if="activeLeftPanel === 'CcLeftPanelLabel'" />
+          <cc-left-panel-dashboard v-if="activeLeftPanel === 'CcLeftPanelDashboard'" />
         </div>
         <div class="col-9 col-right">
           <div class="column items-center no-wrap">
@@ -71,6 +73,8 @@ import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcLeftPanelUser from 'components/cc-left-panel-user';
 import CcSubheaderUser from 'components/cc-subheader-user';
+import CcLeftPanelDashboard from 'components/cc-left-panel-dashboard';
+import CcSubheaderDashboard from 'components/cc-subheader-dashboard';
 
 export default {
   name: 'LayoutDefault',
@@ -81,6 +85,8 @@ export default {
     CcSubheaderLabel,
     CcLeftPanelUser,
     CcSubheaderUser,
+    CcLeftPanelDashboard,
+    CcSubheaderDashboard,
   },
   data() {
     return {

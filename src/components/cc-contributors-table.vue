@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="contributors">
+    <q-window-resize-observable @resize="onResize" />
     <q-table
       :title="config.title"
       :data="datas"
       :config="config"
       :columns="columns"
       :filter="filter"
-      :pagination.sync="config.pagination"
-      hide-bottom>
+      :pagination.sync="config.pagination">
       <!-- <template slot="top-right" slot-scope="props">
         <q-search
           hide-underline
@@ -44,6 +44,7 @@ export default {
   props: ['projectId', 'datas', 'columns', 'actions', 'config', 'filter'],
   data() {
     return {
+      bodyHeight: 0,
       roles: [
         {
           label: 'Super-administrateur',
@@ -61,6 +62,15 @@ export default {
     };
   },
   methods: {
+    onResize(size) {
+      setTimeout(() => {
+        this.setBodySize(size);
+      }, 500);
+    },
+    setBodySize(size) {
+      const el = document.getElementsByTagName('tbody');
+      el[0].style.height = `${size.height - 270}px`;
+    },
     onChangeRole(e) {
       e.col.action(e.row);
     },
@@ -102,35 +112,61 @@ export default {
   beforeDestroy() {
     clearTimeout(this.timeout);
   },
-  watch: {
-    pagination(value) {
-      if (!value) {
-        this.oldPagination = this.$clone(this.config.pagination);
-        this.config.pagination = false;
-        return;
-      }
-      this.config.pagination = this.oldPagination;
-    },
-    rowHeight(value) {
-      this.config.rowHeight = `${value}px`;
-    },
-    bodyHeight(value) {
-      const style = {};
-      if (this.bodyHeightProp !== 'auto') {
-        style[this.bodyHeightProp] = `${value}px`;
-      }
-      this.config.bodyStyle = style;
-    },
-    bodyHeightProp(value) {
-      const style = {};
-      if (value !== 'auto') {
-        style[value] = `${this.bodyHeight}px`;
-      }
-      this.config.bodyStyle = style;
-    },
-  },
+  // watch: {
+  //   pagination(value) {
+  //     if (!value) {
+  //       this.oldPagination = this.$clone(this.config.pagination);
+  //       this.config.pagination = false;
+  //       return;
+  //     }
+  //     this.config.pagination = this.oldPagination;
+  //   },
+  //   rowHeight(value) {
+  //     this.config.rowHeight = `${value}px`;
+  //   },
+  //   bodyHeight(value) {
+  //     const style = {};
+  //     if (this.bodyHeightProp !== 'auto') {
+  //       style[this.bodyHeightProp] = `${value}px`;
+  //     }
+  //     this.config.bodyStyle = style;
+  //   },
+  //   bodyHeightProp(value) {
+  //     const style = {};
+  //     if (value !== 'auto') {
+  //       style[value] = `${this.bodyHeight}px`;
+  //     }
+  //     this.config.bodyStyle = style;
+  //   },
+  // },
 };
 </script>
 
 <style lang="stylus">
+  $table_width = 100%
+  $table_body_height = 490px
+  $column_one_width = 33%
+  $column_two_width = 33%
+  $column_three_width = 33%
+  $column_for_width = 25%
+  .contributors
+    .q-table-container
+      border 0px
+      box-shadow none
+      width $table_width
+    thead, tbody
+      display block
+    tbody
+      overflow auto
+      height $table_body_height
+    thead
+      background-color #F2F2F2
+      tr
+        height 35px
+    td
+      height 68px
+    td:nth-child(1), th:nth-child(1) { min-width: $column_one_width; }
+    td:nth-child(2), th:nth-child(2) { min-width: $column_two_width; }
+    td:nth-child(3), th:nth-child(3) { width: $column_three_width; }
+    td:nth-child(4), th:nth-child(3) { width: $column_for_width; }
 </style>
