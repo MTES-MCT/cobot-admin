@@ -56,10 +56,8 @@
           <cc-left-panel-label v-if="activeLeftPanel === 'CcLeftPanelLabel'" />
           <cc-left-panel-dashboard v-if="activeLeftPanel === 'CcLeftPanelDashboard'" />
         </div>
-        <div class="col-9 col-right">
-          <div class="column items-center no-wrap">
-            <router-view />
-          </div>
+        <div class="col-9">
+          <router-view />
         </div>
       </div>
     </q-page-container>

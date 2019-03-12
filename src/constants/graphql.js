@@ -57,6 +57,7 @@ export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID) {
           coordinates
         }
       }
+      raw
     }
     usersAnswers {
       answers

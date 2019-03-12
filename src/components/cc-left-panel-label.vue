@@ -17,7 +17,8 @@
       <q-item v-for="data in toContribe"
               :key="data._id"
               @click.native="contribute(data._id)"
-              class="item">
+              class="item"
+              :class="{'itemActive': data.isActive}">
         <q-item-side>
           <q-item-tile class="image">
             <img :src="setImg(data.file)">
@@ -50,11 +51,18 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
+      datasetId: this.$route.params.dataset,
+      currentIndex: null,
       dataset: null,
       toContribe: null,
       contributed: null,
-
     };
+  },
+  watch: {
+    $route(to) {
+      this.datasetId = to.params.dataset;
+      this.$apollo.queries.Dataset.refresh();
+    },
   },
   created() {
     this.$root.$on('projectChanged', (project) => {
@@ -70,6 +78,13 @@ export default {
     },
     contribute(datasetId) {
       this.$router.push(`/dashboard/contribute/object/${this.projectId}/${datasetId}`);
+    },
+    setActive() {
+      if (this.currentIndex) {
+        this.toContribe[this.currentIndex].isActive = false;
+      }
+      this.currentIndex = _.findKey(this.toContribe, { _id: this.datasetId });
+      this.toContribe[this.currentIndex].isActive = true;
     },
   },
   apollo: {
@@ -101,6 +116,7 @@ export default {
         this.contributed = contributed;
         this.toContribe = toContribe;
         this.dataset = datas.DataSetBySource;
+        this.setActive();
       },
     },
   },
@@ -139,6 +155,13 @@ export default {
       transform scaleX(0)
       -webkit-transition all 0.3s ease-in-out 0s
       transition all 0.3s ease-in-out 0s
+  .itemActive
+    background-color $pink
+    color white
+    font-weight bold
+    .q-item-sublabel
+      font-weight normal
+      color white
   .active
     a
      &:before

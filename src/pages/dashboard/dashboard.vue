@@ -11,7 +11,7 @@
             </q-card-title>
             <div class="row justify-center">
               <div class="picto">
-                <q-icon name="supervised_user_circle" color="primary"/>
+                <q-icon name="supervised_user_circle" color="pink"/>
               </div>
               <div class="mention">
                 <h4>{{ statistics.contributors }}</h4>
@@ -37,7 +37,7 @@
             </q-card-title>
             <div class="row justify-center">
               <div class="picto">
-                <q-icon name="collections" color="primary"/>
+                <q-icon name="collections" color="pink"/>
               </div>
               <div class="mention">
                 <h4>{{ statistics.datas }}</h4>
@@ -61,7 +61,7 @@
             </q-card-title>
             <div class="row justify-center">
               <div class="picto">
-                <q-icon name="public" color="warning"/>
+                <q-icon name="public" color="pink"/>
               </div>
               <div class="mention">
                 <h4>{{ statistics.contributions }}</h4>
@@ -85,7 +85,7 @@
             </q-card-title>
             <div class="row justify-center">
               <div class="picto">
-                <q-icon name="track_changes" color="info"/>
+                <q-icon name="track_changes" color="pink"/>
               </div>
               <div class="mention">
                 <h4>{{ statistics.achievement }}%</h4>
@@ -220,9 +220,9 @@ export default {
   @import '~variables'
   .main-card
     border-radius 2px
-    width 65vw
-    margin 20px 0 40px 0
-    max-width 1200px
+    width 100%
+    margin 20px 0px 40px 0px
+    padding 0px 20px 00px 20px
   .Chart
     background-color $neutral
     margin-top 20px

@@ -1,7 +1,7 @@
 <template>
-  <div class="main-card row justify-center">
-    <div class="row">
-      <div class="col-12">
+  <div class="main-card">
+    <div class="row justify-center">
+      <div>
        <l-map
           ref="map"
           :min-zoom="minZoom"
@@ -12,70 +12,32 @@
             :bounds="bounds"/>
         </l-map>
       </div>
-      <div class="col-12">
-        <div style="padding-top: 10px">
-          <q-btn  @click="onSend()"
-                  :disable="!canSend"
-                  default
-                  color="primary"
-                  style="margin-right: 10px;">
-            {{ $t("labelbot.send") }}
-          </q-btn>
-          <q-btn @click="onSkip()"
-                default
-                color="primary"
-                style="margin-right: 10px;">
-            {{ $t("labelbot.skip") }}
-          </q-btn>
-          <!-- <q-btn @click="onHelp()" default color="negative">
-            {{ $t("labelbot.help") }}
-          </q-btn> -->
-        </div>
-      </div>
     </div>
-    <!-- <div class="row">
-      <div class="col-12">
-        <div style="padding-top: 10px">
-          <q-btn  @click="onSend()"
-                  :disable="!canSend"
-                  default
-                  color="primary"
-                  style="margin-right: 10px;">
-            {{ $t("labelbot.send") }}
-          </q-btn>
-          <q-btn @click="onSkip()"
-                default
-                color="primary"
-                style="margin-right: 10px;">
-            {{ $t("labelbot.skip") }}
-          </q-btn>
-          <q-btn @click="onHelp()" default color="negative">
-            {{ $t("labelbot.help") }}
-          </q-btn>
-        </div>
-      </div>
-     </div> -->
-    <q-modal v-model="openLabelBox"
+    <transition
+      enter-active-class="animated slideInRight"
+      leave-active-class="animated slideOutRight">
+      <CcRightPanelLabelInfo v-if="isRightPanelInfo"
+                          :name="data.file"
+                          :geodata="data.metadata.geoData"
+                          :exif="data.metadata.raw"/>
+    </transition>
+    <transition
+      enter-active-class="animated slideInRight"
+      leave-active-class="animated slideOutRight" >
+      <CcRightPanelLabel v-if="isRightPanelLabel" :labels="labels"/>
+    </transition>
+    <q-modal v-model="openLabelHelp"
              minimized>
       <q-modal-layout>
-        <q-toolbar slot="header">
+        <q-toolbar color="dark" slot="header">
           <q-toolbar-title>
-            Choix du label
+           Aide
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <p>Merci de cliquer sur l'étiquette correspondant à
-            l'élement que vous venez de détourer</p>
-          <q-btn
-            v-for="(label, index) in labels"
-            :key=index
-            color="primary"
-            :label=label.label
-            @click=setLabel(label)
-            rounded
-            style="margin-left: 10px;"
-          />
-      </div>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+          Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+        </div>
       </q-modal-layout>
     </q-modal>
   </div>
@@ -94,6 +56,9 @@ import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue
 
 import { DATASET_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
 
+import CcRightPanelLabel from 'components/cc-right-panel-label';
+import CcRightPanelLabelInfo from 'components/cc-right-panel-label-info';
+
 delete L.Icon.Default.prototype._getIconUrl;
 
 export default {
@@ -105,17 +70,22 @@ export default {
     LMarker,
     LPopup,
     LPolyline,
+    CcRightPanelLabel,
+    CcRightPanelLabelInfo,
   },
   data() {
     return {
       projectId: this.$route.params.id,
       dataSetId: this.$route.params.dataset,
+      data: null,
+      isRightPanelInfo: false,
+      isRightPanelLabel: false,
       answer: null,
       label: null,
       skipQuery: true,
       loading: false,
       canSend: false,
-      openLabelBox: false,
+      openLabelHelp: false,
       map: null,
       currentLayer: null,
       image: '',
@@ -142,16 +112,26 @@ export default {
           type: 'polygon',
           label: 'Passage piéton',
         },
-
         {
           id: 'bev',
           type: 'polygon',
           label: 'Bande d\'éveil vigilance',
         },
+        {
+          id: 'none',
+          type: 'polygon',
+          label: 'Aucun',
+        },
       ],
     };
   },
   mounted() {
+    this.$root.$on('onLabelInformation', () => {
+      this.isRightPanelInfo = !this.isRightPanelInfo;
+    });
+    this.$root.$on('onLabelHelp', () => {
+      this.openLabelHelp = true;
+    });
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
       this.map._onResize();
@@ -191,15 +171,12 @@ export default {
         const { layer } = event; // layerType,
         this.currentLayer = layer;
         this.answer = layer.getLatLngs();
-        this.onOpenLabelBox();
+        this.isRightPanelLabel = true;
         this.editableLayers.addLayer(layer);
       });
     });
   },
   methods: {
-    onHelp() {
-      this.$root.$emit('openWindowBot');
-    },
     async onSend() {
       try {
         await this.saveAnswer();
@@ -226,7 +203,6 @@ export default {
       ).openTooltip();
       this.label = label.label;
       this.canSend = true;
-      this.openLabelBox = false;
     },
     async saveAnswer() {
       try {
@@ -280,6 +256,12 @@ export default {
       },
       update(data) {
         this.dataSetId = data.DataSet._id;
+        const dataset = data.DataSet;
+        const rawMetadata = dataset.metadata.raw;
+        if (rawMetadata && typeof rawMetadata === 'string') {
+          dataset.metadata.raw = JSON.parse(dataset.metadata.raw);
+        }
+        this.data = dataset;
         this.image = `${process.env.API_URL}/img/${this.projectId}/${data.DataSet.file}`;
       },
     },
@@ -289,9 +271,8 @@ export default {
 <style scopped lang="stylus">
   .main-card
     border-radius 2px
-    width 65vw
-    max-width 1200px
-    margin 20px 0 40px 0
+    margin 20px 0px 40px 0px
+    padding 0px 20px 00px 20px
   .leaflet-control-attribution
     display none
   .toolTip_rectangle

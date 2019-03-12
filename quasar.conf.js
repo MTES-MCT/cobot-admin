@@ -77,6 +77,7 @@ module.exports = function config(ctx) {
         'QTd',
         'QTableColumns',
         'QSearch',
+        'QChip',
         'QChipsInput',
         'QCard',
         'QCardTitle',
@@ -110,6 +111,8 @@ module.exports = function config(ctx) {
     },
     // animations: 'all' --- includes all animations
     animations: [
+      'slideInRight',
+      'slideOutRight',
     ],
     pwa: {
       cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',

@@ -145,10 +145,10 @@ export default {
 <style lang="stylus">
   $table_width = 100%
   $table_body_height = 490px
-  $column_one_width = 33%
+  $column_one_width = 50%
   $column_two_width = 33%
   $column_three_width = 33%
-  $column_for_width = 25%
+  $column_four_width = 25%
   .contributors
     .q-table-container
       border 0px
@@ -168,5 +168,5 @@ export default {
     td:nth-child(1), th:nth-child(1) { min-width: $column_one_width; }
     td:nth-child(2), th:nth-child(2) { min-width: $column_two_width; }
     td:nth-child(3), th:nth-child(3) { width: $column_three_width; }
-    td:nth-child(4), th:nth-child(3) { width: $column_for_width; }
+    td:nth-child(4), th:nth-child(4) { width: $column_four_width; }
 </style>

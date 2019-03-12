@@ -2,16 +2,22 @@
   <div class="row subHeader">
     <div class="col-9">
       <div class="title row col items-center">
-         <q-icon name="ballot" color="pink" size="32px"/>
-        <span class="on-right">JEU DE DONNEE</span>
+         <q-icon name="label" color="pink" size="32px"/>
+        <span class="on-right">LABELISATION</span>
       </div>
     </div>
     <div class="col-3" style="text-align: right; padding-top: 15px;">
-      <q-btn @click="onSkip()"
+      <q-btn @click="onHelp()"
           default
-          color="positive"
+          color="grey"
           style="margin-right: 10px;">
         {{ $t("labelbot.help") }}
+      </q-btn>
+      <q-btn @click="onInformation()"
+          default
+          color="grey"
+          style="margin-right: 10px;">
+        {{ $t("labelbot.info") }}
       </q-btn>
     </div>
   </div>
@@ -20,6 +26,14 @@
 <script>
 export default {
   name: 'CcSubHeaderLabel',
+  methods: {
+    onInformation() {
+      this.$root.$emit('onLabelInformation');
+    },
+    onHelp() {
+      this.$root.$emit('onLabelHelp');
+    },
+  },
 };
 </script>
 

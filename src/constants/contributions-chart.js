@@ -15,11 +15,11 @@ export default {
             {
               data: this.datas.data.datasets[0].data,
               backgroundColor: [
-                'rgba(71, 183,132,.5)', // Green
+                '#FFF',
               ],
               fill: false,
               borderColor: [
-                '#47b784',
+                '#D63764',
               ],
               borderWidth: 3,
             },

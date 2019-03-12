@@ -53,6 +53,7 @@ const i18n = {
     labelbot: {
       skip: 'passer',
       help: 'aide',
+      info: 'info',
       send: 'envoyer',
       answerSaved: 'merci pour votre contribution !',
     },
