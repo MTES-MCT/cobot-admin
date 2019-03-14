@@ -1,9 +1,9 @@
 <template>
   <div>
-    <cc-subheader-dataset />
+    <cc-subheader-dataset v-if="dataset" :numItem="dataset.length"/>
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-dataset />
+        <cc-left-panel-dataset v-if="data" :data="data"/>
       </div>
       <div class="col-9">
         <div v-if="$auth.check([80, 100]) && dataset"
@@ -34,7 +34,7 @@
 
 <script>
 import _ from 'lodash';
-import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
+import { DATASET_BY_SOURCE_QUERY, DATASET_UPLOAD_SUB } from '../../constants/graphql';
 
 import CcLeftPanelDataset from 'components/cc-left-panel-dataset';
 import CcSubheaderDataset from 'components/cc-subheader-dataset';
@@ -48,17 +48,23 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
+      data: null,
       dataset: null,
       selectedDataIndex: '0',
       selectedData: null,
     };
+  },
+  mounted() {
+    this.$root.$on('update:imported', () => {
+      this.$apollo.queries.Dataset.refresh();
+    });
   },
   methods: {
     setImgUrl(file) {
       return `${process.env.API_URL}/img/${this.projectId}/${file}`;
     },
     onSelect(data) {
-      this.$store.dispatch('dataset/setData', data);
+      this.data = data;
       this.setActive(data);
     },
     setActive(data) {
@@ -71,18 +77,29 @@ export default {
     Dataset: {
       query: DATASET_BY_SOURCE_QUERY,
       fetchPolicy: 'no-cache',
+      subscribeToMore: {
+        document: DATASET_UPLOAD_SUB,
+        variables() {
+          return {
+            uid: this.$auth.user().id,
+          };
+        },
+        updateQuery(data, { subscriptionData }) {
+          console.log(JSON.stringify(subscriptionData));
+        },
+      },
       variables() {
         return {
           id: this.projectId,
         };
       },
       update(data) {
-        const dataset = data.DataSetBySource;
+        const dataset = data.DataSetBySource.reverse();
         _.each(dataset, (d) => {
           d.isActive = false;
         });
         this.dataset = dataset;
-        this.$store.dispatch('dataset/setData', this.dataset[0]);
+        [this.data] = dataset;
         this.setActive(this.dataset[0]);
       },
     },

@@ -1,5 +1,8 @@
 <template>
-  <q-list class="rightLabelPanel">
+  <q-list :class="{
+    'rightLabelPanel': side === 'right',
+    'leftLabelPanel': side === 'left'
+  }">
     <q-list-header style="padding-top: 30px;">
       Image information
     </q-list-header>
@@ -8,13 +11,13 @@
         <q-item-tile label>{{ name }}</q-item-tile>
       </q-item-main>
     </q-item>
-    <q-list-header v-if="geodata"
+    <q-list-header v-if="metadata.geoData"
                    style="padding-top: 30px;">Geolocalisation</q-list-header>
-    <q-item v-if="geodata">
+    <q-item v-if="metadata.geoData">
       <GmapMap
           :center="{
-            lat: geodata.location.coordinates[0],
-            lng: geodata.location.coordinates[1]
+            lat: metadata.geoData.location.coordinates[0],
+            lng: metadata.geoData.location.coordinates[1]
           }"
           :zoom="16"
           mapTypeId="satellite"
@@ -33,12 +36,13 @@
                           :options="infoOptions"
                           :position="infoWindowPos"
                           @closeclick="infoWinOpen = false">
-            {{ geodata.location.coordinates[0] }}, {{ geodata.location.coordinates[1] }}
+            {{ metadata.geoData.location.coordinates[0] }},
+            {{ metadata.geoData.location.coordinates[1] }}
           </GmapInfoWindow>
           <GmapMarker
             :position="{
-              lat: geodata.location.coordinates[0],
-              lng: geodata.location.coordinates[1]
+              lat: metadata.geoData.location.coordinates[0],
+              lng: metadata.geoData.location.coordinates[1]
             }"
             :draggable="false"
             :clickable="true"
@@ -46,10 +50,10 @@
           />
         </GmapMap>
     </q-item>
-    <q-list-header v-if="exif" style="padding-top: 30px;">
+    <q-list-header v-if="metadata.raw" style="padding-top: 30px;">
       EXIF
     </q-list-header>
-    <q-item v-for="(row, index) in exif"
+    <q-item v-for="(row, index) in metadata.raw"
             :key="index">
       <q-item-main>
         <q-item-tile label>{{ index }}</q-item-tile>
@@ -73,8 +77,8 @@
 
 <script>
 export default {
-  name: 'CcRightPanelLabelInfo',
-  props: ['name', 'exif', 'geodata'],
+  name: 'CcPanelPhotoInfo',
+  props: ['name', 'side', 'metadata'],
   data() {
     return {
       infoWindowPos: null,
@@ -88,11 +92,25 @@ export default {
       },
     };
   },
+  watch: {
+    metadata() {
+      this.setExif();
+    },
+  },
+  mounted() {
+    this.setExif();
+  },
   methods: {
+    setExif() {
+      const rawMetadata = this.metadata.raw;
+      if (rawMetadata && typeof rawMetadata === 'string') {
+        this.metadata.raw = JSON.parse(rawMetadata);
+      }
+    },
     toggleInfoWindow() {
       this.infoWindowPos = {
-        lat: this.geodata.location.coordinates[0],
-        lng: this.geodata.location.coordinates[1],
+        lat: this.metadata.geoData.location.coordinates[0],
+        lng: this.metadata.geoData.location.coordinates[1],
       };
       this.infoWinOpen = true;
     },
@@ -105,6 +123,11 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
+  .leftLabelPanel
+    position fixed
+    width 25%
+    height: calc(100vh - 138px);
+    overflow-y: auto;
   .rightLabelPanel
     height: calc(100vh - 138px);
     overflow-y: auto;

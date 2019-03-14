@@ -77,6 +77,7 @@ export default {
       return name.replace(/\s/g, '').toLowerCase();
     },
     goToDashboard(project) {
+      this.$store.commit('project/SET_PROJECT', project);
       this.$localStorage.set('project', JSON.stringify(project));
       this.$root.$emit('projectChanged', project);
       this.$router.push(`/dashboard/${project.id}`);

@@ -1,19 +1,29 @@
 <template>
   <q-modal v-model="opened">
-    <h4>Importer un jeu de donnée</h4>
-    <!-- :upload-factory="uploadFile" -->
-    <q-uploader stack-label="Selectionnez les fichiers à importer"
-                :url="url"
-                :headers="setHeaders()"
-                :additional-fields="setBody()"
-                name="file"
-                multiple
-                @fail="fail"/>
-    <div class="padding">
-      <q-btn color="primary"
-             @click="$emit('update:opened', false)"
-             label="annuler" />
-    </div>
+    <q-modal-layout>
+      <q-toolbar color="dark" slot="header">
+        <q-toolbar-title>
+          Importer un jeu de donnée
+        </q-toolbar-title>
+      </q-toolbar>
+      <div class="layout-padding">
+        <q-uploader stack-label="Selectionnez les fichiers à importer"
+                  :url="url"
+                  :upload-factory="uploadFile"
+                  :headers="setHeaders()"
+                  :additional-fields="setBody()"
+                  name="file"
+                  multiple
+                  @fail="fail"/>
+      </div>
+      <q-toolbar style="text-align: right;" color="white" slot="footer">
+        <q-toolbar-title>
+          <q-btn color="grey"
+                 @click="$emit('update:opened', false)"
+                 label="annuler" />
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-modal-layout>
   </q-modal>
 </template>
 
@@ -87,11 +97,11 @@ export default {
 </script>
 
 <style scopped lang="stylus">
-  .padding
-    padding-top: 15px;
-  .modal-content
-    padding 20px
-    h4
-      -webkit-margin-before: 0
-      -webkit-margin-after: 1
+  // .padding
+  //   padding-top: 15px;
+  // .modal-content
+  //   padding 20px
+  //   h4
+  //     -webkit-margin-before: 0
+  //     -webkit-margin-after: 1
 </style>

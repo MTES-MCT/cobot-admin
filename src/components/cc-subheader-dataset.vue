@@ -1,17 +1,61 @@
 <template>
   <div class="row subHeader">
-    <div class="col-12">
+    <div class="col-3">
       <div class="title row col items-center">
         <q-icon name="ballot" color="pink" size="32px"/>
-        <span class="on-right">Jeu de donnée</span>
+        <span class="on-right">Jeu de donnée ({{ numItem }})</span>
       </div>
     </div>
+    <div class="col-9" style="text-align: right; padding-top: 15px;">
+      <q-btn @click="upldoadFromDropbox = true"
+             default
+             color="positive"
+             style="margin-right: 10px;"
+             icon="cloud_download"
+             label="Importer depuis mon compte Dropbox" >
+      </q-btn>
+      <q-btn @click="upldoadFromDesktop = true"
+             color="positive"
+             icon="important_devices"
+             label="Importer depuis mon ordinateur"
+             style="margin-right: 15px;" />
+    </div>
+    <CcUploadFromDesktop v-if="project.name"
+                         :projectId="project.id"
+                         :projectName="project.name"
+                         :question="project.question"
+                         :answers="project.answers"
+                         :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
+    <CcUploadFromDropbox v-if="project.name"
+                         :projectId="project.id"
+                         :projectName="project.name"
+                         :question="project.question"
+                         :answers="project.answers"
+                         :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
   </div>
 </template>
 
 <script>
+import CcUploadFromDesktop from 'components/cc-upload-from-desktop';
+import CcUploadFromDropbox from 'components/cc-upload-from-dropbox';
+
 export default {
   name: 'CcSubHeaderDataset',
+  props: ['numItem'],
+  components: {
+    CcUploadFromDesktop,
+    CcUploadFromDropbox,
+  },
+  data() {
+    return {
+      upldoadFromDesktop: false,
+      upldoadFromDropbox: false,
+      project: {
+        id: this.$route.params.id,
+        name: 'rtoto',
+      },
+    };
+  },
 };
 </script>
 

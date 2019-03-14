@@ -6,6 +6,7 @@ import Vuex from 'vuex';
 import dataset from './dataset';
 import users from './users';
 import label from './label';
+import project from './project';
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ const store = new Vuex.Store({
     dataset,
     users,
     label,
+    project,
   },
 });
 
@@ -27,11 +29,13 @@ if (process.env.DEV && module.hot) {
     const newDataset = require('./dataset').default;
     const newUsers = require('./users').default;
     const newLabel = require('./label').default;
+    const newProject = require('./project').default;
     store.hotUpdate({
       modules: {
         dataset: newDataset,
         users: newUsers,
         label: newLabel,
+        project: newProject,
       },
     });
   });

@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="title row col items-center">
         <q-icon name="group" color="pink" size="32px"/>
-        <span class="on-right">CONTRIBUTEURS</span>
+        <span class="on-right">CONTRIBUTEURS ({{ numItem }})</span>
       </div>
     </div>
     <!-- <div class="col-3" style="text-align: right; padding-top: 15px;">
@@ -20,6 +20,7 @@
 <script>
 export default {
   name: 'CcSubHeaderUser',
+  props: ['numItem'],
 };
 </script>
 

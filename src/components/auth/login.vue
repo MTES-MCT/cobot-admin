@@ -140,11 +140,14 @@ export default {
           name: user.name,
           email: user.email,
         });
+        this.$store.commit('project/SET_PROJECTS', user.projects);
         this.$localStorage.set('projects', JSON.stringify(user.projects));
         const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
         if (lastProjectOpened) {
+          this.$store.commit('project/SET_PROJECT', lastProjectOpened);
           this.$router.push({ name: 'dashboard.contribute.object', params: { id: lastProjectOpened.id } });
         } else {
+          this.$store.commit('project/SET_PROJECT', user.projects[0]);
           this.$localStorage.set('project', JSON.stringify(user.projects[0]));
           this.$router.push({ name: 'dashboard.contribute.object', params: { id: user.projects[0].id } });
         }

@@ -10,7 +10,7 @@
     <q-item>
       <div style="width: 100%; text-align: center;">
         <q-btn @click="addUser"
-                color="primary"
+                color="positive"
                 icon="add"
                 label="ajouter des contributeurs" />
       </div>

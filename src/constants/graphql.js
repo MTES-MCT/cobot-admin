@@ -87,6 +87,12 @@ export const DATASET_STATS_SUB = gql`subscription subContribution($id: ID!) {
   }
 }`;
 
+export const DATASET_UPLOAD_SUB = gql`subscription uploadProgress($uid: ID!) {
+  uploadProgress(uid: $uid) {
+   size
+  }
+}`;
+
 export const ME_QUERY = gql`query user {
   Me {
     id
@@ -96,6 +102,12 @@ export const ME_QUERY = gql`query user {
       id
       name
       role
+      question
+      answers {
+        _id
+        text
+        order
+      }
     }
   }
 }`;

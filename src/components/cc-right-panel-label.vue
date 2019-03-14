@@ -39,7 +39,7 @@
         <q-item key="confirmBlock" v-if="pickUpLabelConfirm" style="text-align: center;">
           <q-item-main>
             <q-item-tile label>
-              vous avez sélectionnez
+              vous avez sélectionné
             </q-item-tile>
             <q-item-tile style="margin-top: 10px;">
               <q-chip @hide="reset()" closable color="dark">

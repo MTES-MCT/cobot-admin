@@ -23,10 +23,10 @@
           <transition
             enter-active-class="animated slideInRight"
             leave-active-class="animated slideOutRight">
-            <CcRightPanelLabelInfo v-if="panel === 'rightPanelInfo'"
-                                  :name="data.file"
-                                  :geodata="data.metadata.geoData"
-                                  :exif="data.metadata.raw"/>
+            <CcPanelPhotoInfo v-if="panel === 'rightPanelInfo'"
+                              side="right"
+                              :name="data.file"
+                              :metadata="data.metadata"/>
           </transition>
           <transition
             enter-active-class="animated slideInRight"
@@ -71,7 +71,7 @@ import { DATASET_QUERY, DATASET_BY_SOURCE_QUERY, DATASET_ANSWERS } from '../../.
 import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
-import CcRightPanelLabelInfo from 'components/cc-right-panel-label-info';
+import CcPanelPhotoInfo from 'components/panel-photo-info';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -85,16 +85,14 @@ export default {
     LPopup,
     LPolyline,
     CcRightPanelLabel,
-    CcRightPanelLabelInfo,
+    CcPanelPhotoInfo,
     CcLeftPanelLabel,
     CcSubheaderLabel,
   },
   data() {
     return {
       projectId: this.$route.params.id,
-      // dataSetId: this.$route.params.dataset,
       dataset: null,
-      // notAnswered: (!this.$route.params.dataset),
       data: null,
       isRightPanelInfo: false,
       isRightPanelLabel: false,
@@ -302,10 +300,6 @@ export default {
         const dataset = data.DataSet;
         this.resetLayer();
         this.$store.dispatch('dataset/setDatasetId', dataset._id);
-        const rawMetadata = dataset.metadata.raw;
-        if (rawMetadata && typeof rawMetadata === 'string') {
-          dataset.metadata.raw = JSON.parse(dataset.metadata.raw);
-        }
         const { usersAnswers } = dataset;
         if (usersAnswers.length > 0) {
           const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cc-subheader-user />
+    <cc-subheader-user :numItem="contributors.length" />
     <div class="row main">
       <div class="col-3">
         <cc-left-panel-user />
@@ -19,23 +19,33 @@
               :filter="filter"/>
           </div>
           <q-modal v-model="opened">
-            <h4>Créer des contributeurs</h4>
-            <p>
-              Ajouter des adresses email séparées par des ";" pour créer de nouveaux contributeurs.
-            </p>
-            <q-input v-model="contributorsEmail"
-                    type="textarea"
-                    float-label="Liste d'email"
-                    :max-height="50"
-                    rows="4" />
-            <div class="padding">
-              <q-btn color="primary"
-                    label="ajouter"
-                    @click="addContributors()"
-                    style="margin-right: 10px;" />
-              <q-btn color="negative"
-                    label="annuler" />
-            </div>
+            <q-modal-layout>
+              <q-toolbar color="dark" slot="header">
+                <q-toolbar-title>
+                  Créer des contributeurs
+                </q-toolbar-title>
+              </q-toolbar>
+              <div class="layout-padding">
+                Ajouter des adresses email séparées par des ";"
+                pour créer de nouveaux contributeurs.
+                <q-input v-model="contributorsEmail"
+                  type="textarea"
+                  float-label="Liste d'email"
+                  :max-height="50"
+                  rows="4" />
+              </div>
+              <q-toolbar style="text-align: right;" color="white" slot="footer">
+                <q-toolbar-title>
+                  <q-btn color="pink"
+                         label="ajouter"
+                         @click="addContributors()"
+                         style="margin-right: 10px;" />
+                  <q-btn color="grey"
+                         label="annuler"
+                         @click="opened = false" />
+                </q-toolbar-title>
+              </q-toolbar>
+            </q-modal-layout>
           </q-modal>
         </div>
       </div>
@@ -217,11 +227,11 @@ export default {
     width 100%
     max-width 1200px
     padding 20px
-  .padding
-    padding-top 20px
-  .modal-content
-    padding 20px
-    h4
-      -webkit-margin-before: 0
-      -webkit-margin-after: 1
+  // .padding
+  //   padding-top 20px
+  // .modal-content
+  //   padding 20px
+  //   h4
+  //     -webkit-margin-before: 0
+  //     -webkit-margin-after: 1
 </style>
