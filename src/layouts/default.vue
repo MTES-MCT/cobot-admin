@@ -47,19 +47,7 @@
     </q-layout-drawer>
 
     <q-page-container>
-      <cc-subheader-label v-if="activeLeftPanel === 'CcLeftPanelLabel'"/>
-      <cc-subheader-user v-if="activeLeftPanel === 'CcLeftPanelUser'"/>
-      <cc-subheader-dashboard v-if="activeLeftPanel === 'CcLeftPanelDashboard'"/>
-      <div class="row main">
-        <div class="col-3">
-          <cc-left-panel-user v-if="activeLeftPanel === 'CcLeftPanelUser'" />
-          <cc-left-panel-label v-if="activeLeftPanel === 'CcLeftPanelLabel'" />
-          <cc-left-panel-dashboard v-if="activeLeftPanel === 'CcLeftPanelDashboard'" />
-        </div>
-        <div class="col-9">
-          <router-view />
-        </div>
-      </div>
+      <router-view />
     </q-page-container>
   </q-layout>
 </template>
@@ -67,24 +55,12 @@
 <script>
 import CcHeaderUser from 'components/cc-header-user';
 import CcMenu from 'components/cc-menu';
-import CcLeftPanelLabel from 'components/cc-left-panel-label';
-import CcSubheaderLabel from 'components/cc-subheader-label';
-import CcLeftPanelUser from 'components/cc-left-panel-user';
-import CcSubheaderUser from 'components/cc-subheader-user';
-import CcLeftPanelDashboard from 'components/cc-left-panel-dashboard';
-import CcSubheaderDashboard from 'components/cc-subheader-dashboard';
 
 export default {
   name: 'LayoutDefault',
   components: {
     CcHeaderUser,
     CcMenu,
-    CcLeftPanelLabel,
-    CcSubheaderLabel,
-    CcLeftPanelUser,
-    CcSubheaderUser,
-    CcLeftPanelDashboard,
-    CcSubheaderDashboard,
   },
   data() {
     return {
@@ -93,13 +69,7 @@ export default {
       activeLeftPanel: null,
     };
   },
-  watch: {
-    $route(to) {
-      this.setPanel(to.name);
-    },
-  },
   mounted() {
-    this.setPanel(this.$route.name);
     this.$root.$on('projectChanged', () => {
       this.getProjectName();
     });
@@ -110,24 +80,6 @@ export default {
       const project = JSON.parse(this.$localStorage.get('project'));
       if (project) {
         this.projectName = project.name;
-      }
-    },
-    setPanel(name) {
-      switch (name) {
-        case 'dashboard':
-          this.activeLeftPanel = 'CcLeftPanelDashboard';
-          break;
-        case 'dashboard.dataset':
-          this.activeLeftPanel = 'CcLeftPanelDataset';
-          break;
-        case 'dashboard.contributors':
-          this.activeLeftPanel = 'CcLeftPanelUser';
-          break;
-        case 'dashboard.contribute.object':
-          this.activeLeftPanel = 'CcLeftPanelLabel';
-          break;
-        default:
-          this.activeLeftPanel = null;
       }
     },
     goTo(to, id) {

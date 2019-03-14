@@ -1,110 +1,120 @@
 <template>
-  <div class="main-card row justify-center">
-    <div class="row justify-center">
-      <div v-if="$auth.check([80, 100])"
-          class="col-md-6 col-sm-12"
-          style="text-align: center;">
-        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-          <q-card-main>
-            <q-card-title>
-              <strong>CONTRIBUTEURS</strong>
-            </q-card-title>
-            <div class="row justify-center">
-              <div class="picto">
-                <q-icon name="supervised_user_circle" color="pink"/>
-              </div>
-              <div class="mention">
-                <h4>{{ statistics.contributors }}</h4>
-              </div>
-            </div>
-          </q-card-main>
-          <q-card-actions class="row justify-end actions">
-            <q-btn  @click="goTo('dashboard.contributors', $route.params.id)"
-                    flat size="sm"
-                    align="right"
-                    icon-right="arrow_forward"
-                    label="Gérer mes contributeurs"/>
-          </q-card-actions>
-        </q-card>
+  <div>
+    <cc-subheader-dashboard />
+    <div class="row main">
+      <div class="col-3">
+        <cc-left-panel-dashboard />
       </div>
-      <div v-if="$auth.check([80, 100])"
-           class="col-md-6 col-sm-12"
-           style="text-align: center;">
-        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-          <q-card-main>
-            <q-card-title>
-              <strong>PHOTOS</strong>
-            </q-card-title>
-            <div class="row justify-center">
-              <div class="picto">
-                <q-icon name="collections" color="pink"/>
-              </div>
-              <div class="mention">
-                <h4>{{ statistics.datas }}</h4>
-              </div>
+      <div class="col-9">
+        <div class="main-card row justify-center">
+          <div class="row justify-center">
+            <div v-if="$auth.check([80, 100])"
+                class="col-md-6 col-sm-12"
+                style="text-align: center;">
+              <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+                <q-card-main>
+                  <q-card-title>
+                    <strong>CONTRIBUTEURS</strong>
+                  </q-card-title>
+                  <div class="row justify-center">
+                    <div class="picto">
+                      <q-icon name="supervised_user_circle" color="pink"/>
+                    </div>
+                    <div class="mention">
+                      <h4>{{ statistics.contributors }}</h4>
+                    </div>
+                  </div>
+                </q-card-main>
+                <q-card-actions class="row justify-end actions">
+                  <q-btn  @click="goTo('dashboard.contributors', $route.params.id)"
+                          flat size="sm"
+                          align="right"
+                          icon-right="arrow_forward"
+                          label="Gérer mes contributeurs"/>
+                </q-card-actions>
+              </q-card>
             </div>
-          </q-card-main>
-          <q-card-actions class="row justify-end actions">
-            <q-btn  @click="goTo('dashboard.dataset', $route.params.id)"
-                    flat size="sm"
-                    align="right"
-                    icon-right="arrow_forward"
-                    label="Gérer ma collection"/>
-          </q-card-actions>
-        </q-card>
-      </div>
-      <div class="col-md-6 col-sm-12" style="text-align: center;">
-        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-          <q-card-main>
-            <q-card-title>
-              <strong>CONTRIBUTIONS</strong>
-            </q-card-title>
-            <div class="row justify-center">
-              <div class="picto">
-                <q-icon name="public" color="pink"/>
-              </div>
-              <div class="mention">
-                <h4>{{ statistics.contributions }}</h4>
-              </div>
+            <div v-if="$auth.check([80, 100])"
+                class="col-md-6 col-sm-12"
+                style="text-align: center;">
+              <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+                <q-card-main>
+                  <q-card-title>
+                    <strong>PHOTOS</strong>
+                  </q-card-title>
+                  <div class="row justify-center">
+                    <div class="picto">
+                      <q-icon name="collections" color="pink"/>
+                    </div>
+                    <div class="mention">
+                      <h4>{{ statistics.datas }}</h4>
+                    </div>
+                  </div>
+                </q-card-main>
+                <q-card-actions class="row justify-end actions">
+                  <q-btn  @click="goTo('dashboard.dataset', $route.params.id)"
+                          flat size="sm"
+                          align="right"
+                          icon-right="arrow_forward"
+                          label="Gérer ma collection"/>
+                </q-card-actions>
+              </q-card>
             </div>
-          </q-card-main>
-          <q-card-actions class="row justify-end actions">
-            <q-btn flat size="sm"
-                    align="right"
-                    icon-right="arrow_forward"
-                    @click="goTo('dashboard.contribute.object', $route.params.id)"
-                    label="accèder au détail"/>
-          </q-card-actions>
-        </q-card>
-      </div>
-      <div class="col-md-6 col-sm-12" style="text-align: center;">
-        <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
-          <q-card-main>
-            <q-card-title>
-              <strong>ACHEVEMENT</strong>
-            </q-card-title>
-            <div class="row justify-center">
-              <div class="picto">
-                <q-icon name="track_changes" color="pink"/>
-              </div>
-              <div class="mention">
-                <h4>{{ statistics.achievement }}%</h4>
-              </div>
+            <div class="col-md-6 col-sm-12" style="text-align: center;">
+              <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+                <q-card-main>
+                  <q-card-title>
+                    <strong>CONTRIBUTIONS</strong>
+                  </q-card-title>
+                  <div class="row justify-center">
+                    <div class="picto">
+                      <q-icon name="public" color="pink"/>
+                    </div>
+                    <div class="mention">
+                      <h4>{{ statistics.contributions }}</h4>
+                    </div>
+                  </div>
+                </q-card-main>
+                <q-card-actions class="row justify-end actions">
+                  <q-btn flat size="sm"
+                          align="right"
+                          icon-right="arrow_forward"
+                          @click="goTo('dashboard.contribute.object', $route.params.id)"
+                          label="accèder au détail"/>
+                </q-card-actions>
+              </q-card>
             </div>
-          </q-card-main>
-          <q-card-actions class="row justify-end actions">
-            <q-btn flat size="sm"
-                    align="right"
-                    icon-right="arrow_forward"
-                    label="accèder au détail"/>
-          </q-card-actions>
-        </q-card>
+            <div class="col-md-6 col-sm-12" style="text-align: center;">
+              <q-card class="q-ma-sm" inline style="width: 250px;" color="neutral">
+                <q-card-main>
+                  <q-card-title>
+                    <strong>ACHEVEMENT</strong>
+                  </q-card-title>
+                  <div class="row justify-center">
+                    <div class="picto">
+                      <q-icon name="track_changes" color="pink"/>
+                    </div>
+                    <div class="mention">
+                      <h4>{{ statistics.achievement }}%</h4>
+                    </div>
+                  </div>
+                </q-card-main>
+                <q-card-actions class="row justify-end actions">
+                  <q-btn flat size="sm"
+                          align="right"
+                          icon-right="arrow_forward"
+                          label="accèder au détail"/>
+                </q-card-actions>
+              </q-card>
+            </div>
+          </div>
+          <div class="Chart">
+            <contributions-chart-data v-if="chart.data.labels.length > 0"
+                                      ref="chart"
+                                      :datas="chart"></contributions-chart-data>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="Chart">
-      <contributions-chart-data v-if="chart.data.labels.length > 0"
-                                ref="chart"
-                                :datas="chart"></contributions-chart-data>
     </div>
   </div>
 </template>
@@ -115,10 +125,15 @@ import _ from 'lodash';
 import { DATASET_STATS_QUERY, DATASET_STATS_SUB } from '../../constants/graphql';
 import contributionsChartData from '../../constants/contributions-chart.js';
 
+import CcLeftPanelDashboard from 'components/cc-left-panel-dashboard';
+import CcSubheaderDashboard from 'components/cc-subheader-dashboard';
+
 export default {
   name: 'DashboardIndex',
   components: {
     contributionsChartData,
+    CcLeftPanelDashboard,
+    CcSubheaderDashboard,
   },
   data() {
     return {

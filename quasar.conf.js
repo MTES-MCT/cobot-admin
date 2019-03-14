@@ -80,6 +80,7 @@ module.exports = function config(ctx) {
         'QChip',
         'QChipsInput',
         'QCard',
+        'QCardMedia',
         'QCardTitle',
         'QCardMain',
         'QCardSeparator',
@@ -113,6 +114,8 @@ module.exports = function config(ctx) {
     animations: [
       'slideInRight',
       'slideOutRight',
+      'fadeIn',
+      'fadeOut',
     ],
     pwa: {
       cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',

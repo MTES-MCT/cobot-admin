@@ -1,39 +1,45 @@
 <template>
-  <div class="main-card row justify-center">
-    <div class="col-12 bg-white">
-      <cc-contributors-table
-        style=""
-        v-if="contributors.length > 0"
-        :projectId="projectId"
-        :config="tableConfig"
-        :columns="columns"
-        :datas="contributors"
-        :actions="actions"
-        :filter="filter"/>
-    </div>
-    <!-- <div class="col-12" style="text-align: center;">
-        <q-btn color="primary"
-               label="créer l'accès à de nouveaux contributeurs"
-               @click="opened = true"
-               style="margin-top: 20px;"/>
-    </div> -->
-    <q-modal v-model="opened">
-      <h4>Créer des contributeurs</h4>
-      <p>Ajouter des adresses email séparées par des ";" pour créer de nouveaux contributeurs.</p>
-      <q-input v-model="contributorsEmail"
-               type="textarea"
-               float-label="Liste d'email"
-               :max-height="50"
-               rows="4" />
-      <div class="padding">
-        <q-btn color="primary"
-               label="ajouter"
-               @click="addContributors()"
-               style="margin-right: 10px;" />
-        <q-btn color="negative"
-               label="annuler" />
+  <div>
+    <cc-subheader-user />
+    <div class="row main">
+      <div class="col-3">
+        <cc-left-panel-user />
       </div>
-  </q-modal>
+      <div class="col-9">
+        <div class="main-card row justify-center">
+          <div class="col-12 bg-white">
+            <cc-contributors-table
+              style=""
+              v-if="contributors.length > 0"
+              :projectId="projectId"
+              :config="tableConfig"
+              :columns="columns"
+              :datas="contributors"
+              :actions="actions"
+              :filter="filter"/>
+          </div>
+          <q-modal v-model="opened">
+            <h4>Créer des contributeurs</h4>
+            <p>
+              Ajouter des adresses email séparées par des ";" pour créer de nouveaux contributeurs.
+            </p>
+            <q-input v-model="contributorsEmail"
+                    type="textarea"
+                    float-label="Liste d'email"
+                    :max-height="50"
+                    rows="4" />
+            <div class="padding">
+              <q-btn color="primary"
+                    label="ajouter"
+                    @click="addContributors()"
+                    style="margin-right: 10px;" />
+              <q-btn color="negative"
+                    label="annuler" />
+            </div>
+          </q-modal>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,10 +51,15 @@ import moment from 'moment';
 import CcContributorsTable from 'components/cc-contributors-table';
 import { PROJECT_CONTRIBUTORS, DELETE_PROJECT_CONTRIBUTOR, PROJECT_CREATE_CONTRIBUTOR, PROJECT_UPDATE_CONTRIBUTOR_ROLE } from '../../constants/graphql';
 
+import CcLeftPanelUser from 'components/cc-left-panel-user';
+import CcSubheaderUser from 'components/cc-subheader-user';
+
 export default {
   name: 'DashboardContributors',
   components: {
     CcContributorsTable,
+    CcLeftPanelUser,
+    CcSubheaderUser,
   },
   data() {
     return {

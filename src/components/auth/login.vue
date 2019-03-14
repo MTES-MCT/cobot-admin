@@ -2,7 +2,7 @@
   <div class="container">
     <div v-if="!setNewPassword || notAllowed" class="row layout-padding">
       <div class="col-12">
-        <q-input v-model="credentials.email" :stack-label="$t('auth.login')" color="primary" />
+        <q-input v-model="credentials.email" :stack-label="$t('auth.login')" color="pink" />
       </div>
       <div class="col-12" style="margin-top:20px;">
         <q-field :error="isWrongCredentials" :error-label="$t('auth.error')">
@@ -10,12 +10,12 @@
             @keyup="onKeyUp"
             v-model="credentials.password"
             :stack-label="$t('auth.password')"
-            color="primary"
+            color="pink"
             type="password" />
         </q-field>
       </div>
       <div class="col-6" style="margin-top:20px;">
-        <q-btn :loading="loading" @click="doLogin" full-width default color="primary">
+        <q-btn :loading="loading" @click="doLogin" full-width default color="pink">
           {{ $t("auth.btnLogin") }}
           <span slot="loading">
             <div> {{ $t("global.connecting") }}</div>
@@ -31,7 +31,7 @@
         <div class="col-12">
           <q-input v-model="credentials.password"
                    :stack-label="$t('auth.password')"
-                   color="primary"
+                   color="pink"
                    type="password" />
         </div>
         <div class="col-12" style="margin-top:20px;">
@@ -40,13 +40,13 @@
               @keyup="onKeyUp"
               v-model="credentials.confirmPassword"
               :stack-label="$t('auth.confirmPassword')"
-              color="primary"
+              color="pink"
               type="password" />
           </q-field>
         </div>
         <div class="col-6" style="margin-top:20px;">
           <q-btn :disable="isDisabledPasswordBtn()"
-                 :loading="loading" @click="createPassword" full-width default color="primary">
+                 :loading="loading" @click="createPassword" full-width default color="pink">
             {{ $t("auth.btnCreatePassword") }}
             <span slot="loading">
               <div> {{ $t("global.connecting") }}</div>
@@ -134,13 +134,19 @@ export default {
     Me: {
       query: ME_QUERY,
       update(data) {
-        this.$localStorage.set('projects', JSON.stringify(data.Me.projects));
+        const user = data.Me;
+        this.$store.commit('users/SET_USER', {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        });
+        this.$localStorage.set('projects', JSON.stringify(user.projects));
         const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
         if (lastProjectOpened) {
           this.$router.push({ name: 'dashboard.contribute.object', params: { id: lastProjectOpened.id } });
         } else {
-          this.$localStorage.set('project', JSON.stringify(data.Me.projects[0]));
-          this.$router.push({ name: 'dashboard.contribute.object', params: { id: data.Me.projects[0].id } });
+          this.$localStorage.set('project', JSON.stringify(user.projects[0]));
+          this.$router.push({ name: 'dashboard.contribute.object', params: { id: user.projects[0].id } });
         }
       },
       skip() {
@@ -155,7 +161,6 @@ export default {
         };
       },
       update(data) {
-        console.log(data);
         if (data && data.AutoLogin) {
           if (!data.AutoLogin.lastConnection) {
             this.credentials = {

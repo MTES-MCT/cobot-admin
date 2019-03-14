@@ -3,40 +3,84 @@
     <q-list-header style="padding-top: 30px;">
         Label
       </q-list-header>
-      <q-item style="text-align: center;">
-        <q-item-main v-if="pickUpLabel">
-          <q-item-tile label>
-            Sélectionnez l'objet que vous venez de détourer :
-          </q-item-tile>
-          <q-item-tile v-for="(label, index) in labels"
-                       :key="index"
-                       label>
-            <q-btn :label="label.label"
-                   @click="onSelect(label)"
-                   class="full-width"
-                   style="margin-top: 10px;"
-                   color="pink" />
-          </q-item-tile>
-        </q-item-main>
-        <q-item-main v-else>
-          <q-item-tile label>
-            <!-- Sélectionnez l'objet que vous venez de détourer : -->
-            vous avez sélectionnez
-          </q-item-tile>
-          <q-item-tile style="margin-top: 10px;">
-            <q-chip @hide="reset()" closable color="dark">
-              {{ label.label }}
-            </q-chip>
-          </q-item-tile>
-          <q-item-tile style="margin-top: 10px;">
-            <q-btn @click="onSave()"
-                   label="contribuer !"
-                   class="full-width"
-                   style="margin-top: 10px;"
-                   color="pink" />
-          </q-item-tile>
-        </q-item-main>
-      </q-item>
+      <transition-group
+        enter-active-class="animated slideInRight"
+        leave-active-class="animated slideOutRight"
+      >
+        <q-item key="pickup" v-if="pickUpLabel" style="text-align: center;">
+          <q-item-main>
+            <q-item-tile label>
+              Sélectionnez l'objet que vous venez de détourer :
+            </q-item-tile>
+            <q-item-tile v-for="(label, index) in labels"
+                        :key="index"
+                        label>
+              <q-btn :label="label.label"
+                    @click="onSelect(label)"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="pink" />
+            </q-item-tile>
+            <q-item-tile>
+              <q-btn label="annuler"
+                      @click="onCancel()"
+                      class="full-width"
+                      style="margin-top: 10px;"
+                      color="dark" />
+            </q-item-tile>
+          </q-item-main>
+        </q-item>
+      </transition-group>
+      <transition-group
+        appear
+        enter-active-class="animated slideInRight"
+        leave-active-class="animated slideOutRight"
+      >
+        <q-item key="confirmBlock" v-if="pickUpLabelConfirm" style="text-align: center;">
+          <q-item-main>
+            <q-item-tile label>
+              vous avez sélectionnez
+            </q-item-tile>
+            <q-item-tile style="margin-top: 10px;">
+              <q-chip @hide="reset()" closable color="dark">
+                {{ label.label }}
+              </q-chip>
+            </q-item-tile>
+            <q-item-tile style="margin-top: 10px;">
+              <q-btn @click="onSave()"
+                    label="contribuer !"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="positive" />
+            </q-item-tile>
+          </q-item-main>
+        </q-item>
+      </transition-group>
+      <transition-group
+        appear
+        enter-active-class="animated slideInRight"
+        leave-active-class="animated slideOutRight"
+      >
+        <q-item key="nextLabel" v-if="nextLabel" style="text-align: center;">
+          <q-item-main>
+            <q-item-tile label>
+              <strong>Merci pour votre contribution !</strong>
+            </q-item-tile>
+            <q-item-tile style="margin-top: 10px;">
+              <q-btn @click="onCancel()"
+                     label="continuer avec cette image"
+                     class="full-width"
+                     style="margin-top: 10px;"
+                     color="positive" />
+              <q-btn @click="onNext()"
+                    label="passer à l'image suivante"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="positive" />
+            </q-item-tile>
+          </q-item-main>
+        </q-item>
+      </transition-group>
   </q-list>
 </template>
 
@@ -47,20 +91,43 @@ export default {
   data() {
     return {
       pickUpLabel: true,
+      pickUpLabelConfirm: false,
+      nextLabel: false,
       label: null,
     };
   },
+  mounted() {
+    this.$root.$on('onLabelSaved', () => {
+      this.pickUpLabelConfirm = false;
+      setTimeout(() => {
+        this.nextLabel = true;
+      }, 1000);
+    });
+  },
   methods: {
     reset() {
-      this.pickUpLabel = true;
+      this.pickUpLabelConfirm = false;
+      setTimeout(() => {
+        this.pickUpLabel = true;
+      }, 1000);
       this.label = null;
     },
     onSelect(label) {
       this.pickUpLabel = false;
+      setTimeout(() => {
+        this.pickUpLabelConfirm = true;
+      }, 1000);
       this.label = label;
     },
+    onCancel() {
+      this.$store.commit('label/SET_ACTION', 'cancel');
+    },
     onSave() {
-      console.log(this.label);
+      this.$store.commit('label/SET_ACTION', 'save');
+      this.$store.commit('label/SET_LABEL', this.label);
+    },
+    onNext() {
+      this.$store.commit('label/SET_ACTION', 'next');
     },
   },
 };
@@ -76,6 +143,9 @@ export default {
     top 138px
     right 0px
     width 25%
+    .q-item
+      span
+        width 100%
   .q-list
     background-color #F2F2F2
     box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)

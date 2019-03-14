@@ -1,49 +1,61 @@
 <template>
-  <div class="main-card">
-    <div class="row justify-center">
-      <div>
-       <l-map
-          ref="map"
-          :min-zoom="minZoom"
-          :crs="crs"
-          style="width: 720px; height: 540px;">
-          <l-image-overlay
-            :url="image"
-            :bounds="bounds"/>
-        </l-map>
+  <div>
+    <cc-subheader-label />
+    <div class="row main">
+      <div class="col-3">
+        <cc-left-panel-label v-if="dataset" :dataset="dataset"/>
+      </div>
+      <div class="col-9">
+        <div class="main-card">
+          <div class="row justify-center">
+            <div>
+            <l-map
+                ref="map"
+                :min-zoom="minZoom"
+                :crs="crs"
+                style="width: 720px; height: 540px;">
+                <l-image-overlay
+                  :url="image"
+                  :bounds="bounds"/>
+              </l-map>
+            </div>
+          </div>
+          <transition
+            enter-active-class="animated slideInRight"
+            leave-active-class="animated slideOutRight">
+            <CcRightPanelLabelInfo v-if="panel === 'rightPanelInfo'"
+                                  :name="data.file"
+                                  :geodata="data.metadata.geoData"
+                                  :exif="data.metadata.raw"/>
+          </transition>
+          <transition
+            enter-active-class="animated slideInRight"
+            leave-active-class="animated slideOutRight" >
+            <CcRightPanelLabel v-if="panel === 'rightPanelLabel'" :labels="labels"/>
+          </transition>
+          <q-modal v-model="openLabelHelp"
+                  minimized>
+            <q-modal-layout>
+              <q-toolbar color="dark" slot="header">
+                <q-toolbar-title>
+                Aide
+                </q-toolbar-title>
+              </q-toolbar>
+              <div class="layout-padding">
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+              </div>
+            </q-modal-layout>
+          </q-modal>
+        </div>
       </div>
     </div>
-    <transition
-      enter-active-class="animated slideInRight"
-      leave-active-class="animated slideOutRight">
-      <CcRightPanelLabelInfo v-if="isRightPanelInfo"
-                          :name="data.file"
-                          :geodata="data.metadata.geoData"
-                          :exif="data.metadata.raw"/>
-    </transition>
-    <transition
-      enter-active-class="animated slideInRight"
-      leave-active-class="animated slideOutRight" >
-      <CcRightPanelLabel v-if="isRightPanelLabel" :labels="labels"/>
-    </transition>
-    <q-modal v-model="openLabelHelp"
-             minimized>
-      <q-modal-layout>
-        <q-toolbar color="dark" slot="header">
-          <q-toolbar-title>
-           Aide
-          </q-toolbar-title>
-        </q-toolbar>
-        <div class="layout-padding">
-          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-          Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
-        </div>
-      </q-modal-layout>
-    </q-modal>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
+import _ from 'lodash';
 import L from 'leaflet';
 import 'leaflet-draw';
 import '../../../constants/leaflet-lang-fr';
@@ -54,8 +66,10 @@ import 'leaflet/dist/images/marker-shadow.png';
 
 import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
 
-import { DATASET_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
+import { DATASET_QUERY, DATASET_BY_SOURCE_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
 
+import CcLeftPanelLabel from 'components/cc-left-panel-label';
+import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
 import CcRightPanelLabelInfo from 'components/cc-right-panel-label-info';
 
@@ -72,11 +86,15 @@ export default {
     LPolyline,
     CcRightPanelLabel,
     CcRightPanelLabelInfo,
+    CcLeftPanelLabel,
+    CcSubheaderLabel,
   },
   data() {
     return {
       projectId: this.$route.params.id,
-      dataSetId: this.$route.params.dataset,
+      // dataSetId: this.$route.params.dataset,
+      dataset: null,
+      // notAnswered: (!this.$route.params.dataset),
       data: null,
       isRightPanelInfo: false,
       isRightPanelLabel: false,
@@ -84,7 +102,6 @@ export default {
       label: null,
       skipQuery: true,
       loading: false,
-      canSend: false,
       openLabelHelp: false,
       map: null,
       currentLayer: null,
@@ -94,7 +111,7 @@ export default {
       crs: L.CRS.Simple,
       colors: {
         polygon: '#F2C037',
-        rectangle: '#26A69A',
+        rectangle: '#E91C63',
       },
       labels: [
         {
@@ -125,10 +142,22 @@ export default {
       ],
     };
   },
+  computed: {
+    ...mapGetters({
+      dataSetId: 'dataset/getDatasetId',
+    }),
+    ...mapState('label', ['panel', 'action']),
+    ...mapState('dataset', ['isDataQualified']),
+  },
+  watch: {
+    dataSetId() {
+      this.$apollo.queries.Data.refresh();
+    },
+    action(newValue) {
+      this.onAction(newValue);
+    },
+  },
   mounted() {
-    this.$root.$on('onLabelInformation', () => {
-      this.isRightPanelInfo = !this.isRightPanelInfo;
-    });
     this.$root.$on('onLabelHelp', () => {
       this.openLabelHelp = true;
     });
@@ -142,11 +171,7 @@ export default {
       const drawPluginOptions = {
         position: 'topright',
         draw: {
-          polygon: {
-            shapeOptions: {
-              color: this.colors.polygon,
-            },
-          },
+          polygon: false,
           polyline: false,
           circle: false,
           circlemarker: false,
@@ -168,45 +193,59 @@ export default {
       this.map.fitBounds(this.bounds);
 
       this.map.on(L.Draw.Event.CREATED, (event) => {
-        const { layer } = event; // layerType,
+        const { layer } = event;
         this.currentLayer = layer;
         this.answer = layer.getLatLngs();
-        this.isRightPanelLabel = true;
+        this.$store.commit('label/SET_PANEL', 'rightPanelLabel');
         this.editableLayers.addLayer(layer);
       });
     });
   },
   methods: {
-    async onSend() {
-      try {
-        await this.saveAnswer();
-      } catch (e) {
-        console.log(e);
+    onSkip() {
+      if (this.$apollo.queries.Dataset) {
+        this.$apollo.queries.Dataset.refresh();
       }
     },
-    onSkip() {
-      this.$apollo.queries.Dataset.refresh();
+    resetEditableLayer() {
+      this.editableLayers.eachLayer((layer) => {
+        this.editableLayers.removeLayer(layer);
+      });
+    },
+    resetLayer() {
+      if (this.polygon) {
+        this.map.removeLayer(this.polygon);
+      }
+    },
+    onAction() {
+      switch (this.action) {
+        case 'cancel':
+          this.$store.commit('label/SET_PANEL', null);
+          this.$store.commit('label/SET_ACTION', null);
+          this.resetEditableLayer();
+          break;
+        case 'save':
+          this.saveAnswer(this.$store.state.label.label);
+          this.$store.commit('label/SET_ACTION', null);
+          break;
+        case 'next':
+          this.$store.commit('label/SET_PANEL', null);
+          this.$store.dispatch('dataset/setDatasetId', null);
+          this.$store.commit('dataset/SET_IS_QUALIFIED', false);
+          this.resetEditableLayer();
+          this.onSkip();
+          break;
+        default:
+          return null;
+      }
+      return true;
     },
     onOpenLabelBox() {
       this.openLabelBox = true;
     },
-    setLabel(label) {
-      this.currentLayer.bindTooltip(
-        label.label,
-        {
-          offset: L.point({
-            x: -20,
-            y: 0,
-          }),
-          className: `toolTip_${label.type}`,
-        },
-      ).openTooltip();
-      this.label = label.label;
-      this.canSend = true;
-    },
-    async saveAnswer() {
+    async saveAnswer(label) {
       try {
-        const answer = this.prepareAnswer(this.answer[0]);
+        const answer = this.prepareAnswer(this.answer[0], label);
         await this.$apollo.mutate({
           mutation: DATASET_ANSWERS,
           variables: {
@@ -214,17 +253,12 @@ export default {
             answer,
           },
         });
-        this.$apollo.queries.Dataset.refresh();
-        this.editableLayers.eachLayer((layer) => {
-          this.editableLayers.removeLayer(layer);
-        });
-        this.$q.notify({ message: this.$t('labelbot.answerSaved'), type: 'positive' });
-        this.canSend = false;
+        this.$root.$emit('onLabelSaved');
       } catch (error) {
-        this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
+        // this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
       }
     },
-    prepareAnswer(coords) {
+    prepareAnswer(coords, label) {
       const ymin = coords[0].lat;
       const ymax = coords[1].lat;
       const xmin = coords[0].lng;
@@ -232,7 +266,7 @@ export default {
       const yminVoc = 1080 - ymin;
       const ymaxVoc = 1080 - ymax;
       const answer = {
-        label: this.label,
+        label,
         origin: coords,
         voc: {
           xmin,
@@ -243,26 +277,54 @@ export default {
       };
       return JSON.stringify(answer);
     },
+    drawUserAnswer(coord) {
+      const latlngs = [
+        [coord[0].lat, coord[0].lng],
+        [coord[1].lat, coord[1].lng],
+        [coord[2].lat, coord[2].lng],
+        [coord[3].lat, coord[3].lng],
+      ];
+      this.polygon = L.polygon(latlngs, { color: '#E91C63' }).addTo(this.map);
+    },
   },
   apollo: {
-    Dataset: {
+    Data: {
       query: DATASET_QUERY,
       fetchPolicy: 'no-cache',
       variables() {
         return {
           projectId: this.projectId,
           id: this.dataSetId,
+          notAnswered: !this.isDataQualified,
         };
       },
       update(data) {
-        this.dataSetId = data.DataSet._id;
         const dataset = data.DataSet;
+        this.resetLayer();
+        this.$store.dispatch('dataset/setDatasetId', dataset._id);
         const rawMetadata = dataset.metadata.raw;
         if (rawMetadata && typeof rawMetadata === 'string') {
           dataset.metadata.raw = JSON.parse(dataset.metadata.raw);
         }
+        const { usersAnswers } = dataset;
+        if (usersAnswers.length > 0) {
+          const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
+          this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+        }
         this.data = dataset;
-        this.image = `${process.env.API_URL}/img/${this.projectId}/${data.DataSet.file}`;
+        this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
+      },
+    },
+    Dataset: {
+      query: DATASET_BY_SOURCE_QUERY,
+      fetchPolicy: 'no-cache',
+      variables() {
+        return {
+          id: this.projectId,
+        };
+      },
+      async update(datas) {
+        this.dataset = datas.DataSetBySource;
       },
     },
   },

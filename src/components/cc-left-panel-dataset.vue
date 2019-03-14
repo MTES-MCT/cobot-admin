@@ -1,20 +1,20 @@
 <template>
-  <q-list class="rightLabelPanel">
+  <q-list v-if="data" style="position: fixed; width:25%; height: 100vh;">
     <q-list-header style="padding-top: 30px;">
       Image information
     </q-list-header>
     <q-item>
       <q-item-main>
-        <q-item-tile label>{{ name }}</q-item-tile>
+        <q-item-tile label>{{ data.file }}</q-item-tile>
       </q-item-main>
     </q-item>
-    <q-list-header v-if="geodata"
+    <q-list-header v-if="data.metadata.geoData"
                    style="padding-top: 30px;">Geolocalisation</q-list-header>
-    <q-item v-if="geodata">
+    <q-item v-if="data.metadata.geoData">
       <GmapMap
           :center="{
-            lat: geodata.location.coordinates[0],
-            lng: geodata.location.coordinates[1]
+            lat: data.metadata.geoData.location.coordinates[0],
+            lng: data.metadata.geoData.location.coordinates[1]
           }"
           :zoom="16"
           mapTypeId="satellite"
@@ -29,16 +29,16 @@
             disableDefaultUi: false
           }"
         >
-          <GmapInfoWindow :opened="infoWinOpen"
+          <!-- <GmapInfoWindow :opened="infoWinOpen"
                           :options="infoOptions"
                           :position="infoWindowPos"
                           @closeclick="infoWinOpen = false">
             {{ geodata.location.coordinates[0] }}, {{ geodata.location.coordinates[1] }}
-          </GmapInfoWindow>
+          </GmapInfoWindow> -->
           <GmapMarker
             :position="{
-              lat: geodata.location.coordinates[0],
-              lng: geodata.location.coordinates[1]
+              lat: data.metadata.geoData.location.coordinates[0],
+              lng: data.metadata.geoData.location.coordinates[1]
             }"
             :draggable="false"
             :clickable="true"
@@ -72,32 +72,29 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
-  name: 'CcRightPanelLabelInfo',
+  name: 'CcLeftPanelDataset',
   props: ['name', 'exif', 'geodata'],
-  data() {
-    return {
-      infoWindowPos: null,
-      infoWinOpen: false,
-      currentMidx: null,
-      infoOptions: {
-        pixelOffset: {
-          width: 0,
-          height: -35,
-        },
-      },
-    };
+  computed: {
+    ...mapGetters({
+      data: 'dataset/getData',
+    }),
+  },
+  watch: {
+    data() {
+      const rawMetadata = this.data.metadata.raw;
+      console.log(rawMetadata);
+      if (rawMetadata && typeof rawMetadata === 'string') {
+        this.data.metadata.raw = JSON.parse(this.data.metadata.raw);
+      }
+      console.log(this.data);
+    },
   },
   methods: {
-    toggleInfoWindow() {
-      this.infoWindowPos = {
-        lat: this.geodata.location.coordinates[0],
-        lng: this.geodata.location.coordinates[1],
-      };
-      this.infoWinOpen = true;
-    },
-    hasChild(row) {
-      return typeof row === 'object' && !row[0];
+    addUser() {
+      this.$root.$emit('onAddUser');
     },
   },
 };
@@ -105,14 +102,6 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .rightLabelPanel
-    height: calc(100vh - 138px);
-    overflow-y: auto;
-    z-index 5890
-    position fixed
-    top 138px
-    right 0px
-    width 25%
   .q-list
     background-color #F2F2F2
     box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)

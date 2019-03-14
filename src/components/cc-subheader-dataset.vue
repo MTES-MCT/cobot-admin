@@ -2,24 +2,16 @@
   <div class="row subHeader">
     <div class="col-12">
       <div class="title row col items-center">
-        <q-icon name="group" color="pink" size="32px"/>
-        <span class="on-right">CONTRIBUTEURS</span>
+        <q-icon name="ballot" color="pink" size="32px"/>
+        <span class="on-right">Jeu de donnée</span>
       </div>
     </div>
-    <!-- <div class="col-3" style="text-align: right; padding-top: 15px;">
-      <q-btn @click="onSkip()"
-          default
-          color="positive"
-          style="margin-right: 10px;">
-        {{ $t("labelbot.send") }}
-      </q-btn>
-    </div> -->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'CcSubHeaderUser',
+  name: 'CcSubHeaderDataset',
 };
 </script>
 
@@ -37,4 +29,6 @@ export default {
       font-weight 600
       padding-top 18px
       padding-left 10px
+
+
 </style>

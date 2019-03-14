@@ -37,6 +37,7 @@ export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
           coordinates
         }
       }
+      raw
     }
     usersAnswers {
       userId
@@ -45,8 +46,8 @@ export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
   }
 }`;
 
-export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID) {
-  DataSet(projectId: $projectId, id: $id) {
+export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID, $notAnswered: Boolean) {
+  DataSet(projectId: $projectId, id: $id, notAnswered: $notAnswered) {
     _id,
     file,
     numAnswers,
@@ -61,6 +62,7 @@ export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID) {
     }
     usersAnswers {
       answers
+      userId
     }
   }
 }`;
@@ -89,6 +91,7 @@ export const ME_QUERY = gql`query user {
   Me {
     id
     name
+    email
     projects {
       id
       name

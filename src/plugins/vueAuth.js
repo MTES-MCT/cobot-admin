@@ -4,7 +4,12 @@ import httpAuth from '@websanova/vue-auth/drivers/http/axios.1.x.js';
 import routerAuth from '@websanova/vue-auth/drivers/router/vue-router.2.x.js';
 import _ from 'lodash';
 
-export default ({ router, app, Vue }) => {
+export default ({
+  router,
+  app,
+  store,
+  Vue,
+}) => {
   router.beforeEach((to, from, next) => {
     app.projectId = to.params.id;
     next();
@@ -24,6 +29,11 @@ export default ({ router, app, Vue }) => {
       enabled: true,
     },
     parseUserData: (data) => {
+      store.commit('users/SET_USER', {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+      });
       if (app.projectId) {
         const currentProject = _.filter(data.projects, (project => project.id === app.projectId));
         data.role = currentProject[0].role;

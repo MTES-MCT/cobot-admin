@@ -28,7 +28,8 @@ export default {
   name: 'CcSubHeaderLabel',
   methods: {
     onInformation() {
-      this.$root.$emit('onLabelInformation');
+      const panel = (this.$store.state.label.panel !== 'rightPanelInfo') ? 'rightPanelInfo' : null;
+      this.$store.commit('label/SET_PANEL', panel);
     },
     onHelp() {
       this.$root.$emit('onLabelHelp');

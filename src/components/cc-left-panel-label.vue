@@ -1,20 +1,25 @@
 <template>
-  <q-list v-if="dataset" highlight style="position: fixed; width:25%; height: 100vh;">
+  <q-list v-if="datasetTodo" style="position: fixed; width:25%; height: 100vh;">
     <q-list-header>
       <div class="row justify-around tabs">
-        <div class="active">
-          <a href="">à qualifier</a>
+        <div :class="{'active': filter === 'toContribute'}">
+          <a @click="setFilter('toContribute')" href="#">
+            à qualifier ({{ datasetTodo.length }})
+          </a>
         </div>
-        <div>
-          <a href="">mes contributions</a>
+        <div :class="{'active': filter === 'contributed'}">
+          <a @click="setFilter('contributed')" href="#">
+            mes contributions ({{ datasetDone.length }})
+          </a>
         </div>
       </div>
     </q-list-header>
-    <q-item v-if="toContribe.length === 0">
+    <q-item v-if="datasetTodo.length === 0">
       <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
     </q-item>
-    <div style="height: calc(100vh - 217px); overflow-y: auto;">
-      <q-item v-for="data in toContribe"
+    <div v-if="filter === 'toContribute'" style="height: calc(100vh - 217px); overflow-y: auto;">
+      <q-item v-for="data in datasetTodo"
+              :ref="data._id"
               :key="data._id"
               @click.native="contribute(data._id)"
               class="item"
@@ -28,96 +33,96 @@
                      :sublabel="`${data.numAnswers} contributions`" />
       </q-item>
     </div>
-    <!-- <q-list-header>Contribuées</q-list-header>
-    <q-item v-for="data in contributed"
-            :key="data._id">>
+    <div v-else style="height: calc(100vh - 217px); overflow-y: auto;">
+      <q-item v-for="data in datasetDone"
+              :ref="data._id"
+              :key="data._id"
+              @click.native="contribute(data._id)"
+              class="item"
+              :class="{'itemActive': data.isActive}">
         <q-item-side>
           <q-item-tile class="image">
             <img :src="setImg(data.file)">
           </q-item-tile>
         </q-item-side>
         <q-item-main :label="data.file"
-                    :sublabel="`${data.numAnswers} contributions`" />
-    </q-item> -->
+                     :sublabel="`${data.numAnswers} contributions`" />
+      </q-item>
+    </div>
   </q-list>
 </template>
 
 <script>
 import _ from 'lodash';
-import { DATASET_BY_SOURCE_QUERY } from '../constants/graphql';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'CcLeftPanel',
+  props: ['dataset'],
   data() {
     return {
+      filter: 'toContribute',
       projectId: this.$route.params.id,
-      datasetId: this.$route.params.dataset,
-      currentIndex: null,
-      dataset: null,
-      toContribe: null,
-      contributed: null,
+      datasetTodo: null,
+      datasetDone: null,
     };
   },
+  computed: {
+    ...mapGetters({
+      datasetId: 'dataset/getDatasetId',
+    }),
+    ...mapState('users', ['user']),
+  },
   watch: {
-    $route(to) {
-      this.datasetId = to.params.dataset;
-      this.$apollo.queries.Dataset.refresh();
+    datasetId() {
+      this.updateDatasetList();
+    },
+    dataset() {
+      this.updateDatasetList();
     },
   },
   created() {
-    this.$root.$on('projectChanged', (project) => {
-      this.projectId = project.id;
-      setTimeout(() => {
-        this.$apollo.queries.Dataset.refresh();
-      }, 300);
-    });
+    this.updateDatasetList();
   },
   methods: {
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
     },
+    setFilter(filter) {
+      this.$store.commit('dataset/SET_IS_QUALIFIED', filter === 'contributed');
+      this.filter = filter;
+    },
     contribute(datasetId) {
-      this.$router.push(`/dashboard/contribute/object/${this.projectId}/${datasetId}`);
+      this.$store.dispatch('dataset/setDatasetId', datasetId);
     },
-    setActive() {
-      if (this.currentIndex) {
-        this.toContribe[this.currentIndex].isActive = false;
-      }
-      this.currentIndex = _.findKey(this.toContribe, { _id: this.datasetId });
-      this.toContribe[this.currentIndex].isActive = true;
-    },
-  },
-  apollo: {
-    Dataset: {
-      query: DATASET_BY_SOURCE_QUERY,
-      variables() {
-        return {
-          id: this.projectId,
-        };
-      },
-      update(datas) {
-        const toContribe = [];
-        const contributed = [];
-        _.each(datas.DataSetBySource, (data) => {
-          if (data.usersAnswers.length > 0) {
-            const hasAnswered = _.filter(
-              data.usersAnswers,
-              (answer => answer.userId === this.$auth.user().id),
-            );
-            if (hasAnswered.length > 0) {
-              contributed.push(data);
-            } else {
-              toContribe.push(data);
-            }
+    updateDatasetList() {
+      const datasetTodo = [];
+      const datasetDone = [];
+      _.each(this.dataset, (data) => {
+        data.isActive = (data._id === this.datasetId);
+        if (data.usersAnswers.length > 0) {
+          const hasAnswered = _.filter(
+            data.usersAnswers,
+            (answer => answer.userId === this.user.id),
+          );
+          if (hasAnswered.length === 0) {
+            datasetTodo.push(data);
           } else {
-            toContribe.push(data);
+            datasetDone.push(data);
           }
-        });
-        this.contributed = contributed;
-        this.toContribe = toContribe;
-        this.dataset = datas.DataSetBySource;
-        this.setActive();
-      },
+        } else {
+          datasetTodo.push(data);
+        }
+      });
+      this.datasetTodo = datasetTodo;
+      this.datasetDone = datasetDone;
+      setTimeout(() => {
+        if (this.$refs[this.datasetId]) {
+          this.$refs[this.datasetId][0].$el.scrollIntoView({
+            behavior: 'smooth',
+          });
+        }
+      }, 300);
     },
   },
 };
@@ -125,8 +130,6 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  // .q-list
-  //   box-shadow 0px 0px 5px 0px rgba(0,0,0,0.75)
   .q-list-header
     height 60px
     margin-bottom 10px
