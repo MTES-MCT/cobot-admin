@@ -96,6 +96,7 @@ module.exports = function config(ctx) {
         'QStepper',
         'QStep',
         'QStepperNavigation',
+        'Loading',
         'QInnerLoading',
         'QSpinnerGears',
         'QSelect',
