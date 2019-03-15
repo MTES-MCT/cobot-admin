@@ -21,7 +21,7 @@
       <q-item v-for="data in datasetTodo"
               :ref="data._id"
               :key="data._id"
-              @click.native="contribute(data._id)"
+              @click.native="contribute(data)"
               class="item"
               :class="{'itemActive': data.isActive}">
         <q-item-side>
@@ -37,7 +37,7 @@
       <q-item v-for="data in datasetDone"
               :ref="data._id"
               :key="data._id"
-              @click.native="contribute(data._id)"
+              @click.native="contribute(data)"
               class="item"
               :class="{'itemActive': data.isActive}">
         <q-item-side>
@@ -56,9 +56,10 @@
 import _ from 'lodash';
 import { mapState, mapGetters } from 'vuex';
 
+import { DATASET_BY_SOURCE_QUERY } from '../constants/graphql';
+
 export default {
   name: 'CcLeftPanel',
-  props: ['dataset'],
   data() {
     return {
       filter: 'toContribute',
@@ -69,6 +70,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      dataset: 'dataset/getDataset',
       datasetId: 'dataset/getDatasetId',
     }),
     ...mapState('users', ['user']),
@@ -81,9 +83,6 @@ export default {
       this.updateDatasetList();
     },
   },
-  created() {
-    this.updateDatasetList();
-  },
   methods: {
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
@@ -92,8 +91,9 @@ export default {
       this.$store.commit('dataset/SET_IS_QUALIFIED', filter === 'contributed');
       this.filter = filter;
     },
-    contribute(datasetId) {
-      this.$store.dispatch('dataset/setDatasetId', datasetId);
+    contribute(data) {
+      this.$store.dispatch('dataset/setData', data);
+      this.$store.dispatch('dataset/setDatasetId', data._id);
     },
     updateDatasetList() {
       const datasetTodo = [];
@@ -106,11 +106,13 @@ export default {
             (answer => answer.userId === this.user.id),
           );
           if (hasAnswered.length === 0) {
+            this.setFirstData(datasetTodo, data);
             datasetTodo.push(data);
           } else {
             datasetDone.push(data);
           }
         } else {
+          this.setFirstData(datasetTodo, data);
           datasetTodo.push(data);
         }
       });
@@ -123,6 +125,53 @@ export default {
           });
         }
       }, 300);
+    },
+    setFirstData(datasetTodo, data) {
+      const datasetId = this.datasetId || null;
+      if (!datasetId && datasetTodo.length === 0) {
+        data.isActive = true;
+        this.$store.dispatch('dataset/setDatasetId', data._id);
+      }
+    },
+  },
+  apollo: {
+    // Data: {
+    //   query: DATASET_QUERY,
+    //   fetchPolicy: 'no-cache',
+    //   variables() {
+    //     return {
+    //       projectId: this.projectId,
+    //       id: this.dataSetId,
+    //       notAnswered: !this.isDataQualified || false,
+    //     };
+    //   },
+    //   update(data) {
+    //     this.$store.dispatch('dataset/setData', data.DataSet);
+    //     this.resetLayer();
+    //     this.$store.dispatch('dataset/setDatasetId', dataset._id);
+    //     const { usersAnswers } = dataset;
+    //     if (usersAnswers.length > 0) {
+    //       const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
+    //       this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+    //     }
+    //     this.data = dataset;
+    //     this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
+    //   },
+    //   skip() {
+    //     return this.datasetId;
+    //   },
+    // },
+    Dataset: {
+      query: DATASET_BY_SOURCE_QUERY,
+      fetchPolicy: 'no-cache',
+      variables() {
+        return {
+          id: this.projectId,
+        };
+      },
+      async update(datas) {
+        this.$store.dispatch('dataset/setDataset', datas.DataSetBySource);
+      },
     },
   },
 };

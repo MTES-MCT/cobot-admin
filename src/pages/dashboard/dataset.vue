@@ -3,7 +3,7 @@
     <cc-subheader-dataset v-if="dataset" :numItem="dataset.length"/>
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-dataset v-if="data" :data="data"/>
+        <cc-left-panel-dataset />
       </div>
       <div class="col-9">
         <div v-if="$auth.check([80, 100]) && dataset"
@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import { DATASET_BY_SOURCE_QUERY, DATASET_UPLOAD_SUB } from '../../constants/graphql';
+import { mapGetters } from 'vuex';
+import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
 import CcLeftPanelDataset from 'components/cc-left-panel-dataset';
 import CcSubheaderDataset from 'components/cc-subheader-dataset';
@@ -45,18 +45,21 @@ export default {
     CcLeftPanelDataset,
     CcSubheaderDataset,
   },
+  computed: {
+    ...mapGetters({
+      dataset: 'dataset/getDataset',
+    }),
+  },
   data() {
     return {
       projectId: this.$route.params.id,
       data: null,
-      dataset: null,
-      selectedDataIndex: '0',
-      selectedData: null,
+      skipDatasetQuery: false,
     };
   },
   mounted() {
     this.$root.$on('update:imported', () => {
-      this.$apollo.queries.Dataset.refresh();
+      this.skipDatasetQuery = false;
     });
   },
   methods: {
@@ -64,30 +67,14 @@ export default {
       return `${process.env.API_URL}/img/${this.projectId}/${file}`;
     },
     onSelect(data) {
-      this.data = data;
-      this.setActive(data);
-    },
-    setActive(data) {
-      this.dataset[this.selectedDataIndex].isActive = false;
-      this.selectedDataIndex = _.findKey(this.dataset, { _id: data._id });
-      this.dataset[this.selectedDataIndex].isActive = true;
+      this.$store.dispatch('dataset/setData', data);
+      this.$apollo.queries.Dataset.refresh();
     },
   },
   apollo: {
     Dataset: {
       query: DATASET_BY_SOURCE_QUERY,
       fetchPolicy: 'no-cache',
-      subscribeToMore: {
-        document: DATASET_UPLOAD_SUB,
-        variables() {
-          return {
-            uid: this.$auth.user().id,
-          };
-        },
-        updateQuery(data, { subscriptionData }) {
-          console.log(JSON.stringify(subscriptionData));
-        },
-      },
       variables() {
         return {
           id: this.projectId,
@@ -95,12 +82,12 @@ export default {
       },
       update(data) {
         const dataset = data.DataSetBySource.reverse();
-        _.each(dataset, (d) => {
-          d.isActive = false;
-        });
-        this.dataset = dataset;
-        [this.data] = dataset;
-        this.setActive(this.dataset[0]);
+        this.$store.dispatch('dataset/setData', dataset[0]);
+        this.$store.dispatch('dataset/setDataset', dataset);
+        this.skipDatasetQuery = true;
+      },
+      skip() {
+        return this.skipDatasetQuery;
       },
     },
   },

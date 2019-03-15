@@ -89,7 +89,7 @@ export const DATASET_STATS_SUB = gql`subscription subContribution($id: ID!) {
 
 export const DATASET_UPLOAD_SUB = gql`subscription uploadProgress($uid: ID!) {
   uploadProgress(uid: $uid) {
-   size
+   data
   }
 }`;
 
@@ -250,4 +250,8 @@ export const PROJECT_CREATE = gql`mutation createProject($name: String) {
 
 export const PROJECT_DELETE = gql`mutation deleteProject($id: ID!) {
   deleteProject(id: $id)
+}`;
+
+export const DOWNLOAD_FROM_DROPBOX = gql`mutation dropbox($url: String, $project: ProjectInput) {
+  dropbox(url: $url, project: $project)
 }`;

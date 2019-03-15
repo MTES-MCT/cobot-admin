@@ -92,21 +92,7 @@ export default {
       },
     };
   },
-  watch: {
-    metadata() {
-      this.setExif();
-    },
-  },
-  mounted() {
-    this.setExif();
-  },
   methods: {
-    setExif() {
-      const rawMetadata = this.metadata.raw;
-      if (rawMetadata && typeof rawMetadata === 'string') {
-        this.metadata.raw = JSON.parse(rawMetadata);
-      }
-    },
     toggleInfoWindow() {
       this.infoWindowPos = {
         lat: this.metadata.geoData.location.coordinates[0],

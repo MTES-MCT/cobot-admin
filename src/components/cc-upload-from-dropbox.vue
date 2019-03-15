@@ -21,6 +21,8 @@
       <q-toolbar style="text-align: right;" color="white" slot="footer">
         <q-toolbar-title>
           <div class="padding" v-if="!imported">
+            <!-- <q-btn color="pink"
+                  :label="progress" /> -->
             <q-btn @click="upload()"
                   color="pink"
                   label="importer" />
@@ -37,8 +39,9 @@
           </div>
         </q-toolbar-title>
       </q-toolbar>
-       <q-inner-loading :visible="isLoading">
-        <q-spinner-gears size="50px" color="pink"></q-spinner-gears>
+      <q-inner-loading class="spinner" :visible="isLoading">
+        <q-spinner-gears size="50px" color="pink" />
+        <p class="progress">{{ progress }}</p>
       </q-inner-loading>
     </q-modal-layout>
   </q-modal>
@@ -46,40 +49,42 @@
 
 <script>
 import { mapState } from 'vuex';
+import { Loading, QSpinnerGears } from 'quasar';
+
+import { DOWNLOAD_FROM_DROPBOX, DATASET_UPLOAD_SUB } from '../constants/graphql';
 
 export default {
   name: 'CcUploadFromDropbox',
-  props: ['projectId', 'projectName', 'question', 'answers', 'opened'],
+  props: ['opened'],
+  components: {
+    Loading,
+    QSpinnerGears,
+  },
   computed: {
     ...mapState('project', ['project']),
   },
   data() {
     return {
       isLoading: false,
+      progress: '0 o',
       imported: false,
       numFile: null,
-      url: 'https://www.dropbox.com/sh/j569sehelgrcf3b/AACQhZahSS8OPTAaFIXYMUVGa?dl=0',
+      url: '',
     };
   },
   methods: {
     async upload() {
-      console.log(this.project);
       if (this.checkUrl()) {
-        this.isLoading = true;
         this.url = this.url.replace(/\?dl=0/, '?dl=1');
-        const result = await this.axios.post('/dropbox', {
-          url: this.url,
-          // projectId: this.project.id,
-          // projectName: this.project.name,
-          // question: this.project.question,
-          // answers: JSON.stringify(this.project.answers),
+        this.isLoading = true;
+        this.$apollo.mutate({
+          mutation: DOWNLOAD_FROM_DROPBOX,
+          variables: {
+            url: this.url,
+            project: this.project,
+          },
         });
-        if (result && result.data) {
-          this.isLoading = false;
-          this.imported = true;
-          this.numFile = result.data.length;
-          this.$root.$emit('update:imported');
-        }
+        this.progress = 'Téléchargement en cours...';
       } else {
         this.$q.notify({
           message: 'L\'url saisie ne semble pas valide',
@@ -89,7 +94,6 @@ export default {
           closeBtn: 'fermer',
         });
       }
-      return false;
     },
     checkUrl() {
       return this.url && this.url.indexOf('dropbox.com') > -1 && this.url.indexOf('?dl=') > -1;
@@ -100,11 +104,38 @@ export default {
     },
     close() {
       this.isLoading = false;
+      this.$root.$emit('update:imported');
       this.$emit('update:opened', false);
+    },
+  },
+  apollo: {
+    $subscribe: {
+      Progress: {
+        query: DATASET_UPLOAD_SUB,
+        variables() {
+          return {
+            uid: this.$auth.user().id,
+          };
+        },
+        result(data) {
+          this.progress = data.data.uploadProgress.data;
+          if (this.progress === 'eot') {
+            this.close();
+          }
+        },
+      },
     },
   },
 };
 </script>
 
 <style scopped lang="stylus">
+  .spinner
+    p
+      margin-top 20px
+      font-weight bold
+      font-size 40px
+  .q-inner-loading
+    .text-primary
+      display none
 </style>

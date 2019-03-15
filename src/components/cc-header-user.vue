@@ -19,10 +19,11 @@ export default {
         title: 'Déconnexion',
         message: 'Etes-vous sûr de vouloir vous déconnecter ?',
         ok: {
+          color: 'pink',
           label: this.$t('global.yes'),
         },
         cancel: {
-          color: 'negative',
+          color: 'grey',
           label: this.$t('global.no'),
         },
         preventClose: true,

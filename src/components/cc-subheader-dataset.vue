@@ -14,24 +14,14 @@
              icon="cloud_download"
              label="Importer depuis mon compte Dropbox" >
       </q-btn>
-      <q-btn @click="upldoadFromDesktop = true"
+      <!-- <q-btn @click="upldoadFromDesktop = true"
              color="positive"
              icon="important_devices"
              label="Importer depuis mon ordinateur"
-             style="margin-right: 15px;" />
+             style="margin-right: 15px;" /> -->
     </div>
-    <CcUploadFromDesktop v-if="project.name"
-                         :projectId="project.id"
-                         :projectName="project.name"
-                         :question="project.question"
-                         :answers="project.answers"
-                         :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
-    <CcUploadFromDropbox v-if="project.name"
-                         :projectId="project.id"
-                         :projectName="project.name"
-                         :question="project.question"
-                         :answers="project.answers"
-                         :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
+    <CcUploadFromDesktop :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
+    <CcUploadFromDropbox :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
   </div>
 </template>
 
@@ -50,10 +40,6 @@ export default {
     return {
       upldoadFromDesktop: false,
       upldoadFromDropbox: false,
-      project: {
-        id: this.$route.params.id,
-        name: 'rtoto',
-      },
     };
   },
 };

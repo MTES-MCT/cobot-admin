@@ -3,7 +3,7 @@
     <cc-subheader-label />
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-label v-if="dataset" :dataset="dataset"/>
+        <cc-left-panel-label />
       </div>
       <div class="col-9">
         <div class="main-card">
@@ -66,7 +66,7 @@ import 'leaflet/dist/images/marker-shadow.png';
 
 import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
 
-import { DATASET_QUERY, DATASET_BY_SOURCE_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
+import { DATASET_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
 
 import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcSubheaderLabel from 'components/cc-subheader-label';
@@ -93,7 +93,6 @@ export default {
     return {
       projectId: this.$route.params.id,
       dataset: null,
-      data: null,
       isRightPanelInfo: false,
       isRightPanelLabel: false,
       answer: null,
@@ -142,13 +141,14 @@ export default {
   },
   computed: {
     ...mapGetters({
-      dataSetId: 'dataset/getDatasetId',
+      datasetId: 'dataset/getDatasetId',
     }),
+    ...mapState('dataset', ['data']),
     ...mapState('label', ['panel', 'action']),
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
-    dataSetId() {
+    datasetId() {
       this.$apollo.queries.Data.refresh();
     },
     action(newValue) {
@@ -247,7 +247,7 @@ export default {
         await this.$apollo.mutate({
           mutation: DATASET_ANSWERS,
           variables: {
-            id: this.dataSetId,
+            id: this.datasetId,
             answer,
           },
         });
@@ -292,33 +292,23 @@ export default {
       variables() {
         return {
           projectId: this.projectId,
-          id: this.dataSetId,
+          id: this.datasetId,
           notAnswered: !this.isDataQualified,
         };
       },
       update(data) {
         const dataset = data.DataSet;
-        this.resetLayer();
-        this.$store.dispatch('dataset/setDatasetId', dataset._id);
         const { usersAnswers } = dataset;
+        this.resetLayer();
         if (usersAnswers.length > 0) {
           const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
-          this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+          if (userAnswer) {
+            this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+          }
         }
-        this.data = dataset;
+        // this.data = dataset;
+        this.$store.dispatch('dataset/setData', dataset);
         this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
-      },
-    },
-    Dataset: {
-      query: DATASET_BY_SOURCE_QUERY,
-      fetchPolicy: 'no-cache',
-      variables() {
-        return {
-          id: this.projectId,
-        };
-      },
-      async update(datas) {
-        this.dataset = datas.DataSetBySource;
       },
     },
   },

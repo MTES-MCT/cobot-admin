@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CcPanelPhotoInfo from 'components/panel-photo-info';
 
 export default {
@@ -13,7 +14,9 @@ export default {
   components: {
     CcPanelPhotoInfo,
   },
-  props: ['data'],
+  computed: {
+    ...mapState('dataset', ['data']),
+  },
 };
 </script>
 

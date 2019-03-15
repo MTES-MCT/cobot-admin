@@ -28,15 +28,10 @@
        <!-- </q-collapsible> -->
 
       <q-item v-if="$auth.check(100)" @click.native="goToNewProject()">
-        <q-btn outline
-                color="primary"
-                label="ajouter un projet" />
+        <q-btn color="positive"
+               label="ajouter un projet" />
       </q-item>
     </q-collapsible>
-    <!-- <q-item>
-      <q-item-side icon="people" />
-      <q-item-main label="Mon compte" />
-    </q-item> -->
     <q-item v-if="$auth.check(100)" @click.native="goToCobot()">
       <q-item-side icon="language" />
       <q-item-main label="Messages de Cobot" />
@@ -71,6 +66,16 @@ export default {
     this.$root.$on('newProject', (project) => {
       this.Me.projects.push(project);
     });
+  },
+  mounted() {
+    const project = JSON.parse(this.$localStorage.get('project'));
+    delete project.__typename;
+    delete project.__typename;
+    _.each(project.answers, (answer) => {
+      delete answer._id;
+      delete answer.__typename;
+    });
+    this.$store.dispatch('project/setProject', project);
   },
   methods: {
     slug(name) {
