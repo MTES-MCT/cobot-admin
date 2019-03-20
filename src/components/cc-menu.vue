@@ -1,42 +1,53 @@
 <template>
-  <q-list
-    no-border
-    link
-    inset-delimiter
-    separator
-    style="height: calc(100vh - 55px);"
-  >
-    <q-collapsible indent icon="mail" label="mes projets" opened>
-      <!-- <q-collapsible v-for="project in Me.projects"
-                     :key="project.id"
-                     :label="project.name"
-                     sublabel="Edit"
-                     icon="receipt"> -->
-      <q-item v-for="project in Me.projects"
-              :key="project.id"
-              link>
-        <q-item-main>
-          <q-item-tile
-            @click.native="goToDashboard(project)"
-            label>{{ project.name }}</q-item-tile>
-          <q-item-tile
-            v-if="$auth.check([80, 100])"
-            @click.native="goToEditProject(project.id)"
-            sublabel>Edit</q-item-tile>
-        </q-item-main>
+  <div>
+    <q-list
+      no-border
+      link
+      inset-delimiter
+      separator
+      class="menu"
+    >
+      <q-list-header>
+        <div class="row">
+          <div class="col-6">
+            Mes projects
+          </div>
+          <div class="col-6" style="text-align:right">
+            <a href="#" @click="goToNewProject()">ajouter un projet</a>
+          </div>
+        </div>
+      </q-list-header>
+      <q-collapsible v-for="project in Me.projects"
+                    :key="project.id"
+                    :label="project.name"
+                    group="project"
+                    icon="receipt">
+        <div class="links">
+          <ul>
+            <li @click="goToDashboard(project)">aller au projet</li>
+            <li @click="goToEditProject(project.id)">éditer le projet</li>
+          </ul>
+        </div>
+      </q-collapsible>
+      <q-item v-if="$auth.check(110)" @click.native="goToCobot()">
+        <q-item-side icon="language" />
+        <q-item-main label="Messages de Cobot" />
       </q-item>
-       <!-- </q-collapsible> -->
-
-      <q-item v-if="$auth.check(100)" @click.native="goToNewProject()">
-        <q-btn color="positive"
-               label="ajouter un projet" />
-      </q-item>
-    </q-collapsible>
-    <q-item v-if="$auth.check(100)" @click.native="goToCobot()">
-      <q-item-side icon="language" />
-      <q-item-main label="Messages de Cobot" />
-    </q-item>
-  </q-list>
+    </q-list>
+    <q-modal v-model="openEditProject"
+             minimized>
+      <q-modal-layout>
+        <q-toolbar color="dark" slot="header">
+          <q-toolbar-title>
+            Edition du projet
+          </q-toolbar-title>
+        </q-toolbar>
+        <div class="layout-padding">
+          <p>Lorem Ipsum is simply dummy</p>
+        </div>
+      </q-modal-layout>
+    </q-modal>
+  </div>
 </template>
 
 <script>
@@ -48,6 +59,7 @@ export default {
   name: 'CcMenu',
   data() {
     return {
+      openEditProject: false,
       Me: {
         projects: [],
       },
@@ -87,8 +99,9 @@ export default {
       this.$root.$emit('projectChanged', project);
       this.$router.push(`/dashboard/${project.id}`);
     },
-    goToEditProject(id) {
-      this.$router.push(`/project/${id}`);
+    goToEditProject() {
+      this.openEditProject = true;
+      // this.$router.push(`/project/${id}`);
     },
     goToNewProject() {
       this.$router.push('/project');
@@ -110,4 +123,26 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
+    .menu
+      height: calc(100vh - 55px);
+      .links
+        ul
+          list-style-type none
+          margin 0
+          padding-left 0
+          padding-bottom 10px
+          li
+            line-height 2rem
+            padding-left 65px
+            color $pink
+            &:hover
+              cursor pointer
+              background lightgrey
+      a
+        color $pink
+        text-decoration none
+        &:hover
+          text-decoration underline
+      .q-collapsible-sub-item
+        padding 0
 </style>

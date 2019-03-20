@@ -8,7 +8,7 @@
       </q-toolbar>
       <div class="layout-padding">
         <q-uploader stack-label="Selectionnez les fichiers à importer"
-                  :url="url"
+                  url=""
                   :upload-factory="uploadFile"
                   :headers="setHeaders()"
                   :additional-fields="setBody()"
@@ -62,10 +62,9 @@ export default {
     },
     parseGpsData(data) {
       const aData = data.split(',');
-      aData[0] = `${parseInt(aData[0], 10)}/1`;
-      aData[1] = `${parseInt(aData[1], 10)}/1`;
-      const second = aData[2].split('.');
-      aData[2] = `${parseInt(second[0], 10)}/${parseInt(second[1], 10)}`;
+      aData[0] = `${parseFloat(aData[0], 10)}/1`;
+      aData[1] = `${parseFloat(aData[1], 10)}/1`;
+      aData[2] = `${parseFloat(aData[2], 10)}/1`;
       return aData.join(',');
     },
     setBody() {

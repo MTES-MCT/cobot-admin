@@ -2,9 +2,6 @@
   <div>
     <div v-if="!deleted && !projectNotFound" class="main-card row justify-center">
       <div class="col-12">
-        <h2>Edition du projet "{{ project.name }}"</h2>
-      </div>
-      <div class="col-12">
         <q-card indent style="background-color: white;">
           <q-card-title>
             <strong>Details du projet</strong>
@@ -19,50 +16,14 @@
             </div>
           </q-card-main>
           <q-card-actions class="row justify-end actions">
-            <q-btn  outline
-                    @click="save()"
-                    color="primary"
+            <q-btn  @click="save()"
+                    color="positive"
                     align="right"
                     icon="save"
                     label="enregistrer"/>
           </q-card-actions>
         </q-card>
       </div>
-      <div class="col-12 padding">
-        <q-card style="background-color: white;">
-          <q-card-title>
-            <strong>Jeux de données à qualifier</strong>
-          </q-card-title>
-          <q-card-main>
-            <div class="row justify-around">
-              <div>
-                <q-btn @click="upldoadFromDropbox = true"
-                       color="primary"
-                       icon="cloud_download"
-                       label="Importer depuis mon compte Dropbox" />
-              </div>
-              <div>
-                <q-btn @click="upldoadFromDesktop = true"
-                       color="primary"
-                       icon="important_devices"
-                       label="Importer depuis mon ordinateur" />
-              </div>
-            </div>
-          </q-card-main>
-        </q-card>
-      </div>
-      <CcUploadFromDesktop v-if="project.name"
-                           :projectId="id"
-                           :projectName="project.name"
-                           :question="project.question"
-                           :answers="project.answers"
-                           :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
-      <CcUploadFromDropbox v-if="project.name"
-                           :projectId="id"
-                           :projectName="project.name"
-                           :question="project.question"
-                           :answers="project.answers"
-                           :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
       <div class="col-12 padding">
         <q-card indent style="background-color: white;">
           <q-card-title>
@@ -85,8 +46,7 @@
           </q-card-main>
           <q-card-actions class="row justify-end actions">
             <q-btn  @click="save()"
-                    outline
-                    color="primary"
+                    color="positive"
                     align="right"
                     icon="save"
                     label="enregistrer"/>
@@ -130,8 +90,6 @@ export default {
   },
   data() {
     return {
-      upldoadFromDesktop: false,
-      upldoadFromDropbox: false,
       id: this.$route.params.id,
       deleted: false,
       projectNotFound: false,
@@ -248,8 +206,9 @@ export default {
   @import '~variables'
   .main-card
     border-radius 2px
-    width 65vw
-    max-width 1200px
+    width 100%
+    margin 20px 0px 40px 0px
+    padding 0px 20px 00px 20px
   .padding
     padding-top: 30px;
   .q-card

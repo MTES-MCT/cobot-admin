@@ -25,7 +25,7 @@ const store = new Vuex.Store({
 // code with "process.env.DEV" -- so this doesn't
 // get into our production build (and it shouldn't).
 if (process.env.DEV && module.hot) {
-  module.hot.accept(['./dataset', './users', './label'], () => {
+  module.hot.accept(['./dataset', './users', './label', './project'], () => {
     const newDataset = require('./dataset').default;
     const newUsers = require('./users').default;
     const newLabel = require('./label').default;

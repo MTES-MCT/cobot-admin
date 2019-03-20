@@ -20,10 +20,17 @@
               </q-card-media>
               <q-card-main>
                 <p>{{ data.file }}</p>
-                <p class="text-faded"><q-icon name="place" />
-                  {{ data.numAnswers }} contributions
-                </p>
               </q-card-main>
+              <q-card-actions>
+                <div v-if="data.numAnswers > 0" style="width: 100%; text-align: center">
+                  <q-chip v-for="(answer, index) in groupAnswers(data._id, data.usersAnswers)"
+                          :key="index"
+                          color="dark">{{ index }} ({{ answer.length }})</q-chip>
+                </div>
+                <div v-else style="width: 100%; text-align: center;">
+                  <p>aucune contribution</p>
+                </div>
+              </q-card-actions>
             </q-card>
           </div>
         </div>
@@ -33,6 +40,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import { mapGetters } from 'vuex';
 import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
@@ -57,6 +65,11 @@ export default {
       skipDatasetQuery: false,
     };
   },
+  watch: {
+    dataset(newVal) {
+      console.log(newVal);
+    },
+  },
   mounted() {
     this.$root.$on('update:imported', () => {
       this.skipDatasetQuery = false;
@@ -69,6 +82,15 @@ export default {
     onSelect(data) {
       this.$store.dispatch('dataset/setData', data);
       this.$apollo.queries.Dataset.refresh();
+    },
+    groupAnswers(id, answers) {
+      const groupedAnswers = _.groupBy(answers, (answer) => {
+        if (answer.label.id) {
+          return answer.label.label;
+        }
+        return answer.label;
+      });
+      return groupedAnswers;
     },
   },
   apollo: {
@@ -106,6 +128,7 @@ export default {
       border solid 5px $pink
     .q-card
       width 300px
+      height 400px
       &:hover
         cursor pointer
       .q-card-main
@@ -114,4 +137,8 @@ export default {
           white-space nowrap
           overflow hidden
           text-overflow ellipsis
+      .q-card-actions
+        .q-chip
+          margin-top 10px
+          margin-left 5px
 </style>

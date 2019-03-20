@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import CcPanelPhotoInfo from 'components/panel-photo-info';
 
 export default {
@@ -15,7 +15,9 @@ export default {
     CcPanelPhotoInfo,
   },
   computed: {
-    ...mapState('dataset', ['data']),
+    ...mapGetters({
+      data: 'dataset/getData',
+    }),
   },
 };
 </script>

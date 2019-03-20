@@ -29,6 +29,7 @@ module.exports = function config(ctx) {
     build: {
       env: {
         API_URL: JSON.stringify(process.env.API_URL),
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       },
       scopeHoisting: true,
       vueRouterMode: 'hash',

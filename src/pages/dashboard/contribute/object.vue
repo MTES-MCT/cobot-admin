@@ -142,8 +142,8 @@ export default {
   computed: {
     ...mapGetters({
       datasetId: 'dataset/getDatasetId',
+      data: 'dataset/getData',
     }),
-    ...mapState('dataset', ['data']),
     ...mapState('label', ['panel', 'action']),
     ...mapState('dataset', ['isDataQualified']),
   },
