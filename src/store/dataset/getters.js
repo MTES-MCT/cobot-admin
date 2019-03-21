@@ -7,9 +7,11 @@ export const getDataset = (state) => {
   if (state.data) {
     _.each(state.dataset, (data) => {
       data.isActive = (data._id === state.data._id);
-      if (data.usersAnswers && data.usersAnswers.length > 0 && !data.usersAnswers[0].label) {
-        data.usersAnswers = _.map(data.usersAnswers, answer => JSON.parse(answer.answers));
-      }
+      _.each(data.usersAnswers, (answer) => {
+        if (typeof answer.answers === 'string') {
+          answer.answers = JSON.parse(answer.answers);
+        }
+      });
     });
   }
   return state.dataset;

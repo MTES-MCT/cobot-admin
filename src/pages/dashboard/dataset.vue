@@ -23,7 +23,7 @@
               </q-card-main>
               <q-card-actions>
                 <div v-if="data.numAnswers > 0" style="width: 100%; text-align: center">
-                  <q-chip v-for="(answer, index) in groupAnswers(data._id, data.usersAnswers)"
+                  <q-chip v-for="(answer, index) in groupAnswers(data, data.usersAnswers)"
                           :key="index"
                           color="dark">{{ index }} ({{ answer.length }})</q-chip>
                 </div>
@@ -65,11 +65,6 @@ export default {
       skipDatasetQuery: false,
     };
   },
-  watch: {
-    dataset(newVal) {
-      console.log(newVal);
-    },
-  },
   mounted() {
     this.$root.$on('update:imported', () => {
       this.skipDatasetQuery = false;
@@ -83,12 +78,12 @@ export default {
       this.$store.dispatch('dataset/setData', data);
       this.$apollo.queries.Dataset.refresh();
     },
-    groupAnswers(id, answers) {
+    groupAnswers(data, answers) {
       const groupedAnswers = _.groupBy(answers, (answer) => {
-        if (answer.label.id) {
-          return answer.label.label;
+        if (answer.answers.label.id) {
+          return answer.answers.label.label;
         }
-        return answer.label;
+        return answer.answers.label;
       });
       return groupedAnswers;
     },

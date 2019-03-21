@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cc-subheader-label />
+    <cc-subheader-label :items="getElements()" />
     <div class="row main">
       <div class="col-3">
         <cc-left-panel-label />
@@ -8,8 +8,15 @@
       <div class="col-9">
         <div class="main-card">
           <div class="row justify-center">
-            <div>
-            <l-map
+            <div style="text-align: center;">
+              <p>Si cette photo contient l'un des élements suivants, merci de le détourer :</p>
+              <p style="font-weight: bold;">{{ getElements() }}</p>
+              <p>
+                <a href="#" @click="onNone()" class="next">
+                  <small>aucun élément, passer à la photo suivante</small>
+                </a>
+              </p>
+              <l-map
                 ref="map"
                 :min-zoom="minZoom"
                 :crs="crs"
@@ -200,10 +207,10 @@ export default {
     });
   },
   methods: {
-    onSkip() {
-      if (this.$apollo.queries.Dataset) {
-        this.$apollo.queries.Dataset.refresh();
-      }
+    getElements() {
+      let labels = _.map(this.labels, 'label');
+      labels = _.reject(labels, (label => label === 'Aucun'));
+      return labels.join(', ');
     },
     resetEditableLayer() {
       this.editableLayers.eachLayer((layer) => {
@@ -223,27 +230,33 @@ export default {
           this.resetEditableLayer();
           break;
         case 'save':
-          this.saveAnswer(this.$store.state.label.label);
-          this.$store.commit('label/SET_ACTION', null);
+          this.saveAnswer(this.$store.state.label.label, () => {
+            this.$store.commit('label/SET_ACTION', null);
+          });
           break;
         case 'next':
           this.$store.commit('label/SET_PANEL', null);
           this.$store.dispatch('dataset/setDatasetId', null);
           this.$store.commit('dataset/SET_IS_QUALIFIED', false);
           this.resetEditableLayer();
-          this.onSkip();
           break;
         default:
           return null;
       }
       return true;
     },
+    onNone() {
+      this.saveAnswer(JSON.stringify(this.labels[4]), () => {
+        this.$store.dispatch('dataset/setDatasetId', null);
+        this.onSkip();
+      });
+    },
     onOpenLabelBox() {
       this.openLabelBox = true;
     },
-    async saveAnswer(label) {
+    async saveAnswer(label, callback) {
       try {
-        const answer = this.prepareAnswer(this.answer[0], label);
+        const answer = (this.answer) ? this.prepareAnswer(this.answer[0], label) : label;
         await this.$apollo.mutate({
           mutation: DATASET_ANSWERS,
           variables: {
@@ -251,7 +264,9 @@ export default {
             answer,
           },
         });
+        this.answer = null;
         this.$root.$emit('onLabelSaved');
+        callback();
       } catch (error) {
         // this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
       }
@@ -306,7 +321,6 @@ export default {
             this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
           }
         }
-        // this.data = dataset;
         this.$store.dispatch('dataset/setData', dataset);
         this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
       },
@@ -315,6 +329,11 @@ export default {
 };
 </script>
 <style scopped lang="stylus">
+  @import '~variables'
+  .next
+    color $pink
+    &:hover
+      text-decoration underline
   .main-card
     border-radius 2px
     margin 20px 0px 40px 0px

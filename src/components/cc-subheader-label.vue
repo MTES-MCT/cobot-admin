@@ -26,6 +26,7 @@
 <script>
 export default {
   name: 'CcSubHeaderLabel',
+  props: ['items'],
   methods: {
     onInformation() {
       const panel = (this.$store.state.label.panel !== 'rightPanelInfo') ? 'rightPanelInfo' : null;

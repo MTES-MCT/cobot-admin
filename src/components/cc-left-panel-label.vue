@@ -83,6 +83,11 @@ export default {
       this.updateDatasetList();
     },
   },
+  created() {
+    this.$root.$on('onLabelSaved', () => {
+      this.$apollo.queries.Dataset.refresh();
+    });
+  },
   methods: {
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
@@ -135,32 +140,6 @@ export default {
     },
   },
   apollo: {
-    // Data: {
-    //   query: DATASET_QUERY,
-    //   fetchPolicy: 'no-cache',
-    //   variables() {
-    //     return {
-    //       projectId: this.projectId,
-    //       id: this.dataSetId,
-    //       notAnswered: !this.isDataQualified || false,
-    //     };
-    //   },
-    //   update(data) {
-    //     this.$store.dispatch('dataset/setData', data.DataSet);
-    //     this.resetLayer();
-    //     this.$store.dispatch('dataset/setDatasetId', dataset._id);
-    //     const { usersAnswers } = dataset;
-    //     if (usersAnswers.length > 0) {
-    //       const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
-    //       this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
-    //     }
-    //     this.data = dataset;
-    //     this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
-    //   },
-    //   skip() {
-    //     return this.datasetId;
-    //   },
-    // },
     Dataset: {
       query: DATASET_BY_SOURCE_QUERY,
       fetchPolicy: 'no-cache',
