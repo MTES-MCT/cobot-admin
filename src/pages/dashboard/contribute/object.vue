@@ -104,7 +104,7 @@ export default {
       isRightPanelLabel: false,
       answer: null,
       label: null,
-      skipQuery: true,
+      skipQuery: false,
       loading: false,
       openLabelHelp: false,
       map: null,
@@ -248,7 +248,7 @@ export default {
     onNone() {
       this.saveAnswer(JSON.stringify(this.labels[4]), () => {
         this.$store.dispatch('dataset/setDatasetId', null);
-        this.onSkip();
+        this.$root.$emit('onNext');
       });
     },
     onOpenLabelBox() {
@@ -323,6 +323,7 @@ export default {
         }
         this.$store.dispatch('dataset/setData', dataset);
         this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
+        this.skipQuery = true;
       },
     },
   },

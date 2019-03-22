@@ -11,8 +11,15 @@
              default
              color="positive"
              style="margin-right: 10px;"
+             icon="cloud_upload"
+             label="Importer des photos depuis mon compte Dropbox" >
+      </q-btn>
+      <q-btn @click="exportData = true"
+             default
+             color="pink"
+             style="margin-right: 10px;"
              icon="cloud_download"
-             label="Importer depuis mon compte Dropbox" >
+             label="Exporter les données" >
       </q-btn>
       <!-- <q-btn @click="upldoadFromDesktop = true"
              color="positive"
@@ -22,12 +29,14 @@
     </div>
     <CcUploadFromDesktop :opened.sync="upldoadFromDesktop"></CcUploadFromDesktop>
     <CcUploadFromDropbox :opened.sync="upldoadFromDropbox"></CcUploadFromDropbox>
+    <CcExportData :opened.sync="exportData"></CcExportData>
   </div>
 </template>
 
 <script>
 import CcUploadFromDesktop from 'components/cc-upload-from-desktop';
 import CcUploadFromDropbox from 'components/cc-upload-from-dropbox';
+import CcExportData from 'components/cc-export-data';
 
 export default {
   name: 'CcSubHeaderDataset',
@@ -35,11 +44,13 @@ export default {
   components: {
     CcUploadFromDesktop,
     CcUploadFromDropbox,
+    CcExportData,
   },
   data() {
     return {
       upldoadFromDesktop: false,
       upldoadFromDropbox: false,
+      exportData: false,
     };
   },
 };

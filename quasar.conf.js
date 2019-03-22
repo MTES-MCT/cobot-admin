@@ -101,6 +101,8 @@ module.exports = function config(ctx) {
         'QInnerLoading',
         'QSpinnerGears',
         'QSelect',
+        'QRadio',
+        'QOptionGroup',
         'QWindowResizeObservable',
       ],
       directives: [

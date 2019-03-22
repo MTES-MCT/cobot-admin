@@ -3,12 +3,12 @@
     <q-list-header>
       <div class="row justify-around tabs">
         <div :class="{'active': filter === 'toContribute'}">
-          <a @click="setFilter('toContribute')" href="#">
+          <a @click="setFilter('toContribute')">
             à qualifier ({{ datasetTodo.length }})
           </a>
         </div>
         <div :class="{'active': filter === 'contributed'}">
-          <a @click="setFilter('contributed')" href="#">
+          <a @click="setFilter('contributed')">
             mes contributions ({{ datasetDone.length }})
           </a>
         </div>
@@ -74,18 +74,18 @@ export default {
       datasetId: 'dataset/getDatasetId',
     }),
     ...mapState('users', ['user']),
+    ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
     datasetId() {
-      this.updateDatasetList();
-    },
-    dataset() {
-      this.updateDatasetList();
+      this.$apollo.queries.Dataset.refresh();
     },
   },
   created() {
-    this.$root.$on('onLabelSaved', () => {
-      this.$apollo.queries.Dataset.refresh();
+    this.$root.$on('onNext', () => {
+      if (this.$apollo.queries.Dataset) {
+        this.$apollo.queries.Dataset.refresh();
+      }
     });
   },
   methods: {
@@ -94,6 +94,7 @@ export default {
     },
     setFilter(filter) {
       this.$store.commit('dataset/SET_IS_QUALIFIED', filter === 'contributed');
+      this.$store.dispatch('dataset/setDatasetId', null);
       this.filter = filter;
     },
     contribute(data) {
@@ -111,18 +112,29 @@ export default {
             (answer => answer.userId === this.user.id),
           );
           if (hasAnswered.length === 0) {
-            this.setFirstData(datasetTodo, data);
             datasetTodo.push(data);
           } else {
             datasetDone.push(data);
           }
         } else {
-          this.setFirstData(datasetTodo, data);
           datasetTodo.push(data);
         }
       });
       this.datasetTodo = datasetTodo;
       this.datasetDone = datasetDone;
+      this.setFirstData();
+    },
+    setFirstData() {
+      const datasetId = this.datasetId || null;
+      if (!datasetId) {
+        if (!this.isDataQualified) {
+          this.datasetTodo[0].isActive = true;
+          this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
+        } else {
+          this.datasetDone[0].isActive = true;
+          this.$store.dispatch('dataset/setDatasetId', this.datasetDone[0]._id);
+        }
+      }
       setTimeout(() => {
         if (this.$refs[this.datasetId]) {
           this.$refs[this.datasetId][0].$el.scrollIntoView({
@@ -130,13 +142,6 @@ export default {
           });
         }
       }, 300);
-    },
-    setFirstData(datasetTodo, data) {
-      const datasetId = this.datasetId || null;
-      if (!datasetId && datasetTodo.length === 0) {
-        data.isActive = true;
-        this.$store.dispatch('dataset/setDatasetId', data._id);
-      }
     },
   },
   apollo: {
@@ -148,8 +153,9 @@ export default {
           id: this.projectId,
         };
       },
-      async update(datas) {
+      update(datas) {
         this.$store.dispatch('dataset/setDataset', datas.DataSetBySource);
+        this.updateDatasetList();
       },
     },
   },
@@ -168,6 +174,7 @@ export default {
     margin-top 7px
   a
     position relative
+    cursor pointer
     font-weight bold
     color $tertiary
     text-decoration none

@@ -7,9 +7,17 @@ export const getDataset = (state) => {
   if (state.data) {
     _.each(state.dataset, (data) => {
       data.isActive = (data._id === state.data._id);
+      data.hasNone = false;
       _.each(data.usersAnswers, (answer) => {
         if (typeof answer.answers === 'string') {
           answer.answers = JSON.parse(answer.answers);
+        }
+        if (typeof answer.answers.label === 'string') {
+          if (answer.answers.label === 'Aucun') {
+            data.hasNone = true;
+          }
+        } else if (answer.answers.label.id === 'none') {
+          data.hasNone = true;
         }
       });
     });

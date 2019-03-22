@@ -12,7 +12,7 @@
             <q-card v-for="data in dataset"
                     :key="data._id"
                     @click.native="onSelect(data)"
-                    :class="{ 'active': data.isActive }"
+                    :class="{ 'active': data.isActive, 'hasNone': data.hasNone }"
                     class="q-ma-sm"
                     inline>
               <q-card-media>
@@ -23,9 +23,10 @@
               </q-card-main>
               <q-card-actions>
                 <div v-if="data.numAnswers > 0" style="width: 100%; text-align: center">
-                  <q-chip v-for="(answer, index) in groupAnswers(data, data.usersAnswers)"
-                          :key="index"
-                          color="dark">{{ index }} ({{ answer.length }})</q-chip>
+                  <q-chip v-for="(answer, answerIndex) in groupAnswers(data.usersAnswers)"
+                          :key="answerIndex"
+                          @click="onPreview(data)"
+                          color="dark">{{ answerIndex }} ({{ answer.length }})</q-chip>
                 </div>
                 <div v-else style="width: 100%; text-align: center;">
                   <p>aucune contribution</p>
@@ -35,6 +36,21 @@
           </div>
         </div>
       </div>
+      <q-modal v-model="openPreview"
+               class="modalPreview">
+        <q-modal-layout>
+          <q-toolbar color="dark" slot="header">
+            <q-toolbar-title>
+            Prévisualisation
+            </q-toolbar-title>
+          </q-toolbar>
+          <div class="layout-padding">
+            <cc-label-map v-if="previewData"
+                          :projectId="projectId"
+                          :data="previewData"></cc-label-map>
+          </div>
+        </q-modal-layout>
+      </q-modal>
     </div>
   </div>
 </template>
@@ -46,12 +62,14 @@ import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
 import CcLeftPanelDataset from 'components/cc-left-panel-dataset';
 import CcSubheaderDataset from 'components/cc-subheader-dataset';
+import CcLabelMap from 'components/cc-label-map';
 
 export default {
   name: 'Dataset',
   components: {
     CcLeftPanelDataset,
     CcSubheaderDataset,
+    CcLabelMap,
   },
   computed: {
     ...mapGetters({
@@ -63,6 +81,8 @@ export default {
       projectId: this.$route.params.id,
       data: null,
       skipDatasetQuery: false,
+      previewData: null,
+      openPreview: false,
     };
   },
   mounted() {
@@ -74,12 +94,15 @@ export default {
     setImgUrl(file) {
       return `${process.env.API_URL}/img/${this.projectId}/${file}`;
     },
+    onPreview(data) {
+      this.previewData = data;
+      this.openPreview = true;
+    },
     onSelect(data) {
       this.$store.dispatch('dataset/setData', data);
-      this.$apollo.queries.Dataset.refresh();
     },
-    groupAnswers(data, answers) {
-      const groupedAnswers = _.groupBy(answers, (answer) => {
+    groupAnswers(usersAnswers) {
+      const groupedAnswers = _.groupBy(usersAnswers, (answer) => {
         if (answer.answers.label.id) {
           return answer.answers.label.label;
         }
@@ -118,9 +141,16 @@ export default {
     width 100%
     margin 20px 0px 40px 0px
     padding 0px 20px 00px 20px
+  .modalPreview
+    .modal-content
+      max-height 85vh
+    .layout-padding
+      padding-top 10px
   .dataset
     .active
       border solid 5px $pink
+    .hasNone
+      opacity 0.5
     .q-card
       width 300px
       height 400px
