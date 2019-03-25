@@ -9,8 +9,27 @@
         <div class="main-card">
           <div class="row justify-center">
             <div style="text-align: center;">
-              <p>Si cette photo contient l'un des élements suivants, merci de le détourer :</p>
-              <p style="font-weight: bold;">{{ getElements() }}</p>
+              <p>Si la photo ci-dessous contient l'un des éléments suivants :</p>
+              <p>
+                <span v-for="(label, index) in labels"
+                      :key="index"
+                      v-if="label.id !== 'none'">
+                  <a class="labelLink"
+                      href="#">
+                    {{ label.label }}
+                    <q-tooltip>
+                      <img :src="label.img" />
+                    </q-tooltip>
+                  </a>
+                  <span v-if="index !== labels.length - 2">, </span>
+                </span>
+              </p>
+              <p>
+                Merci de le détourer en appuyant sur le bouton
+                <img src="../../../statics/reactangleTool.png"
+                     style="width: 20px; margin: 0 10px 0 10px;" />
+                situé en haut à droite de la zone image.
+              </p>
               <p>
                 <a href="#" @click="onNone()" class="next">
                   <small>aucun élément, passer à la photo suivante</small>
@@ -40,20 +59,7 @@
             leave-active-class="animated slideOutRight" >
             <CcRightPanelLabel v-if="panel === 'rightPanelLabel'" :labels="labels"/>
           </transition>
-          <q-modal v-model="openLabelHelp"
-                  minimized>
-            <q-modal-layout>
-              <q-toolbar color="dark" slot="header">
-                <q-toolbar-title>
-                Aide
-                </q-toolbar-title>
-              </q-toolbar>
-              <div class="layout-padding">
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
-              </div>
-            </q-modal-layout>
-          </q-modal>
+          <CcHelp />
         </div>
       </div>
     </div>
@@ -79,6 +85,7 @@ import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
 import CcPanelPhotoInfo from 'components/panel-photo-info';
+import CcHelp from 'components/cc-help';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -95,6 +102,7 @@ export default {
     CcPanelPhotoInfo,
     CcLeftPanelLabel,
     CcSubheaderLabel,
+    CcHelp,
   },
   data() {
     return {
@@ -122,21 +130,25 @@ export default {
           id: 'chantier',
           type: 'polygon',
           label: 'Elément de chantier',
+          img: '../../../statics/chantier.png',
         },
         {
           id: 'bitumen',
           type: 'polygon',
           label: 'Rue Pavée',
+          img: '../../../statics/pave.png',
         },
         {
           id: 'pieton',
           type: 'polygon',
           label: 'Passage piéton',
+          img: '../../../statics/pieton.png',
         },
         {
           id: 'bev',
           type: 'polygon',
           label: 'Bande d\'éveil vigilance',
+          img: '../../../statics/bev.png',
         },
         {
           id: 'none',
@@ -163,9 +175,6 @@ export default {
     },
   },
   mounted() {
-    this.$root.$on('onLabelHelp', () => {
-      this.openLabelHelp = true;
-    });
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
       this.map._onResize();
@@ -190,7 +199,6 @@ export default {
         },
         edit: {
           featureGroup: this.editableLayers,
-          remove: true,
         },
       };
       const drawControl = new L.Control.Draw(drawPluginOptions);
@@ -208,9 +216,14 @@ export default {
   },
   methods: {
     getElements() {
-      let labels = _.map(this.labels, 'label');
-      labels = _.reject(labels, (label => label === 'Aucun'));
-      return labels.join(', ');
+      const aLabels = _.map(this.labels, 'label');
+      const labelLink = [];
+      _.each(aLabels, (label) => {
+        if (label !== 'Aucun') {
+          labelLink.push(`<a class="labelLink" href="">${label}</a>`);
+        }
+      });
+      return labelLink.join(', ');
     },
     resetEditableLayer() {
       this.editableLayers.eachLayer((layer) => {
@@ -333,8 +346,16 @@ export default {
   @import '~variables'
   .next
     color $pink
+    font-weight bold
+    text-decoration none
     &:hover
       text-decoration underline
+  .labelLink
+    font-weight bold
+    text-decoration none
+    border-bottom: 1px dotted $pink
+    &:visited
+      color inherit
   .main-card
     border-radius 2px
     margin 20px 0px 40px 0px
@@ -355,4 +376,6 @@ export default {
     border-left-color #F2C037
   .leaflet-tooltip-right.toolTip_polygon::before
     border-right-color #F2C037
+  .q-carousel-quick-nav
+    background none
 </style>

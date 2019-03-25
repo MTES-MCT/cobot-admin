@@ -143,6 +143,7 @@ export default {
         this.$store.commit('project/SET_PROJECTS', user.projects);
         this.$localStorage.set('projects', JSON.stringify(user.projects));
         const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
+        this.$store.commit('users/SET_OPEN_WELCOME', true);
         if (lastProjectOpened) {
           this.$store.commit('project/SET_PROJECT', lastProjectOpened);
           this.$router.push({ name: 'dashboard.contribute.object', params: { id: lastProjectOpened.id } });

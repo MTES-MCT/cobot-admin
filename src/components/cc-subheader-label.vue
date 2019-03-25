@@ -20,20 +20,29 @@
         {{ $t("labelbot.info") }}
       </q-btn>
     </div>
+    <ccWelcome></ccWelcome>
   </div>
 </template>
 
 <script>
+import ccWelcome from './cc-welcome';
+
 export default {
   name: 'CcSubHeaderLabel',
+  components: {
+    ccWelcome,
+  },
   props: ['items'],
+  mounted() {
+    this.$root.$emit('onOpenWelcome');
+  },
   methods: {
     onInformation() {
       const panel = (this.$store.state.label.panel !== 'rightPanelInfo') ? 'rightPanelInfo' : null;
       this.$store.commit('label/SET_PANEL', panel);
     },
     onHelp() {
-      this.$root.$emit('onLabelHelp');
+      this.$store.commit('users/SET_OPEN_HELP', true);
     },
   },
 };

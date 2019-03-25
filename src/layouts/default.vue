@@ -24,13 +24,19 @@
                 </div>
               </div>
             </div>
-            <div class="col-9" style="padding-left: 50px;">
+            <div class="col-7" style="padding-left: 50px;">
+              <q-btn @click="goTo('dashboard.contribute.object', $route.params.id)"
+                     flat icon="public" label="Contribuer" />
               <q-btn @click="goTo('dashboard', $route.params.id)"
                      flat icon="dashboard" label="Dashboard" />
               <q-btn @click="goTo('dashboard.contributors', $route.params.id)"
                     flat icon="group" label="Contributeurs" />
               <q-btn @click="goTo('dashboard.dataset', $route.params.id)"
                      flat icon="ballot" label="Jeu de donnée" />
+            </div>
+            <div class="col-1" style="text-align: right; padding-right: 20px;">
+              <q-btn @click="openInfo()"
+                     flat icon="info" />
             </div>
           </div>
         </q-toolbar-title>
@@ -49,18 +55,23 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <CcInfo></CcInfo>
+
   </q-layout>
 </template>
 
 <script>
 import CcHeaderUser from 'components/cc-header-user';
 import CcMenu from 'components/cc-menu';
+import CcInfo from 'components/cc-info';
 
 export default {
   name: 'LayoutDefault',
   components: {
     CcHeaderUser,
     CcMenu,
+    CcInfo,
   },
   data() {
     return {
@@ -84,6 +95,9 @@ export default {
     },
     goTo(to, id) {
       this.$router.push({ name: to, params: { id } });
+    },
+    openInfo() {
+      this.$store.commit('users/SET_OPEN_INFO', true);
     },
   },
 };

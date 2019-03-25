@@ -3,12 +3,12 @@
     <q-list-header>
       <div class="row justify-around tabs">
         <div :class="{'active': filter === 'toContribute'}">
-          <a @click="setFilter('toContribute')">
+          <a class="underline" @click="setFilter('toContribute')">
             à qualifier ({{ datasetTodo.length }})
           </a>
         </div>
         <div :class="{'active': filter === 'contributed'}">
-          <a @click="setFilter('contributed')">
+          <a class="underline"  @click="setFilter('contributed')">
             mes contributions ({{ datasetDone.length }})
           </a>
         </div>
@@ -172,7 +172,7 @@ export default {
     cursor pointer
   .tabs
     margin-top 7px
-  a
+  .underline
     position relative
     cursor pointer
     font-weight bold
@@ -193,6 +193,10 @@ export default {
       transform scaleX(0)
       -webkit-transition all 0.3s ease-in-out 0s
       transition all 0.3s ease-in-out 0s
+    &:hover:before
+      visibility visible
+      -webkit-transform scaleX(1)
+      transform scaleX(1)
   .itemActive
     background-color $pink
     color white
@@ -201,16 +205,11 @@ export default {
       font-weight normal
       color white
   .active
-    a
-     &:before
-      visibility visible
-      -webkit-transform scaleX(1)
-      transform scaleX(1)
-  a
-    &:hover:before
-      visibility visible
-      -webkit-transform scaleX(1)
-      transform scaleX(1)
+    .underline
+      &:before
+        visibility visible
+        -webkit-transform scaleX(1)
+        transform scaleX(1)
   .image
     img
       width 100px

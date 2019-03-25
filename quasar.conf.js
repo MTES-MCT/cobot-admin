@@ -103,6 +103,10 @@ module.exports = function config(ctx) {
         'QSelect',
         'QRadio',
         'QOptionGroup',
+        'QTooltip',
+        'QCarousel',
+        'QCarouselSlide',
+        'QCarouselControl',
         'QWindowResizeObservable',
       ],
       directives: [

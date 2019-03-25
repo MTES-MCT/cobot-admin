@@ -75,6 +75,7 @@ export default {
   },
   computed: {
     ...mapState('dataset', ['dataset']),
+    ...mapState('project', ['project']),
   },
   data() {
     return {
@@ -107,10 +108,14 @@ export default {
     });
   },
   methods: {
-    exportData() {
+    async exportData() {
       this.isLoading = true;
       console.log(this.dataset);
-      console.log(this.exportModeLabel, this.exportMode);
+      // const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
+      // const query = `projectId=${this.project.id}&criteria=${criteria}`;
+      // const exportData = await this.axios.get(`/export?${query}`);
+      // console.log(exportData);
+      // this.isLoading = false;
     },
     unSelectOptionWithLabel() {
       this.exportModeLabel = [];
