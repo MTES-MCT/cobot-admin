@@ -111,6 +111,9 @@ export default {
       update(data) {
         return clone(data.Me);
       },
+      error() {
+        this.$router.push({ path: '/auth/login' });
+      },
     },
   },
 };

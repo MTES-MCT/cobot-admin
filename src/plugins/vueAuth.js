@@ -11,7 +11,8 @@ export default ({
   Vue,
 }) => {
   router.beforeEach((to, from, next) => {
-    app.projectId = to.params.id;
+    // app.projectId = to.params.id;
+    // console.log('beforeEach', app.projectId);
     next();
   });
   Vue.use(VueAuth, {
@@ -33,6 +34,7 @@ export default ({
         id: data.id,
         name: data.name,
         email: data.email,
+        roele: data.role,
       });
       if (app.projectId) {
         const currentProject = _.filter(data.projects, (project => project.id === app.projectId));

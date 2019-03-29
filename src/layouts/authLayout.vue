@@ -1,7 +1,7 @@
 <template>
   <div class="row auth-layout">
     <div class="col-xs-12 col-sm-6">
-      <router-view></router-view>
+      <router-view :key="$route.fullPath"></router-view>
     </div>
     <div class="col-xs-12 col-sm-6 cover">
       <div>

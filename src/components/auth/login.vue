@@ -95,7 +95,6 @@ export default {
       }).then(() => {
         this.loading = false;
         this.$apollo.queries.Me.skip = false;
-        this.$apollo.queries.Me.refetch();
       }, () => {
         this.isWrongCredentials = true;
         this.loading = false;
@@ -135,14 +134,19 @@ export default {
       query: ME_QUERY,
       update(data) {
         const user = data.Me;
+        this.$store.commit('project/SET_PROJECTS', user.projects);
+        this.$localStorage.set('projects', JSON.stringify(user.projects));
+        const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
+        const role = (lastProjectOpened && lastProjectOpened.role) ?
+          lastProjectOpened.role : user.projects[0].role;
+
         this.$store.commit('users/SET_USER', {
           id: user.id,
           name: user.name,
           email: user.email,
+          role,
         });
-        this.$store.commit('project/SET_PROJECTS', user.projects);
-        this.$localStorage.set('projects', JSON.stringify(user.projects));
-        const lastProjectOpened = JSON.parse(this.$localStorage.get('project'));
+
         this.$store.commit('users/SET_OPEN_WELCOME', true);
         if (lastProjectOpened) {
           this.$store.commit('project/SET_PROJECT', lastProjectOpened);
@@ -165,6 +169,7 @@ export default {
         };
       },
       update(data) {
+        console.log(data);
         if (data && data.AutoLogin) {
           if (!data.AutoLogin.lastConnection) {
             this.credentials = {

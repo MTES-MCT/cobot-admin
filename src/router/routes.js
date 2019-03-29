@@ -7,7 +7,7 @@ export default [
     // meta: {
     //   auth: {
     //     roles: [1, 80, 100],
-    //     forbiddenRedirect: '/auth',
+    //     forbiddenRedirect: '/auth/login',
     //   },
     // },
     children: [

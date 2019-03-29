@@ -158,7 +158,7 @@ export default {
       const emails = this.contributorsEmail.split(';');
       _.each(emails, async (email) => {
         if (this.isEmailValid(email.trim())) {
-          await this.createContributor(email);
+          await this.createContributor(email.trim());
         }
       });
       this.opened = false;
