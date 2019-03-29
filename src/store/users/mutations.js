@@ -14,3 +14,7 @@ export const SET_OPEN_HELP = (state, value) => {
 export const SET_OPEN_INFO = (state, value) => {
   state.openInfo = value;
 };
+
+export const SET_OPEN_EDIT_PROJECT = (state, value) => {
+  state.openEditProject = value;
+};

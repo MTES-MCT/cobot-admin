@@ -34,19 +34,7 @@
         <q-item-main label="Messages de Cobot" />
       </q-item>
     </q-list>
-    <q-modal v-model="openEditProject"
-             minimized>
-      <q-modal-layout>
-        <q-toolbar color="dark" slot="header">
-          <q-toolbar-title>
-            Edition du projet
-          </q-toolbar-title>
-        </q-toolbar>
-        <div class="layout-padding">
-          <p>Lorem Ipsum is simply dummy</p>
-        </div>
-      </q-modal-layout>
-    </q-modal>
+    <ccEditProject />
   </div>
 </template>
 
@@ -55,11 +43,15 @@ import _ from 'lodash';
 import { clone } from 'quasar';
 import { ME_QUERY } from '../constants/graphql';
 
+import CcEditProject from './cc-edit-project';
+
 export default {
   name: 'CcMenu',
+  components: {
+    CcEditProject,
+  },
   data() {
     return {
-      openEditProject: false,
       Me: {
         projects: [],
       },
@@ -99,12 +91,15 @@ export default {
       this.$root.$emit('projectChanged', project);
       this.$router.push(`/dashboard/${project.id}`);
     },
-    goToEditProject() {
-      this.openEditProject = true;
+    goToEditProject(projectId) {
+      this.$store.commit('project/SET_PROJECT_ID', projectId);
+      this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
       // this.$router.push(`/project/${id}`);
     },
     goToNewProject() {
-      this.$router.push('/project');
+      this.$store.commit('project/SET_PROJECT_ID', null);
+      this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
+      // this.$router.push('/project');
     },
     goToCobot() {
       this.$router.push('/crud');

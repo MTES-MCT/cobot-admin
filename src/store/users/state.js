@@ -3,4 +3,5 @@ export default {
   openWelcome: false,
   openHelp: false,
   openInfo: false,
+  openEditProject: false,
 };

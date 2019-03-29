@@ -12,7 +12,8 @@
                     <span>COBOT</span>
                     <p><small>{{ projectName }}</small></p>
                   </div>
-                  <div class="col-2" style="padding-top: 10px;">
+                  <div v-if="$auth.check([80, 100])"
+                       class="col-2" style="padding-top: 10px;">
                     <q-btn flat
                            dense
                            round
@@ -27,16 +28,16 @@
             <div class="col-7" style="padding-left: 50px;">
               <q-btn @click="goTo('dashboard.contribute.object', $route.params.id)"
                      flat icon="public" label="Contribuer" />
-              <q-btn @click="goTo('dashboard', $route.params.id)"
+              <q-btn v-if="$auth.check([80, 100])" @click="goTo('dashboard', $route.params.id)"
                      flat icon="dashboard" label="Dashboard" />
-              <q-btn @click="goTo('dashboard.contributors', $route.params.id)"
-                    flat icon="group" label="Contributeurs" />
-              <q-btn @click="goTo('dashboard.dataset', $route.params.id)"
+              <q-btn v-if="$auth.check([80, 100])"
+                     @click="goTo('dashboard.contributors', $route.params.id)"
+                     flat icon="group" label="Contributeurs" />
+              <q-btn v-if="$auth.check([80, 100])"
+                     @click="goTo('dashboard.dataset', $route.params.id)"
                      flat icon="ballot" label="Jeu de donnée" />
-            </div>
-            <div class="col-1" style="text-align: right; padding-right: 20px;">
               <q-btn @click="openInfo()"
-                     flat icon="info" />
+                     flat icon="info" label="A propos" />
             </div>
           </div>
         </q-toolbar-title>

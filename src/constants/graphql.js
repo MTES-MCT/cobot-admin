@@ -186,6 +186,7 @@ export const MESSAGE_MUTATION = '';
 export const PROJECT_QUERY = gql`query getProject($id: ID!) {
   Project(id: $id) {
     name
+    details
     question
     answers{
       text

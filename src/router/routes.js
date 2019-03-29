@@ -4,12 +4,12 @@ export default [
     path: '/',
     component: () => import('layouts/default'),
     redirect: { name: 'dashboard' },
-    meta: {
-      auth: {
-        roles: [1, 80, 100],
-        forbiddenRedirect: '/auth',
-      },
-    },
+    // meta: {
+    //   auth: {
+    //     roles: [1, 80, 100],
+    //     forbiddenRedirect: '/auth',
+    //   },
+    // },
     children: [
       {
         name: '',
