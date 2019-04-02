@@ -9,19 +9,13 @@
     </q-toolbar>
     <div class="layout-padding">
       <p>
-        Vous avez été invité à contribuer à la qualification
-        d’un jeu de données photographiques.
+       Bienvenue,
       </p>
       <p>
-        Pour chacune des photos présentées vous allez pouvoir attester
-        de la présence d’un ou plusieurs éléments
-        en précisant leur emplacement grâce à notre outil de détourage.
+        Merci de nous aider à rendre la mobilité urbaine accessible à tous en
+        apprenant à notre Labelbot à reconnaître les obstacles sur la voie publique !
       </p>
-      <p>
-        Merci, grâce à vous, nous mettons les micro-contributions
-        au service de la mobilité urbaine pour tous !
-      </p>
-      <p><a class="next" href="">En savoir plus</a></p>
+      <p><a class="next" @click="onNext" href="#">suivant</a></p>
     </div>
     <q-toolbar style="text-align: right;" color="white" slot="footer">
       <q-toolbar-title>
@@ -53,6 +47,10 @@ export default {
   //   });
   // },
   methods: {
+    onNext() {
+      this.$store.commit('users/SET_OPEN_WELCOME', false);
+      this.$store.commit('users/SET_OPEN_HELP', true);
+    },
     close() {
       this.$store.commit('users/SET_OPEN_WELCOME', false);
     },
