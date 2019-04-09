@@ -1,20 +1,70 @@
 <template>
-  <q-list v-if="datasetTodo" style="position: fixed; width:25%; height: 100vh;">
+  <q-list class="panelLabel" style="position: fixed; width:25%; height: 100vh;">
     <q-list-header>
-      <div class="row justify-around tabs">
-        <div :class="{'active': filter === 'toContribute'}">
-          <a class="underline" @click="setFilter('toContribute')">
-            à qualifier ({{ datasetTodo.length }})
-          </a>
-        </div>
-        <div :class="{'active': filter === 'contributed'}">
-          <a class="underline"  @click="setFilter('contributed')">
-            mes contributions ({{ datasetDone.length }})
-          </a>
-        </div>
-      </div>
+      Si la photo ci-contre contient l'un des éléments suivants,
+      sélectionnez l'objet que vous allez identifier sur l'image
     </q-list-header>
-    <q-item v-if="datasetTodo.length === 0">
+    <transition-group enter-active-class="animated slideInLeft"
+                      leave-active-class="animated slideOutLeft">
+      <q-item key="pickup" v-if="pickUpLabel" style="text-align: center;">
+        <q-item-main>
+          <q-item-tile v-for="(label, index) in labels"
+                       v-if="label.id !== 'none'"
+                       :key="index"
+                       label>
+            <q-btn :label="label.label"
+                  @click="onSelect(label)"
+                  class="full-width"
+                  style="margin-top: 10px;"
+                  color="pink">
+                  <q-tooltip>
+                    <img :src="label.img" style="width: 200px;" />
+                  </q-tooltip>
+            </q-btn>
+          </q-item-tile>
+          <q-item-tile>
+            <q-btn label="passer à la photo suivante"
+                  @click="onNext()"
+                  class="full-width"
+                  style="margin-top: 10px;"
+                  color="dark" />
+          </q-item-tile>
+        </q-item-main>
+      </q-item>
+    </transition-group>
+    <transition-group
+        appear
+        enter-active-class="animated slideInLeft"
+        leave-active-class="animated slideOutLeft"
+      >
+        <q-item key="confirmBlock" v-if="pickUpLabelConfirm" style="text-align: center;">
+          <q-item-main>
+            <q-item-tile label>
+              vous avez sélectionné
+            </q-item-tile>
+            <q-item-tile style="margin-top: 10px;">
+              <q-chip @hide="onReset()" closable color="dark">
+                {{ label.label }}
+              </q-chip>
+            </q-item-tile>
+            <q-item-tile style="padding-top: 10px;">
+              Vous pouvez commencer à identifier l'objet dans l'image.
+            </q-item-tile>
+            <q-item-tile style="padding-top: 10px;">
+              <a @click="onNext()" class="next">passer à l'image suivante</a>
+            </q-item-tile>
+            <q-item-tile style="margin-top: 10px;">
+              <q-btn @click="onSave()"
+                     v-if="canContribute"
+                     label="contribuer !"
+                     class="full-width"
+                     style="margin-top: 10px;"
+                     color="positive" />
+            </q-item-tile>
+          </q-item-main>
+        </q-item>
+      </transition-group>
+    <!-- <q-item v-if="datasetTodo.length === 0">
       <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
     </q-item>
     <div v-if="filter === 'toContribute'" style="height: calc(100vh - 217px); overflow-y: auto;">
@@ -48,7 +98,7 @@
         <q-item-main :label="data.file"
                      :sublabel="`${data.numAnswers} contributions`" />
       </q-item>
-    </div>
+    </div> -->
   </q-list>
 </template>
 
@@ -60,8 +110,12 @@ import { DATASET_BY_SOURCE_QUERY } from '../constants/graphql';
 
 export default {
   name: 'CcLeftPanel',
+  props: ['labels'],
   data() {
     return {
+      label: null,
+      pickUpLabel: true,
+      pickUpLabelConfirm: false,
       filter: 'toContribute',
       projectId: this.$route.params.id,
       datasetTodo: null,
@@ -72,12 +126,14 @@ export default {
     ...mapGetters({
       dataset: 'dataset/getDataset',
       datasetId: 'dataset/getDatasetId',
+      canContribute: 'label/canContribute',
     }),
     ...mapState('users', ['user']),
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
     datasetId() {
+      this.onReset();
       this.$apollo.queries.Dataset.refresh();
     },
   },
@@ -89,6 +145,23 @@ export default {
     });
   },
   methods: {
+    onSelect(selectedLabel) {
+      this.label = selectedLabel;
+      this.$store.commit('label/SET_LABEL', this.label);
+      this.pickUpLabel = false;
+      // this.$store.commit('label/SET_ACTION', 'save');
+      setTimeout(() => {
+        this.pickUpLabelConfirm = true;
+      }, 1000);
+    },
+    onReset() {
+      this.label = null;
+      this.$store.commit('label/SET_LABEL', null);
+      this.pickUpLabelConfirm = false;
+      setTimeout(() => {
+        this.pickUpLabel = true;
+      }, 1000);
+    },
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
     },
@@ -124,6 +197,12 @@ export default {
       this.datasetDone = datasetDone;
       this.setFirstData();
     },
+    onSave() {
+      this.$store.commit('label/SET_ACTION', 'save');
+    },
+    onNext() {
+      this.$root.$emit('onNext');
+    },
     setFirstData() {
       const datasetId = this.datasetId || null;
       if (!datasetId) {
@@ -135,13 +214,13 @@ export default {
           this.$store.dispatch('dataset/setDatasetId', this.datasetDone[0]._id);
         }
       }
-      setTimeout(() => {
-        if (this.$refs[this.datasetId]) {
-          this.$refs[this.datasetId][0].$el.scrollIntoView({
-            behavior: 'smooth',
-          });
-        }
-      }, 300);
+      // setTimeout(() => {
+      //   if (this.$refs[this.datasetId]) {
+      //     this.$refs[this.datasetId][0].$el.scrollIntoView({
+      //       behavior: 'smooth',
+      //     });
+      //   }
+      // }, 300);
     },
   },
   apollo: {
@@ -164,53 +243,16 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .q-list-header
-    height 60px
-    margin-bottom 10px
-    border-bottom 1px solid #e0e0e0
-  .item
-    cursor pointer
-  .tabs
-    margin-top 7px
-  .underline
-    position relative
-    cursor pointer
-    font-weight bold
-    color $tertiary
-    text-decoration none
-    &:visited
+  .panelLabel
+    .next
+      color $pink
+      font-weight bold
       text-decoration none
-    &:before
-      content ""
-      position absolute
-      width 100%
-      height 4px
-      bottom -20px
-      left 0;
-      background-color $primary
-      visibility hidden
-      -webkit-transform scaleX(0)
-      transform scaleX(0)
-      -webkit-transition all 0.3s ease-in-out 0s
-      transition all 0.3s ease-in-out 0s
-    &:hover:before
-      visibility visible
-      -webkit-transform scaleX(1)
-      transform scaleX(1)
-  .itemActive
-    background-color $pink
-    color white
-    font-weight bold
-    .q-item-sublabel
-      font-weight normal
-      color white
-  .active
-    .underline
-      &:before
-        visibility visible
-        -webkit-transform scaleX(1)
-        transform scaleX(1)
-  .image
-    img
-      width 100px
+      &:hover
+        cursor pointer
+        text-decoration underline
+    .q-list-header
+      height 90px
+      margin-bottom 10px
+      border-bottom 1px solid #e0e0e0
 </style>

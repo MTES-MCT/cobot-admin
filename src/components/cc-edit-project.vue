@@ -78,7 +78,7 @@ import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 
 // PROJECT_UPDATE, PROJECT_DELETE
-import { PROJECT_QUERY } from '../constants/graphql';
+import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE } from '../constants/graphql';
 
 export default {
   name: 'CcEditProject',
@@ -130,9 +130,25 @@ export default {
         this.save();
       }
     },
-    save() {
+    async save() {
       if (this.project.name) {
-        console.log('ok');
+        try {
+          const newProject = await this.$apollo.mutate({
+            mutation: PROJECT_CREATE,
+            variables: {
+              name: this.project.name,
+              details: this.project.details,
+            },
+          });
+          console.log(newProject);
+          if (newProject) {
+            this.$store.commit('project/SET_PROJECT', newProject.data.createProject.id);
+            this.$root.$emit('newProject', newProject);
+            this.$refs.stepper.next();
+          }
+        } catch (error) {
+          this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
+        }
       } else {
         this.$q.dialog({
           title: 'Erreur',
@@ -140,6 +156,26 @@ export default {
           color: 'pink',
         });
       }
+    },
+    update() {
+      this.$apollo.mutate({
+        mutation: PROJECT_UPDATE,
+        variables: {
+          id: this.id,
+          name: this.project.name,
+          question: this.project.question,
+          answers: this.project.answers,
+        },
+      }).then(() => {
+        this.$localStorage.set('project', this.project);
+        this.$root.$emit('projectUpdated', {
+          id: this.id,
+          name: this.project.name,
+        });
+        this.$q.notify({ message: this.$t('global.updateDone'), type: 'positive' });
+      }).catch(() => {
+        this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
+      });
     },
     close() {
       this.$store.commit('users/SET_OPEN_EDIT_PROJECT', false);

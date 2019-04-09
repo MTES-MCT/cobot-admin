@@ -228,7 +228,7 @@ export default {
     };
   },
   created() {
-    this.$refs.goToSlide(0);
+    // this.$refs.goToSlide(0);
   },
   methods: {
     nextSlide() {

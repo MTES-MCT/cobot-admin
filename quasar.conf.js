@@ -122,6 +122,8 @@ module.exports = function config(ctx) {
     animations: [
       'slideInRight',
       'slideOutRight',
+      'slideInLeft',
+      'slideOutLeft',
       'fadeIn',
       'fadeOut',
     ],

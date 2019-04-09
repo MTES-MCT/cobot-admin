@@ -59,6 +59,9 @@ export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID, $notAns
         }
       }
       raw
+      originalWidth
+      originalHeight
+      originalOrientation
     }
     usersAnswers {
       answers
@@ -242,10 +245,11 @@ export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String
   }
 }`;
 
-export const PROJECT_CREATE = gql`mutation createProject($name: String) {
+export const PROJECT_CREATE = gql`mutation createProject($name: String, $details: String) {
   createProject(name: $name) {
     id
     name
+    details
   }
 }`;
 

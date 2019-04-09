@@ -3,38 +3,12 @@
     <cc-subheader-label :items="getElements()" />
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-label />
+        <cc-left-panel-label :labels="labels" />
       </div>
       <div class="col-9">
         <div class="main-card">
           <div class="row justify-center">
             <div style="text-align: center;">
-              <p>Si la photo ci-dessous contient l'un des éléments suivants :</p>
-              <p>
-                <span v-for="(label, index) in labels"
-                      :key="index"
-                      v-if="label.id !== 'none'">
-                  <a class="labelLink"
-                      href="#">
-                    {{ label.label }}
-                    <q-tooltip>
-                      <img :src="label.img" />
-                    </q-tooltip>
-                  </a>
-                  <span v-if="index !== labels.length - 2">, </span>
-                </span>
-              </p>
-              <p>
-                Merci de le détourer en appuyant sur le bouton
-                <img src="../../../statics/reactangleTool.png"
-                     style="width: 20px; margin: 0 10px 0 10px;" />
-                situé en haut à droite de la zone image.
-              </p>
-              <p>
-                <a href="#" @click="onNone()" class="next">
-                  <small>aucun élément, passer à la photo suivante</small>
-                </a>
-              </p>
               <l-map
                 ref="map"
                 :min-zoom="minZoom"
@@ -45,6 +19,7 @@
                   :bounds="bounds"/>
               </l-map>
             </div>
+            <div class="mapLoading" v-if="isLoading"></div>
           </div>
           <transition
             enter-active-class="animated slideInRight"
@@ -63,6 +38,9 @@
         </div>
       </div>
     </div>
+    <q-inner-loading :visible="isLoading" style="z-index: 1200;">
+      <q-spinner-gears size="50px" color="pink"></q-spinner-gears>
+    </q-inner-loading>
   </div>
 </template>
 
@@ -80,10 +58,11 @@ import 'leaflet/dist/images/marker-shadow.png';
 import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
 
 import { DATASET_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
+import labels from '../../../constants/labels';
 
 import CcLeftPanelLabel from 'components/cc-left-panel-label';
-import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
+import CcSubheaderLabel from 'components/cc-subheader-label';
 import CcPanelPhotoInfo from 'components/panel-photo-info';
 import CcHelp from 'components/cc-help';
 
@@ -111,11 +90,11 @@ export default {
       isRightPanelInfo: false,
       isRightPanelLabel: false,
       answer: null,
-      label: null,
       skipQuery: false,
-      loading: false,
+      isLoading: false,
       openLabelHelp: false,
       map: null,
+      drawControl: null,
       currentLayer: null,
       image: '',
       bounds: [[0, 0], [1080, 1440]],
@@ -125,56 +104,38 @@ export default {
         polygon: '#F2C037',
         rectangle: '#E91C63',
       },
-      labels: [
-        {
-          id: 'chantier',
-          type: 'polygon',
-          label: 'Elément de chantier',
-          img: '../../../statics/chantier.png',
-        },
-        {
-          id: 'bitumen',
-          type: 'polygon',
-          label: 'Rue Pavée',
-          img: '../../../statics/pave.png',
-        },
-        {
-          id: 'pieton',
-          type: 'polygon',
-          label: 'Passage piéton',
-          img: '../../../statics/pieton.png',
-        },
-        {
-          id: 'bev',
-          type: 'polygon',
-          label: 'Bande d\'éveil vigilance',
-          img: '../../../statics/bev.png',
-        },
-        {
-          id: 'none',
-          type: 'polygon',
-          label: 'Aucun',
-        },
-      ],
+      labels,
     };
   },
   computed: {
     ...mapGetters({
       datasetId: 'dataset/getDatasetId',
       data: 'dataset/getData',
+      label: 'label/getLabel',
     }),
     ...mapState('label', ['panel', 'action']),
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
     datasetId() {
+      this.isLoading = false;
       this.$apollo.queries.Data.refresh();
     },
     action(newValue) {
       this.onAction(newValue);
     },
+    label() {
+      if (this.label) {
+        this.onLabelSelected();
+      } else {
+        this.map.removeControl(this.drawControl);
+      }
+    },
   },
   mounted() {
+    this.$root.$on('onNext', () => {
+      this.onNone();
+    });
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
       this.map._onResize();
@@ -182,34 +143,17 @@ export default {
       this.editableLayers = new L.FeatureGroup();
       this.map.addLayer(this.editableLayers);
 
-      const drawPluginOptions = {
-        position: 'topright',
-        draw: {
-          polygon: false,
-          polyline: false,
-          circle: false,
-          circlemarker: false,
-          rectangle: {
-            shapeOptions: {
-              showArea: false,
-              color: this.colors.rectangle,
-            },
-          },
-          marker: false,
-        },
-        edit: {
-          featureGroup: this.editableLayers,
-        },
-      };
-      const drawControl = new L.Control.Draw(drawPluginOptions);
-      this.map.addControl(drawControl);
       this.map.fitBounds(this.bounds);
+
+      // setTimeout(() => {
+      //   this.setHorizontalMap();
+      // }, 1000);
 
       this.map.on(L.Draw.Event.CREATED, (event) => {
         const { layer } = event;
         this.currentLayer = layer;
         this.answer = layer.getLatLngs();
-        this.$store.commit('label/SET_PANEL', 'rightPanelLabel');
+        this.$store.commit('label/SET_CAN_CONTRIBUTE', true);
         this.editableLayers.addLayer(layer);
       });
     });
@@ -245,6 +189,9 @@ export default {
         case 'save':
           this.saveAnswer(this.$store.state.label.label, () => {
             this.$store.commit('label/SET_ACTION', null);
+            this.$store.dispatch('dataset/setDatasetId', null);
+            this.$store.commit('dataset/SET_IS_QUALIFIED', false);
+            this.resetEditableLayer();
           });
           break;
         case 'next':
@@ -258,10 +205,32 @@ export default {
       }
       return true;
     },
+    onLabelSelected() {
+      const drawPluginOptions = {
+        position: 'topright',
+        draw: {
+          polygon: false,
+          polyline: false,
+          circle: false,
+          circlemarker: false,
+          rectangle: {
+            shapeOptions: {
+              showArea: false,
+              color: this.colors.rectangle,
+            },
+          },
+          marker: false,
+        },
+        edit: {
+          featureGroup: this.editableLayers,
+        },
+      };
+      this.drawControl = new L.Control.Draw(drawPluginOptions);
+      this.map.addControl(this.drawControl);
+    },
     onNone() {
-      this.saveAnswer(JSON.stringify(this.labels[4]), () => {
+      this.saveAnswer(JSON.stringify(this.labels[3]), () => {
         this.$store.dispatch('dataset/setDatasetId', null);
-        this.$root.$emit('onNext');
       });
     },
     onOpenLabelBox() {
@@ -278,7 +247,9 @@ export default {
           },
         });
         this.answer = null;
-        this.$root.$emit('onLabelSaved');
+        this.resetLayer();
+        // this.$root.$emit('onNext');
+        this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
         callback();
       } catch (error) {
         // this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
@@ -312,6 +283,31 @@ export default {
       ];
       this.polygon = L.polygon(latlngs, { color: '#E91C63' }).addTo(this.map);
     },
+    setVerticalMap() {
+      this.map._onResize();
+      this.$refs.map.$el.style.height = '720px';
+      this.$refs.map.$el.style.width = '540px';
+      console.log(this.map.getBounds());
+      setTimeout(() => {
+        this.bounds = [[0, 0], [720, 540]];
+        this.map.fitBounds(this.bounds);
+      }, 500);
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
+    },
+    setHorizontalMap() {
+      this.map._onResize();
+      this.$refs.map.$el.style.height = '540px';
+      this.$refs.map.$el.style.width = '720px';
+      setTimeout(() => {
+        this.bounds = [[0, 0], [1080, 1440]];
+        this.map.fitBounds(this.bounds);
+      }, 500);
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
+    },
   },
   apollo: {
     Data: {
@@ -327,7 +323,7 @@ export default {
       update(data) {
         const dataset = data.DataSet;
         const { usersAnswers } = dataset;
-        this.resetLayer();
+        const { metadata } = dataset;
         if (usersAnswers.length > 0) {
           const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
           if (userAnswer) {
@@ -336,6 +332,15 @@ export default {
         }
         this.$store.dispatch('dataset/setData', dataset);
         this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
+        if (metadata.originalOrientation && metadata.originalOrientation === 6) {
+          setTimeout(() => {
+            this.setVerticalMap();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            this.setHorizontalMap();
+          }, 500);
+        }
         this.skipQuery = true;
       },
     },
@@ -350,6 +355,14 @@ export default {
     text-decoration none
     &:hover
       text-decoration underline
+  .mapLoading
+    position absolute;
+    width 720px
+    height 720px
+    background-color #FFF
+    color $dark
+    z-index 1000
+
   .labelLink
     font-weight bold
     text-decoration none

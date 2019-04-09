@@ -10,3 +10,7 @@ export const SET_ACTION = (state, action) => {
 export const SET_LABEL = (state, label) => {
   state.label = label;
 };
+
+export const SET_CAN_CONTRIBUTE = (state, boolean) => {
+  state.canContribute = boolean;
+};
