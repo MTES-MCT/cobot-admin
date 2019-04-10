@@ -195,7 +195,11 @@ export default {
       });
       this.datasetTodo = datasetTodo;
       this.datasetDone = datasetDone;
-      this.setFirstData();
+      if (datasetTodo.length > 0) {
+        this.setFirstData();
+      } else {
+        this.$root.$emit('onComplete');
+      }
     },
     onSave() {
       this.$store.commit('label/SET_ACTION', 'save');
@@ -206,21 +210,17 @@ export default {
     setFirstData() {
       const datasetId = this.datasetId || null;
       if (!datasetId) {
-        if (!this.isDataQualified) {
-          this.datasetTodo[0].isActive = true;
-          this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
-        } else {
-          this.datasetDone[0].isActive = true;
-          this.$store.dispatch('dataset/setDatasetId', this.datasetDone[0]._id);
-        }
+        this.datasetTodo[0].isActive = true;
+        this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
+        // if (!this.isDataQualified) {
+        //   this.datasetTodo[0].isActive = true;
+        //   console.log('setFirstData', this.datasetTodo[0]._id);
+        //   this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
+        // } else {
+        //   this.datasetDone[0].isActive = true;
+        //   this.$store.dispatch('dataset/setDatasetId', this.datasetDone[0]._id);
+        // }
       }
-      // setTimeout(() => {
-      //   if (this.$refs[this.datasetId]) {
-      //     this.$refs[this.datasetId][0].$el.scrollIntoView({
-      //       behavior: 'smooth',
-      //     });
-      //   }
-      // }, 300);
     },
   },
   apollo: {

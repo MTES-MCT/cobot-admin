@@ -8,7 +8,7 @@
       <div class="col-9">
         <div class="main-card">
           <div class="row justify-center">
-            <div style="text-align: center;">
+            <div v-if="!complete" style="text-align: center;">
               <l-map
                 ref="map"
                 :min-zoom="minZoom"
@@ -19,6 +19,7 @@
                   :bounds="bounds"/>
               </l-map>
             </div>
+            <div v-else>Complete</div>
             <div class="mapLoading" v-if="isLoading"></div>
           </div>
           <transition
@@ -45,6 +46,7 @@
 </template>
 
 <script>
+/* eslint prefer-destructuring: 0 */
 import { mapState, mapGetters } from 'vuex';
 import _ from 'lodash';
 import L from 'leaflet';
@@ -90,9 +92,10 @@ export default {
       isRightPanelInfo: false,
       isRightPanelLabel: false,
       answer: null,
-      skipQuery: false,
-      isLoading: false,
+      skipQuery: true,
+      isLoading: true,
       openLabelHelp: false,
+      complete: false,
       map: null,
       drawControl: null,
       currentLayer: null,
@@ -105,6 +108,16 @@ export default {
         rectangle: '#E91C63',
       },
       labels,
+      imagesTest: [
+        `${process.env.API_URL}/img/${this.$route.params.id}/IMG_5910.JPG`,
+        `${process.env.API_URL}/img/${this.$route.params.id}/PHOTO-2019-03-28-13-58-05 2.jpg`,
+        `${process.env.API_URL}/img/${this.$route.params.id}/IMG_5767.JPG`,
+      ],
+      imagesTestId: [
+        '5cacd15a5f835dac0db3e402',
+        '5cacd1575f835dac0db3e3d8',
+        '5cacd1595f835dac0db3e3f6',
+      ],
     };
   },
   computed: {
@@ -118,7 +131,8 @@ export default {
   },
   watch: {
     datasetId() {
-      this.isLoading = false;
+      this.isLoading = true;
+      this.skipQuery = false;
       this.$apollo.queries.Data.refresh();
     },
     action(newValue) {
@@ -135,6 +149,11 @@ export default {
   mounted() {
     this.$root.$on('onNext', () => {
       this.onNone();
+      this.skipQuery = false;
+    });
+    this.$root.$on('onComplete', () => {
+      this.complete = true;
+      this.isLoading = false;
     });
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
@@ -144,10 +163,6 @@ export default {
       this.map.addLayer(this.editableLayers);
 
       this.map.fitBounds(this.bounds);
-
-      // setTimeout(() => {
-      //   this.setHorizontalMap();
-      // }, 1000);
 
       this.map.on(L.Draw.Event.CREATED, (event) => {
         const { layer } = event;
@@ -248,7 +263,6 @@ export default {
         });
         this.answer = null;
         this.resetLayer();
-        // this.$root.$emit('onNext');
         this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
         callback();
       } catch (error) {
@@ -284,17 +298,20 @@ export default {
       this.polygon = L.polygon(latlngs, { color: '#E91C63' }).addTo(this.map);
     },
     setVerticalMap() {
-      this.map._onResize();
-      this.$refs.map.$el.style.height = '720px';
-      this.$refs.map.$el.style.width = '540px';
-      console.log(this.map.getBounds());
-      setTimeout(() => {
-        this.bounds = [[0, 0], [720, 540]];
-        this.map.fitBounds(this.bounds);
-      }, 500);
-      setTimeout(() => {
+      if (this.map.getBounds()._northEast.lat === 1080) {
+        this.map._onResize();
+        this.$refs.map.$el.style.height = '720px';
+        this.$refs.map.$el.style.width = '540px';
+        setTimeout(() => {
+          this.bounds = [[0, 0], [720, 540]];
+          this.map.fitBounds(this.bounds);
+        }, 500);
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+      } else {
         this.isLoading = false;
-      }, 500);
+      }
     },
     setHorizontalMap() {
       this.map._onResize();
@@ -322,26 +339,32 @@ export default {
       },
       update(data) {
         const dataset = data.DataSet;
-        const { usersAnswers } = dataset;
-        const { metadata } = dataset;
-        if (usersAnswers.length > 0) {
-          const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
-          if (userAnswer) {
-            this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+        if (dataset) {
+          const { usersAnswers } = dataset;
+          const { metadata } = dataset;
+          if (usersAnswers.length > 0) {
+            const userAnswer = _.find(usersAnswers, { userId: this.$auth.user().id });
+            if (userAnswer) {
+              this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
+            }
+          }
+          this.$store.dispatch('dataset/setData', dataset);
+          this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
+          console.log(this.image);
+          if (metadata.originalOrientation && metadata.originalOrientation === 6) {
+            setTimeout(() => {
+              this.setVerticalMap();
+            }, 500);
+          } else {
+            setTimeout(() => {
+              this.setHorizontalMap();
+            }, 500);
           }
         }
-        this.$store.dispatch('dataset/setData', dataset);
-        this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
-        if (metadata.originalOrientation && metadata.originalOrientation === 6) {
-          setTimeout(() => {
-            this.setVerticalMap();
-          }, 500);
-        } else {
-          setTimeout(() => {
-            this.setHorizontalMap();
-          }, 500);
-        }
         this.skipQuery = true;
+      },
+      skip() {
+        return this.skipQuery;
       },
     },
   },
