@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+// import _ from 'lodash';
 import { mapGetters } from 'vuex';
 import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
@@ -117,7 +117,7 @@ export default {
         };
       },
       update(data) {
-        const dataset = _.take(data.DataSetBySource, 100);
+        const dataset = data.DataSetBySource;
         this.$store.dispatch('dataset/setData', dataset[0]);
         this.$store.dispatch('dataset/setDataset', dataset);
         this.skipDatasetQuery = true;

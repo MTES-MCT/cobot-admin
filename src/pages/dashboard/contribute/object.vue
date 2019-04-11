@@ -242,7 +242,6 @@ export default {
       this.openLabelBox = true;
     },
     async saveAnswer(label, callback) {
-      console.log(label);
       try {
         const answer = (this.answer) ? this.prepareAnswer(this.answer[0], label) : label;
         await this.$apollo.mutate({
