@@ -9,7 +9,7 @@ export default [
   {
     id: 'bitumen',
     type: 'polygon',
-    label: 'Rue Pavée',
+    label: 'pavés',
     img: '../statics/pave.png',
     isNotSelected: false,
   },

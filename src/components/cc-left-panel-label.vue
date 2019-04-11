@@ -35,78 +35,65 @@
     <transition-group
         appear
         enter-active-class="animated slideInLeft"
-        leave-active-class="animated slideOutLeft"
-      >
-        <q-item key="confirmBlock" v-if="pickUpLabelConfirm" style="text-align: center;">
+        leave-active-class="animated slideOutLeft" >
+      <q-item v-if="pickUpLabelConfirm"
+              key="confirmBlock"
+              style="text-align: center;">
+        <q-item-main>
+          <q-item-tile label>
+            vous avez sélectionné
+          </q-item-tile>
+          <q-item-tile style="margin-top: 10px;">
+            <q-chip @hide="onReset()" closable color="dark">
+              {{ label.label }}
+            </q-chip>
+          </q-item-tile>
+          <q-item-tile style="padding-top: 10px;">
+            Vous pouvez commencer à identifier l'objet dans l'image.
+          </q-item-tile>
+          <q-item-tile style="padding-top: 10px;">
+            <a @click="onNext()" class="next">passer à l'image suivante</a>
+          </q-item-tile>
+          <!-- <q-item-tile style="margin-top: 10px;">
+            <q-btn @click="onSave()"
+                    v-if="canContribute"
+                    label="contribuer !"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="positive" />
+          </q-item-tile> -->
+        </q-item-main>
+      </q-item>
+    </transition-group>
+    <transition-group
+        appear
+        enter-active-class="animated slideInLeft"
+        leave-active-class="animated slideOutLeft">
+        <q-item key="nextLabel" v-if="nextLabel" style="text-align: center;">
           <q-item-main>
             <q-item-tile label>
-              vous avez sélectionné
+              <strong>Merci pour votre contribution !</strong>
             </q-item-tile>
             <q-item-tile style="margin-top: 10px;">
-              <q-chip @hide="onReset()" closable color="dark">
-                {{ label.label }}
-              </q-chip>
-            </q-item-tile>
-            <q-item-tile style="padding-top: 10px;">
-              Vous pouvez commencer à identifier l'objet dans l'image.
-            </q-item-tile>
-            <q-item-tile style="padding-top: 10px;">
-              <a @click="onNext()" class="next">passer à l'image suivante</a>
-            </q-item-tile>
-            <q-item-tile style="margin-top: 10px;">
-              <q-btn @click="onSave()"
-                     v-if="canContribute"
-                     label="contribuer !"
+              <q-btn @click="onSaveAndContinue()"
+                     label="continuer avec cette image"
                      class="full-width"
                      style="margin-top: 10px;"
                      color="positive" />
+              <q-btn @click="onSave()"
+                    label="passer à l'image suivante"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="positive" />
             </q-item-tile>
           </q-item-main>
         </q-item>
-      </transition-group>
-    <!-- <q-item v-if="datasetTodo.length === 0">
-      <q-item-main label="Merci ! Vous avez qualifié l'ensemble de nos données." />
-    </q-item>
-    <div v-if="filter === 'toContribute'" style="height: calc(100vh - 217px); overflow-y: auto;">
-      <q-item v-for="data in datasetTodo"
-              :ref="data._id"
-              :key="data._id"
-              @click.native="contribute(data)"
-              class="item"
-              :class="{'itemActive': data.isActive}">
-        <q-item-side>
-          <q-item-tile class="image">
-            <img :src="setImg(data.file)">
-          </q-item-tile>
-        </q-item-side>
-        <q-item-main :label="data.file"
-                     :sublabel="`${data.numAnswers} contributions`" />
-      </q-item>
-    </div>
-    <div v-else style="height: calc(100vh - 217px); overflow-y: auto;">
-      <q-item v-for="data in datasetDone"
-              :ref="data._id"
-              :key="data._id"
-              @click.native="contribute(data)"
-              class="item"
-              :class="{'itemActive': data.isActive}">
-        <q-item-side>
-          <q-item-tile class="image">
-            <img :src="setImg(data.file)">
-          </q-item-tile>
-        </q-item-side>
-        <q-item-main :label="data.file"
-                     :sublabel="`${data.numAnswers} contributions`" />
-      </q-item>
-    </div> -->
+    </transition-group>
   </q-list>
 </template>
 
 <script>
-import _ from 'lodash';
 import { mapState, mapGetters } from 'vuex';
-
-import { DATASET_BY_SOURCE_QUERY } from '../constants/graphql';
 
 export default {
   name: 'CcLeftPanel',
@@ -116,25 +103,31 @@ export default {
       label: null,
       pickUpLabel: true,
       pickUpLabelConfirm: false,
-      filter: 'toContribute',
+      nextLabel: false,
       projectId: this.$route.params.id,
-      datasetTodo: null,
-      datasetDone: null,
     };
   },
   computed: {
     ...mapGetters({
       dataset: 'dataset/getDataset',
-      datasetId: 'dataset/getDatasetId',
       canContribute: 'label/canContribute',
     }),
     ...mapState('users', ['user']),
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
-    datasetId() {
-      this.onReset();
-      this.$apollo.queries.Dataset.refresh();
+    canContribute(newVal) {
+      if (newVal) {
+        this.pickUpLabelConfirm = false;
+        setTimeout(() => {
+          this.nextLabel = true;
+        }, 1000);
+      } else {
+        this.nextLabel = false;
+        setTimeout(() => {
+          this.pickUpLabel = true;
+        }, 1000);
+      }
     },
   },
   created() {
@@ -149,7 +142,6 @@ export default {
       this.label = selectedLabel;
       this.$store.commit('label/SET_LABEL', this.label);
       this.pickUpLabel = false;
-      // this.$store.commit('label/SET_ACTION', 'save');
       setTimeout(() => {
         this.pickUpLabelConfirm = true;
       }, 1000);
@@ -157,85 +149,23 @@ export default {
     onReset() {
       this.label = null;
       this.$store.commit('label/SET_LABEL', null);
-      this.pickUpLabelConfirm = false;
-      setTimeout(() => {
-        this.pickUpLabel = true;
-      }, 1000);
     },
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
     },
-    setFilter(filter) {
-      this.$store.commit('dataset/SET_IS_QUALIFIED', filter === 'contributed');
-      this.$store.dispatch('dataset/setDatasetId', null);
-      this.filter = filter;
-    },
-    contribute(data) {
-      this.$store.dispatch('dataset/setData', data);
-      this.$store.dispatch('dataset/setDatasetId', data._id);
-    },
-    updateDatasetList() {
-      const datasetTodo = [];
-      const datasetDone = [];
-      _.each(this.dataset, (data) => {
-        data.isActive = (data._id === this.datasetId);
-        if (data.usersAnswers.length > 0) {
-          const hasAnswered = _.filter(
-            data.usersAnswers,
-            (answer => answer.userId === this.user.id),
-          );
-          if (hasAnswered.length === 0) {
-            datasetTodo.push(data);
-          } else {
-            datasetDone.push(data);
-          }
-        } else {
-          datasetTodo.push(data);
-        }
-      });
-      this.datasetTodo = datasetTodo;
-      this.datasetDone = datasetDone;
-      if (datasetTodo.length > 0) {
-        this.setFirstData();
-      } else {
-        this.$root.$emit('onComplete');
-      }
+    onSaveAndContinue() {
+      this.$store.commit('label/SET_ACTION', 'save');
+      this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
+      this.$store.commit('label/SET_LABEL', null);
     },
     onSave() {
       this.$store.commit('label/SET_ACTION', 'save');
+      this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
+      this.$store.commit('label/SET_LABEL', null);
+      this.onNext();
     },
     onNext() {
       this.$root.$emit('onNext');
-    },
-    setFirstData() {
-      const datasetId = this.datasetId || null;
-      if (!datasetId) {
-        this.datasetTodo[0].isActive = true;
-        this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
-        // if (!this.isDataQualified) {
-        //   this.datasetTodo[0].isActive = true;
-        //   console.log('setFirstData', this.datasetTodo[0]._id);
-        //   this.$store.dispatch('dataset/setDatasetId', this.datasetTodo[0]._id);
-        // } else {
-        //   this.datasetDone[0].isActive = true;
-        //   this.$store.dispatch('dataset/setDatasetId', this.datasetDone[0]._id);
-        // }
-      }
-    },
-  },
-  apollo: {
-    Dataset: {
-      query: DATASET_BY_SOURCE_QUERY,
-      fetchPolicy: 'no-cache',
-      variables() {
-        return {
-          id: this.projectId,
-        };
-      },
-      update(datas) {
-        this.$store.dispatch('dataset/setDataset', datas.DataSetBySource);
-        this.updateDatasetList();
-      },
     },
   },
 };

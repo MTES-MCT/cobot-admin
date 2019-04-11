@@ -108,16 +108,6 @@ export default {
         rectangle: '#E91C63',
       },
       labels,
-      imagesTest: [
-        `${process.env.API_URL}/img/${this.$route.params.id}/IMG_5910.JPG`,
-        `${process.env.API_URL}/img/${this.$route.params.id}/PHOTO-2019-03-28-13-58-05 2.jpg`,
-        `${process.env.API_URL}/img/${this.$route.params.id}/IMG_5767.JPG`,
-      ],
-      imagesTestId: [
-        '5cacd15a5f835dac0db3e402',
-        '5cacd1575f835dac0db3e3d8',
-        '5cacd1595f835dac0db3e3f6',
-      ],
     };
   },
   computed: {
@@ -130,11 +120,11 @@ export default {
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
-    datasetId() {
-      this.isLoading = true;
-      this.skipQuery = false;
-      this.$apollo.queries.Data.refresh();
-    },
+    // datasetId() {
+    //   this.isLoading = true;
+    //   this.skipQuery = false;
+    //   this.$apollo.queries.Data.refresh();
+    // },
     action(newValue) {
       this.onAction(newValue);
     },
@@ -148,7 +138,7 @@ export default {
   },
   mounted() {
     this.$root.$on('onNext', () => {
-      this.onNone();
+      this.onNext();
       this.skipQuery = false;
     });
     this.$root.$on('onComplete', () => {
@@ -158,6 +148,9 @@ export default {
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
       this.map._onResize();
+
+      this.map.scrollWheelZoom.disable();
+      this.map.dragging.disable();
 
       this.editableLayers = new L.FeatureGroup();
       this.map.addLayer(this.editableLayers);
@@ -171,6 +164,8 @@ export default {
         this.$store.commit('label/SET_CAN_CONTRIBUTE', true);
         this.editableLayers.addLayer(layer);
       });
+
+      this.skipQuery = false;
     });
   },
   methods: {
@@ -197,21 +192,21 @@ export default {
     onAction() {
       switch (this.action) {
         case 'cancel':
-          this.$store.commit('label/SET_PANEL', null);
+          // this.$store.commit('label/SET_PANEL', null);
           this.$store.commit('label/SET_ACTION', null);
           this.resetEditableLayer();
           break;
         case 'save':
           this.saveAnswer(this.$store.state.label.label, () => {
             this.$store.commit('label/SET_ACTION', null);
-            this.$store.dispatch('dataset/setDatasetId', null);
+            // this.$store.dispatch('dataset/setDatasetId', null);
             this.$store.commit('dataset/SET_IS_QUALIFIED', false);
             this.resetEditableLayer();
           });
           break;
         case 'next':
           this.$store.commit('label/SET_PANEL', null);
-          this.$store.dispatch('dataset/setDatasetId', null);
+          // this.$store.dispatch('dataset/setDatasetId', null);
           this.$store.commit('dataset/SET_IS_QUALIFIED', false);
           this.resetEditableLayer();
           break;
@@ -242,11 +237,11 @@ export default {
       };
       this.drawControl = new L.Control.Draw(drawPluginOptions);
       this.map.addControl(this.drawControl);
+      this.drawControl._toolbars.draw._modes.rectangle.handler.enable();
     },
-    onNone() {
-      this.saveAnswer(JSON.stringify(this.labels[3]), () => {
-        this.$store.dispatch('dataset/setDatasetId', null);
-      });
+    onNext() {
+      this.skipQuery = false;
+      this.resetEditableLayer();
     },
     onOpenLabelBox() {
       this.openLabelBox = true;
@@ -333,7 +328,6 @@ export default {
       variables() {
         return {
           projectId: this.projectId,
-          id: this.datasetId,
           notAnswered: !this.isDataQualified,
         };
       },
@@ -349,8 +343,8 @@ export default {
             }
           }
           this.$store.dispatch('dataset/setData', dataset);
+          this.$store.dispatch('dataset/setDatasetId', dataset._id);
           this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
-          console.log(this.image);
           if (metadata.originalOrientation && metadata.originalOrientation === 6) {
             setTimeout(() => {
               this.setVerticalMap();
