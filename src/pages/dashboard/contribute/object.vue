@@ -120,11 +120,6 @@ export default {
     ...mapState('dataset', ['isDataQualified']),
   },
   watch: {
-    // datasetId() {
-    //   this.isLoading = true;
-    //   this.skipQuery = false;
-    //   this.$apollo.queries.Data.refresh();
-    // },
     action(newValue) {
       this.onAction(newValue);
     },
@@ -192,21 +187,18 @@ export default {
     onAction() {
       switch (this.action) {
         case 'cancel':
-          // this.$store.commit('label/SET_PANEL', null);
           this.$store.commit('label/SET_ACTION', null);
           this.resetEditableLayer();
           break;
         case 'save':
           this.saveAnswer(this.$store.state.label.label, () => {
             this.$store.commit('label/SET_ACTION', null);
-            // this.$store.dispatch('dataset/setDatasetId', null);
             this.$store.commit('dataset/SET_IS_QUALIFIED', false);
             this.resetEditableLayer();
           });
           break;
         case 'next':
           this.$store.commit('label/SET_PANEL', null);
-          // this.$store.dispatch('dataset/setDatasetId', null);
           this.$store.commit('dataset/SET_IS_QUALIFIED', false);
           this.resetEditableLayer();
           break;
@@ -240,6 +232,7 @@ export default {
       this.drawControl._toolbars.draw._modes.rectangle.handler.enable();
     },
     onNext() {
+      this.isLoading = true;
       this.skipQuery = false;
       this.resetEditableLayer();
     },
