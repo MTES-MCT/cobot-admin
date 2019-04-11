@@ -11,6 +11,7 @@ module.exports = function config(ctx) {
       'apollo',
       'googleMap',
       'masonry',
+      'pagination',
     ],
     css: [
       'app.styl',

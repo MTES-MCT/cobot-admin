@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cc-subheader-dataset v-if="dataset" :numItem="dataset.length"/>
+    <cc-subheader-dataset v-if="dataset" :numItem="datasetNum"/>
     <div class="row main">
       <div class="col-3">
         <cc-left-panel-dataset />
@@ -39,6 +39,15 @@
               </div>
             </div>
           </div>
+          <div class="col-md-6 col-sm-12" style="text-align: center;">
+            <paginate
+              :page-count="datasetNumPage"
+              :prev-text="'précédent'"
+              :next-text="'suivant'"
+              :container-class="'pagination'"
+              :click-handler="onChangePage">
+            </paginate>
+          </div>
         </div>
       </div>
       <q-modal v-model="openPreview"
@@ -62,7 +71,7 @@
 
 <script>
 // import _ from 'lodash';
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
 
 import CcLeftPanelDataset from 'components/cc-left-panel-dataset';
@@ -80,10 +89,20 @@ export default {
     ...mapGetters({
       dataset: 'dataset/getDataset',
     }),
+    ...mapState('dataset', ['pagerOffset']),
+  },
+  watch: {
+    pagerOffset() {
+      console.log('page change');
+    },
   },
   data() {
     return {
       projectId: this.$route.params.id,
+      datasetNum: null,
+      datasetNumPage: 0,
+      pager: null,
+      pagerLimit: 20,
       data: null,
       skipDatasetQuery: false,
       previewData: null,
@@ -106,6 +125,16 @@ export default {
     onSelect(data) {
       this.$store.dispatch('dataset/setData', data);
     },
+    onChangePage(page) {
+      this.$store.commit('dataset/SET_PAGER_OFFSET', page - 1);
+      this.setPage();
+    },
+    setPage() {
+      const offset = this.pagerLimit * this.pagerOffset;
+      const dataset = this.allDataset.slice(offset, offset + this.pagerLimit);
+      this.$store.dispatch('dataset/setData', dataset[0]);
+      this.$store.dispatch('dataset/setDataset', dataset);
+    },
   },
   apollo: {
     Dataset: {
@@ -117,9 +146,10 @@ export default {
         };
       },
       update(data) {
-        const dataset = data.DataSetBySource;
-        this.$store.dispatch('dataset/setData', dataset[0]);
-        this.$store.dispatch('dataset/setDataset', dataset);
+        this.allDataset = data.DataSetBySource;
+        this.datasetNum = this.allDataset.length;
+        this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
+        this.setPage();
         this.skipDatasetQuery = true;
       },
       skip() {
@@ -132,9 +162,29 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .grid-sizer,
-  .grid-item
-    width 25%
+  .pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 20px 0;
+    border-radius: 4px;
+  }
+  .pagination > li {
+    display: inline;
+  }
+  .pagination > li > a,
+  .pagination > li > span {
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    margin-right: 10px;
+    line-height: 1.42857143;
+    color: $pink;
+    border-radius: 25px;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid $pink;
+  }
   .main-card
     border-radius 2px
     width 100%
@@ -146,23 +196,11 @@ export default {
     .layout-padding
       padding-top 10px
   .dataset
-    .active
-      border solid 5px $pink
-    .hasNone
-      opacity 0.5
-    .q-card
-      width 300px
-      height 400px
-      &:hover
-        cursor pointer
-      .q-card-main
-        text-align left
-        p
-          white-space nowrap
-          overflow hidden
-          text-overflow ellipsis
-      .q-card-actions
-        .q-chip
-          margin-top 10px
-          margin-left 5px
+   .grid-sizer,
+    .grid-item
+      width 25%
+      .active
+        border solid 5px $pink
+      .hasNone
+        opacity 0.5
 </style>

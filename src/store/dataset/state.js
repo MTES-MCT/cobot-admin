@@ -3,4 +3,5 @@ export default {
   dataset: null,
   data: null,
   isDataQualified: false,
+  pagerOffset: 0,
 };

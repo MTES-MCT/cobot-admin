@@ -16,3 +16,8 @@ export const SET_IS_QUALIFIED = (state, isQualified) => {
   state.isDataQualified = isQualified;
   return isQualified;
 };
+
+export const SET_PAGER_OFFSET = (state, pagerOffset) => {
+  state.pagerOffset = pagerOffset;
+  return pagerOffset;
+};
