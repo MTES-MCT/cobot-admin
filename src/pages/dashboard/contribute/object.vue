@@ -191,15 +191,17 @@ export default {
           this.resetEditableLayer();
           break;
         case 'save':
-          this.saveAnswer(this.$store.state.label.label, () => {
+          this.saveAnswer(this.label, () => {
             this.$store.commit('label/SET_ACTION', null);
             this.$store.commit('dataset/SET_IS_QUALIFIED', false);
+            this.$store.commit('label/SET_LABEL', null);
             this.resetEditableLayer();
           });
           break;
         case 'next':
           this.$store.commit('label/SET_PANEL', null);
           this.$store.commit('dataset/SET_IS_QUALIFIED', false);
+          this.$store.commit('label/SET_LABEL', null);
           this.resetEditableLayer();
           break;
         default:
@@ -240,6 +242,7 @@ export default {
       this.openLabelBox = true;
     },
     async saveAnswer(label, callback) {
+      console.log(label);
       try {
         const answer = (this.answer) ? this.prepareAnswer(this.answer[0], label) : label;
         await this.$apollo.mutate({

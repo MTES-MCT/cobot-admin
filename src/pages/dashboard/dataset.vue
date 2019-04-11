@@ -9,30 +9,35 @@
         <div v-if="$auth.check([80, 100]) && dataset"
             class="main-card dataset">
           <div class="col-md-6 col-sm-12" style="text-align: center;">
-            <q-card v-for="data in dataset"
-                    :key="data._id"
-                    @click.native="onSelect(data)"
-                    :class="{ 'active': data.isActive, 'hasNone': data.hasNone }"
-                    class="q-ma-sm"
-                    inline>
-              <q-card-media>
-                <img :src="setImgUrl(data.file)" style="width: 300px">
-              </q-card-media>
-              <q-card-main>
-                <p>{{ data.file }}</p>
-              </q-card-main>
-              <q-card-actions>
-                <div v-if="data.numAnswers > 0" style="width: 100%; text-align: center">
-                  <q-chip v-for="(answer, answerIndex) in groupAnswers(data.usersAnswers)"
-                          :key="answerIndex"
-                          @click="onPreview(data)"
-                          color="dark">{{ answerIndex }} ({{ answer.length }})</q-chip>
+            <div v-masonry
+                 transition-duration='0.3s'
+                 item-selector='.grid-item'
+                 column-width='.grid-sizer'
+                 percent-position='true'>
+              <div v-for="data in dataset"
+                  :key="data._id"
+                  fit-width="true"
+                  v-masonry-tile
+                  class="grid-item">
+                <div class="grid-sizer"></div>
+                <div @click="onSelect(data)"
+                     :class="{ 'active': data.isActive, 'hasNone': data.hasNone }"
+                     style="padding-bottom: 10px;">
+                  <img :src="setImgUrl(data.file)" style="width: 98%">
+                  <p>{{ data.file }}</p>
+                  <div v-if="data.numAnswers > 0" style="width: 100%; text-align: center">
+                    <q-chip v-for="(answer, answerIndex) in data.groupedAnswers"
+                            :key="answerIndex"
+                            @click="onPreview(data)"
+                            style="margin-bottom: 5px;"
+                            color="dark">{{ answerIndex }} ({{ answer.length }})</q-chip>
+                  </div>
+                  <div v-else style="width: 100%; text-align: center;">
+                    <p>aucune contribution</p>
+                  </div>
                 </div>
-                <div v-else style="width: 100%; text-align: center;">
-                  <p>aucune contribution</p>
-                </div>
-              </q-card-actions>
-            </q-card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -101,15 +106,6 @@ export default {
     onSelect(data) {
       this.$store.dispatch('dataset/setData', data);
     },
-    groupAnswers(usersAnswers) {
-      const groupedAnswers = _.groupBy(usersAnswers, (answer) => {
-        if (answer.answers.label.id) {
-          return answer.answers.label.label;
-        }
-        return answer.answers.label;
-      });
-      return groupedAnswers;
-    },
   },
   apollo: {
     Dataset: {
@@ -121,7 +117,7 @@ export default {
         };
       },
       update(data) {
-        const dataset = data.DataSetBySource.reverse();
+        const dataset = _.take(data.DataSetBySource, 100);
         this.$store.dispatch('dataset/setData', dataset[0]);
         this.$store.dispatch('dataset/setDataset', dataset);
         this.skipDatasetQuery = true;
@@ -136,6 +132,9 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
+  .grid-sizer,
+  .grid-item
+    width 25%
   .main-card
     border-radius 2px
     width 100%

@@ -1,6 +1,19 @@
 /* eslint-disable import/prefer-default-export */
 import _ from 'lodash';
 
+const groupAnswers = (usersAnswers) => {
+  const groupedAnswers = _.groupBy(usersAnswers, (answer) => {
+    if (!answer.answers.label) {
+      return answer.answers.label;
+    }
+    if (answer.answers.label.id) {
+      return answer.answers.label.label;
+    }
+    return answer.answers.label;
+  });
+  return groupedAnswers;
+};
+
 export const getDatasetId = (state => state.datasetId);
 
 export const getDataset = (state) => {
@@ -11,12 +24,13 @@ export const getDataset = (state) => {
       _.each(data.usersAnswers, (answer) => {
         if (typeof answer.answers === 'string') {
           answer.answers = JSON.parse(answer.answers);
+          data.groupedAnswers = groupAnswers(data.usersAnswers);
         }
         if (typeof answer.answers.label === 'string') {
           if (answer.answers.label === 'Aucun') {
             data.hasNone = true;
           }
-        } else if (answer.answers.label.id === 'none') {
+        } else if (!answer.answers.label || answer.answers.label.id === 'none') {
           data.hasNone = true;
         }
       });

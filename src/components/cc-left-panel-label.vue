@@ -156,12 +156,10 @@ export default {
     onSaveAndContinue() {
       this.$store.commit('label/SET_ACTION', 'save');
       this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
-      this.$store.commit('label/SET_LABEL', null);
     },
     onSave() {
       this.$store.commit('label/SET_ACTION', 'save');
       this.$store.commit('label/SET_CAN_CONTRIBUTE', false);
-      this.$store.commit('label/SET_LABEL', null);
       this.onNext();
     },
     onNext() {

@@ -61,48 +61,29 @@ export default {
       this.editableLayers = new L.FeatureGroup();
       this.map.addLayer(this.editableLayers);
 
-      // const drawPluginOptions = {
-      //   position: 'topright',
-      //   draw: {
-      //     polygon: false,
-      //     polyline: false,
-      //     circle: false,
-      //     circlemarker: false,
-      //     rectangle: {
-      //       shapeOptions: {
-      //         showArea: false,
-      //         color: this.colors.rectangle,
-      //       },
-      //     },
-      //     marker: false,
-      //   },
-      //   edit: {
-      //     featureGroup: this.editableLayers,
-      //     remove: true,
-      //   },
-      // };
-      // const drawControl = new L.Control.Draw(drawPluginOptions);
-      // this.map.addControl(drawControl);
       this.map.fitBounds(this.bounds);
 
-      this.map.on(L.Draw.Event.CREATED, (event) => {
-        const { layer } = event;
-        this.currentLayer = layer;
-        this.answer = layer.getLatLngs();
-        this.$store.commit('label/SET_PANEL', 'rightPanelLabel');
-        this.editableLayers.addLayer(layer);
-      });
       this.displayLabels();
     });
   },
   methods: {
     displayLabels() {
+      const { metadata } = this.data;
       if (this.polygons.length > 0) {
         _.each(this.polygons, (polygon) => {
           this.resetLayer(polygon);
         });
       }
       this.image = `${process.env.API_URL}/img/${this.projectId}/${this.data.file}`;
+      if (metadata.originalOrientation && metadata.originalOrientation === 6) {
+        setTimeout(() => {
+          this.setVerticalMap();
+        }, 500);
+      } else {
+        setTimeout(() => {
+          this.setHorizontalMap();
+        }, 500);
+      }
       _.each(this.data.usersAnswers, (answer) => {
         this.drawUserAnswer(answer.answers.origin);
       });
@@ -118,6 +99,34 @@ export default {
     },
     resetLayer(polygon) {
       this.map.removeLayer(polygon);
+    },
+    setVerticalMap() {
+      if (this.map.getBounds()._northEast.lat === 1080) {
+        this.map._onResize();
+        this.$refs.map.$el.style.height = '720px';
+        this.$refs.map.$el.style.width = '540px';
+        setTimeout(() => {
+          this.bounds = [[0, 0], [720, 540]];
+          this.map.fitBounds(this.bounds);
+        }, 500);
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+      } else {
+        this.isLoading = false;
+      }
+    },
+    setHorizontalMap() {
+      this.map._onResize();
+      this.$refs.map.$el.style.height = '540px';
+      this.$refs.map.$el.style.width = '720px';
+      setTimeout(() => {
+        this.bounds = [[0, 0], [1080, 1440]];
+        this.map.fitBounds(this.bounds);
+      }, 500);
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
     },
   },
 };

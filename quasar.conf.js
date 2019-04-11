@@ -10,6 +10,7 @@ module.exports = function config(ctx) {
       'vueAuth',
       'apollo',
       'googleMap',
+      'masonry',
     ],
     css: [
       'app.styl',
