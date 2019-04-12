@@ -4,4 +4,5 @@ export default {
   data: null,
   isDataQualified: false,
   pagerOffset: 0,
+  refresh: false,
 };

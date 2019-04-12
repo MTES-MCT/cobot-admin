@@ -89,11 +89,13 @@ export default {
     ...mapGetters({
       dataset: 'dataset/getDataset',
     }),
-    ...mapState('dataset', ['pagerOffset']),
+    ...mapState('dataset', ['pagerOffset', 'refresh']),
   },
   watch: {
-    pagerOffset() {
-      console.log('page change');
+    refresh(newVal) {
+      if (newVal) {
+        this.skipDatasetQuery = false;
+      }
     },
   },
   data() {
@@ -151,6 +153,7 @@ export default {
         this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
         this.setPage();
         this.skipDatasetQuery = true;
+        this.$store.commit('dataset/SET_REFRESH', false);
       },
       skip() {
         return this.skipDatasetQuery;

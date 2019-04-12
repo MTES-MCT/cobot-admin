@@ -21,3 +21,8 @@ export const SET_PAGER_OFFSET = (state, pagerOffset) => {
   state.pagerOffset = pagerOffset;
   return pagerOffset;
 };
+
+export const SET_REFRESH = (state, boolean) => {
+  state.refresh = boolean;
+  return boolean;
+};

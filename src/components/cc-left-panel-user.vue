@@ -4,8 +4,9 @@
       Ajouter des utilisateurs
     </q-list-header>
     <q-item>
-      Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
+      Pour ajouter des utilisateurs, cliquez sur le bouton ci-dessous.
+      Une popin s'ouvrira dans laquelle vous pourrez saisir
+      des adresses emails séparées par des ";".
     </q-item>
     <q-item>
       <div style="width: 100%; text-align: center;">

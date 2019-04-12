@@ -1,6 +1,7 @@
 <template>
   <CcPanelPhotoInfo  v-if="data"
                      side="left"
+                     :id="data._id"
                      :name="data.file"
                      :metadata="data.metadata" />
 </template>

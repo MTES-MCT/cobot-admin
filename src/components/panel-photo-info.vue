@@ -11,6 +11,14 @@
         <q-item-tile label>{{ name }}</q-item-tile>
       </q-item-main>
     </q-item>
+    <q-item>
+      <div style="width: 100%; text-align: center;">
+        <q-btn @click="deleteData"
+               color="negative"
+               icon="delete"
+               label="supprimer cette donnée" />
+      </div>
+    </q-item>
     <q-list-header v-if="metadata.geoData"
                    style="padding-top: 30px;">Geolocalisation</q-list-header>
     <q-item v-if="metadata.geoData">
@@ -76,9 +84,11 @@
 </template>
 
 <script>
+import { DATA_DELETE } from '../constants/graphql';
+
 export default {
   name: 'CcPanelPhotoInfo',
-  props: ['name', 'side', 'metadata'],
+  props: ['id', 'name', 'side', 'metadata'],
   data() {
     return {
       infoWindowPos: null,
@@ -102,6 +112,34 @@ export default {
     },
     hasChild(row) {
       return typeof row === 'object' && !row[0];
+    },
+    deleteData() {
+      this.$q.dialog({
+        title: 'Suppression',
+        message: 'Etes-vous sûr de vouloir supprimer cette donnée ?',
+        ok: {
+          color: 'pink',
+          label: 'oui',
+        },
+        cancel: {
+          color: 'dark',
+          label: 'non',
+        },
+        preventClose: true,
+      }).then(() => {
+        this.$apollo.mutate({
+          mutation: DATA_DELETE,
+          variables: {
+            id: this.id,
+          },
+        }).then(() => {
+          this.$store.commit('dataset/SET_REFRESH', true);
+          // this.datas.splice(props.row.__index, 1);
+        }).catch((error) => {
+          console.log(error);
+        });
+      }).catch(() => {
+      });
     },
   },
 };

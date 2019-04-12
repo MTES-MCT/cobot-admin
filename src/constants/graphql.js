@@ -86,6 +86,10 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($id: ID!) {
   }
 }`;
 
+export const DATA_DELETE = gql`mutation dataDelete($id: ID!) {
+  dataDelete(id: $id)
+}`;
+
 export const DATASET_STATS_SUB = gql`subscription subContribution($id: ID!) {
   contributionAdded(id: $id) {
     createdAt
