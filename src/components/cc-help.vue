@@ -1,7 +1,7 @@
 <template>
   <q-modal v-model="openHelp"
            class="help"
-                    minimized>
+           minimized>
     <q-modal-layout style="width: 950px;">
       <q-toolbar color="dark" slot="header">
         <q-toolbar-title>
@@ -75,14 +75,16 @@
             </div>
             <p>
               Si l’image ne contient aucun de ces éléments,
-              cliquez sur le lien
-              "<span style="color: #e91e63;">aucun élément, passer à la photo suivante</span>"
+              cliquez sur le bouton
             </p>
+             <div style="text-align: center;">
+              <img src="../statics/next_photo.png" style="width: 350px;"/>
+            </div>
           </q-carousel-slide>
           <q-carousel-slide>
             <p style="padding-top: 10px;">
               <strong>Etape 2 :</strong>
-               Si l’image contient 1 ou plusieurs élément :
+               Si l’image contient 1 ou plusieurs éléments :
             </p>
             <p>
               Cliquez sur le bouton correspondant à l’élément que vous allez identifier :
@@ -248,6 +250,8 @@ export default {
 
 <style lang="stylus">
   .help
+    .modal-content
+      max-height 85vh !important;
     .q-modal-layout-content
       overflow-y hidden
     .layout-padding
