@@ -207,8 +207,12 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
 
 export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
   ProjectContributors(id: $id) {
+    name
     email
     lastConnection
+    activity {
+      lastAnswersAt
+    }
     projects {
       role
     }

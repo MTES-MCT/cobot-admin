@@ -25,7 +25,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-7" style="padding-left: 50px;">
+            <div class="col-7" style="padding-left: 20px;">
               <q-btn @click="goTo('dashboard.contribute.object', $route.params.id)"
                      flat icon="public" label="Contribuer" />
               <q-btn v-if="$auth.check([80, 100])" @click="goTo('dashboard', $route.params.id)"

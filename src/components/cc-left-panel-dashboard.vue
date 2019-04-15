@@ -3,37 +3,53 @@
     <q-list-header>
       Dernières activitées
     </q-list-header>
-    <q-item>
-      <q-item-main label="Contibution de Roxane" />
-      <q-item-side right>
-        <q-item-tile stamp>il y a 10 mn</q-item-tile>
-      </q-item-side>
-    </q-item>
-    <q-item>
-      <q-item-main label="Arthur a ajouté 10 photos" />
-      <q-item-side right>
-        <q-item-tile stamp>il y a 1h</q-item-tile>
-      </q-item-side>
-    </q-item>
-    <q-item>
-      <q-item-main label="Contribution de Stéphane" />
-      <q-item-side right>
-        <q-item-tile stamp>il y a 2h</q-item-tile>
-      </q-item-side>
-    </q-item>
-     <q-item>
-      <q-item-main label="Contibution de Laurence" />
-      <q-item-side right>
-        <q-item-tile stamp>il y a 1 jour</q-item-tile>
-      </q-item-side>
+    <q-item v-for="(feed, index) in feeds"
+            :key="index">
+      <q-item-main>
+        <q-item-tile label>Contribution de {{ feed.user }}</q-item-tile>
+         <q-item-tile sublabel>{{ feed.relativeDate }}</q-item-tile>
+      </q-item-main>
     </q-item>
   </q-list>
 </template>
 
 <script>
+import moment from 'moment';
+import _ from 'lodash';
+import { PROJECT_CONTRIBUTORS } from '../constants/graphql';
 
 export default {
   name: 'CcLeftPanelDashboard',
+  data() {
+    return {
+      projectId: this.$route.params.id,
+      feeds: null,
+    };
+  },
+  apollo: {
+    feeds: {
+      query: PROJECT_CONTRIBUTORS,
+      variables() {
+        return {
+          id: this.projectId,
+        };
+      },
+      update(data) {
+        moment.locale('fr');
+        const datas = _.filter(data.ProjectContributors, user => user.activity.lastAnswersAt);
+        let feeds = [];
+        _.each(datas, (user) => {
+          feeds.push({
+            user: user.name || user.email,
+            createdAt: moment(user.activity.lastAnswersAt),
+            relativeDate: moment(String(user.activity.lastAnswersAt)).startOf().fromNow(),
+          });
+        });
+        feeds = _.orderBy(feeds, ['createdAt'], ['desc']);
+        return feeds;
+      },
+    },
+  },
 };
 </script>
 
