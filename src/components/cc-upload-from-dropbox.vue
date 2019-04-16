@@ -75,7 +75,7 @@ export default {
   methods: {
     async upload() {
       if (this.checkUrl()) {
-        // this.url = this.url.replace(/\?dl=0/, '?dl=1');
+        this.url = this.url.replace(/\?dl=0/, '?dl=1');
         this.isLoading = true;
         this.$apollo.mutate({
           mutation: DOWNLOAD_FROM_DROPBOX,
@@ -96,8 +96,8 @@ export default {
       }
     },
     checkUrl() {
-      return true;
-      // return this.url && this.url.indexOf('dropbox.com') > -1 && this.url.indexOf('?dl=') > -1;
+      // return true;
+      return this.url && this.url.indexOf('dropbox.com') > -1 && this.url.indexOf('?dl=') > -1;
     },
     gotoDataset() {
       const slug = this.projectName.replace(/\s/g, '').toLowerCase();

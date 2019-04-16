@@ -198,7 +198,11 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
     name
     details
     question
-    answers{
+    answers {
+      text
+      order
+    }
+    labels {
       text
       order
     }
@@ -250,14 +254,14 @@ export const DELETE_PROJECT_CONTRIBUTOR = gql`mutation deleteProjectContributor(
   }
 }`;
 
-export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String, $question: String, $answers: [AnswerInput]) {
-  updateProject(id: $id, name: $name, question: $question, answers: $answers) {
+export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String, $question: String, $answers: [AnswerInput], $labels: [LabelInput]) {
+  updateProject(id: $id, name: $name, question: $question, answers: $answers, labels: $labels) {
     name
   }
 }`;
 
 export const PROJECT_CREATE = gql`mutation createProject($name: String, $details: String) {
-  createProject(name: $name) {
+  createProject(name: $name, details: $details) {
     id
     name
     details

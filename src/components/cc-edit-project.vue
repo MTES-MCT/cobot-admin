@@ -23,8 +23,9 @@
               </q-field>
             </q-step>
 
-            <q-step title="Etape 2" subtitle="Labels">
+            <q-step name="etape2" title="Etape 2" subtitle="Labels">
               <q-chips-input v-model="labels"
+                             @input="onLabel"
                              color="pink"
                              float-label="Labels recherchés" />
             </q-step>
@@ -91,27 +92,24 @@ export default {
       skipQuery: true,
       labels: [],
       project: {
-        name: '',
-        details: '',
+        name: null,
+        details: null,
       },
     };
   },
   watch: {
     projectId() {
-      this.$refs.stepper.goToStep('etape1');
+      // this.$refs.stepper.goToStep('etape1');
       if (this.projectId) {
         this.$apollo.queries.project.skip = false;
       }
     },
-    labels() {
-      console.log(this.labels);
-    },
   },
   methods: {
-    getLabels(project) {
+    getLabels(projectLabels) {
       const labels = [];
-      _.each(project.answers, (answer) => {
-        labels.push(answer.text);
+      _.each(projectLabels, (label) => {
+        labels.push(label.text);
       });
       return labels;
     },
@@ -125,10 +123,22 @@ export default {
     },
     onNext() {
       if (this.projectId) {
+        this.update();
         this.$refs.stepper.next();
       } else {
         this.save();
+        this.$refs.stepper.next();
       }
+    },
+    onLabel() {
+      this.project.labels = [];
+      _.each(this.labels, (label, index) => {
+        this.project.labels.push({
+          text: label,
+          order: index,
+        });
+      });
+      this.update();
     },
     async save() {
       if (this.project.name) {
@@ -140,11 +150,9 @@ export default {
               details: this.project.details,
             },
           });
-          console.log(newProject);
           if (newProject) {
-            this.$store.commit('project/SET_PROJECT', newProject.data.createProject.id);
-            this.$root.$emit('newProject', newProject);
-            this.$refs.stepper.next();
+            this.$store.commit('project/SET_PROJECT_ID', newProject.data.createProject.id);
+            this.$root.$emit('newProject', newProject.data.createProject);
           }
         } catch (error) {
           this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
@@ -161,18 +169,19 @@ export default {
       this.$apollo.mutate({
         mutation: PROJECT_UPDATE,
         variables: {
-          id: this.id,
+          id: this.projectId,
           name: this.project.name,
           question: this.project.question,
           answers: this.project.answers,
+          labels: this.project.labels,
         },
       }).then(() => {
         this.$localStorage.set('project', this.project);
         this.$root.$emit('projectUpdated', {
-          id: this.id,
+          id: this.projectId,
           name: this.project.name,
         });
-        this.$q.notify({ message: this.$t('global.updateDone'), type: 'positive' });
+        this.$q.notify({ message: this.$t('global.updateDone'), type: 'grey' });
       }).catch(() => {
         this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
       });
@@ -193,7 +202,7 @@ export default {
         if (data.Project) {
           let project = clone(data.Project);
           project = omitDeep(project, ['__typename']);
-          this.labels = this.getLabels(project);
+          this.labels = this.getLabels(project.labels);
           return project;
         }
         return false;
@@ -209,7 +218,7 @@ export default {
 <style lang="stylus">
   .editProject
     .modal-content
-      width 40vw
+      width 50vw
     .q-stepper-nav
       position absolute
       bottom 10px

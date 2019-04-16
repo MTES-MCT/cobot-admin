@@ -1,12 +1,12 @@
 <template>
   <div>
-    <cc-subheader-dataset v-if="dataset" :numItem="datasetNum"/>
-    <div class="row main">
+    <cc-subheader-dataset :numItem="datasetNum"/>
+    <div class="row main" v-if="dataset">
       <div class="col-3">
         <cc-left-panel-dataset />
       </div>
       <div class="col-9">
-        <div v-if="$auth.check([80, 100]) && dataset"
+        <div v-if="$auth.check([80, 100])"
             class="main-card dataset">
           <div class="col-md-6 col-sm-12" style="text-align: center;">
             <div v-masonry
@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="col-md-6 col-sm-12" style="text-align: center;">
-            <paginate
+            <paginate v-if="datasetNumPage > 1"
               :page-count="datasetNumPage"
               :prev-text="'précédent'"
               :next-text="'suivant'"
@@ -101,7 +101,7 @@ export default {
   data() {
     return {
       projectId: this.$route.params.id,
-      datasetNum: null,
+      datasetNum: 0,
       datasetNumPage: 0,
       pager: null,
       pagerLimit: 20,
@@ -113,7 +113,8 @@ export default {
   },
   mounted() {
     this.$root.$on('update:imported', () => {
-      this.skipDatasetQuery = false;
+      this.$apollo.queries.Dataset.refresh();
+      // this.skipDatasetQuery = false;
     });
   },
   methods: {
@@ -148,12 +149,18 @@ export default {
         };
       },
       update(data) {
-        this.allDataset = data.DataSetBySource;
-        this.datasetNum = this.allDataset.length;
-        this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
-        this.setPage();
-        this.skipDatasetQuery = true;
-        this.$store.commit('dataset/SET_REFRESH', false);
+        console.log(data.DataSetBySource);
+        if (data.DataSetBySource.length > 0) {
+          this.allDataset = data.DataSetBySource;
+          this.datasetNum = this.allDataset.length;
+          this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
+          this.setPage();
+          this.skipDatasetQuery = true;
+          this.$store.commit('dataset/SET_REFRESH', false);
+        } else {
+          this.datasetNum = 0;
+          this.$store.dispatch('dataset/setDataset', null);
+        }
       },
       skip() {
         return this.skipDatasetQuery;
