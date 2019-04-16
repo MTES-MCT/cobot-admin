@@ -66,6 +66,10 @@
             <q-btn color="grey"
                   @click="close()"
                   label="fermer" />
+            <q-btn color="negative"
+                   @click="onDelete()"
+                   label="supprimer le projet"
+                   style="margin-left: 10px;" />
           </q-toolbar-title>
         </q-toolbar>
       </q-modal-layout>
@@ -79,7 +83,8 @@ import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 
 // PROJECT_UPDATE, PROJECT_DELETE
-import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE } from '../constants/graphql';
+// DELETE_PROJECT
+import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE, PROJECT_DELETE } from '../constants/graphql';
 
 export default {
   name: 'CcEditProject',
@@ -99,7 +104,6 @@ export default {
   },
   watch: {
     projectId() {
-      // this.$refs.stepper.goToStep('etape1');
       if (this.projectId) {
         this.$apollo.queries.project.skip = false;
       }
@@ -176,18 +180,51 @@ export default {
           labels: this.project.labels,
         },
       }).then(() => {
-        this.$localStorage.set('project', this.project);
+        this.$localStorage.set('project', JSON.stringify(this.project));
         this.$root.$emit('projectUpdated', {
           id: this.projectId,
           name: this.project.name,
         });
-        this.$q.notify({ message: this.$t('global.updateDone'), type: 'grey' });
+        this.$q.notify({ message: this.$t('global.updateDone'), type: 'positive' });
       }).catch(() => {
         this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
       });
     },
     close() {
       this.$store.commit('users/SET_OPEN_EDIT_PROJECT', false);
+    },
+    onDelete() {
+      this.$q.dialog({
+        title: 'Suppression d\'un projet',
+        message: 'Etes-vous sûr de vouloir supprimer l\'ensemble du projet (contributions, contributeur et données) ?',
+        ok: {
+          color: 'negative',
+          label: this.$t('global.yes'),
+        },
+        cancel: {
+          color: 'grey',
+          label: this.$t('global.no'),
+        },
+        preventClose: true,
+      }).then(() => {
+        this.$apollo.mutate({
+          mutation: PROJECT_DELETE,
+          variables: {
+            id: this.projectId,
+          },
+        }).then(() => {
+          let projects = this.$localStorage.get('projects');
+          if (projects) {
+            projects = JSON.parse(projects);
+            this.$localStorage.set('projects', JSON.stringify(projects));
+            [this.project] = projects;
+            this.$root.$emit('projectDeleted', { id: this.projectId });
+            this.goTo('dashboard', this.project.id);
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      });
     },
   },
   apollo: {

@@ -13,7 +13,7 @@
             Mes projects
           </div>
           <div class="col-6" style="text-align:right">
-            <a href="#" @click="goToNewProject()">ajouter un projet</a>
+            <a href="javascript:void(0)" @click="goToNewProject()">ajouter un projet</a>
           </div>
         </div>
       </q-list-header>

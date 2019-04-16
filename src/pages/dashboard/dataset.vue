@@ -149,7 +149,6 @@ export default {
         };
       },
       update(data) {
-        console.log(data.DataSetBySource);
         if (data.DataSetBySource.length > 0) {
           this.allDataset = data.DataSetBySource;
           this.datasetNum = this.allDataset.length;
