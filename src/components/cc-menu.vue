@@ -86,7 +86,11 @@ export default {
       return name.replace(/\s/g, '').toLowerCase();
     },
     goToDashboard(project) {
+      delete project.__typename;
       this.$store.commit('project/SET_PROJECT', project);
+      this.$store.dispatch('dataset/setData', null);
+      this.$store.dispatch('dataset/setDataset', null);
+      this.$store.dispatch('dataset/setDatasetId', project.id);
       this.$localStorage.set('project', JSON.stringify(project));
       this.$root.$emit('projectChanged', project);
       this.$router.push(`/dashboard/${project.id}`);

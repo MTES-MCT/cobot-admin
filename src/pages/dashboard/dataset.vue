@@ -113,7 +113,9 @@ export default {
   },
   mounted() {
     this.$root.$on('update:imported', () => {
-      this.$apollo.queries.Dataset.refresh();
+      if (this.$apollo.queries.Dataset) {
+        this.$apollo.queries.Dataset.refresh();
+      }
       // this.skipDatasetQuery = false;
     });
   },

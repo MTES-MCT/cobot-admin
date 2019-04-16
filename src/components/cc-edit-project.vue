@@ -66,7 +66,8 @@
             <q-btn color="grey"
                   @click="close()"
                   label="fermer" />
-            <q-btn color="negative"
+            <q-btn v-if="projectId"
+                   color="negative"
                    @click="onDelete()"
                    label="supprimer le projet"
                    style="margin-left: 10px;" />
@@ -82,8 +83,6 @@ import _ from 'lodash';
 import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 
-// PROJECT_UPDATE, PROJECT_DELETE
-// DELETE_PROJECT
 import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE, PROJECT_DELETE } from '../constants/graphql';
 
 export default {
@@ -118,6 +117,10 @@ export default {
       return labels;
     },
     goTo(to, id) {
+      this.$store.dispatch('dataset/setData', null);
+      this.$store.dispatch('dataset/setDataset', null);
+      this.$store.dispatch('dataset/setDatasetId', this.project.id);
+
       this.$store.commit('project/SET_PROJECT', this.project);
       this.$localStorage.set('project', JSON.stringify(this.project));
       this.$root.$emit('projectChanged', this.project);
@@ -216,6 +219,7 @@ export default {
           let projects = this.$localStorage.get('projects');
           if (projects) {
             projects = JSON.parse(projects);
+            projects = _.filter(projects, (project => project.id !== this.projectId));
             this.$localStorage.set('projects', JSON.stringify(projects));
             [this.project] = projects;
             this.$root.$emit('projectDeleted', { id: this.projectId });
