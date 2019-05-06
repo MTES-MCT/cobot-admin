@@ -149,6 +149,10 @@ export default {
     onReset() {
       this.label = null;
       this.$store.commit('label/SET_LABEL', null);
+      this.pickUpLabelConfirm = false;
+      setTimeout(() => {
+        this.pickUpLabel = true;
+      }, 1000);
     },
     setImg(img) {
       return `${process.env.API_URL}/img/${this.projectId}/${img}`;
