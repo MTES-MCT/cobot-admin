@@ -160,6 +160,28 @@ export default {
         this.editableLayers.addLayer(layer);
       });
 
+      this.map.on(L.Draw.Event.EDITSTART, () => {
+        this.defaultAnswer = this.answers;
+        const el = this.$refs.map.$el.querySelectorAll('.leaflet-draw-actions-top');
+        el[0].childNodes[0].style.display = 'none';
+      });
+
+      this.map.on(L.Draw.Event.EDITMOVE, (event) => {
+        const { layer } = event;
+        this.currentLayer = layer;
+        this.answer = layer.getLatLngs();
+      });
+
+      this.map.on(L.Draw.Event.EDITRESIZE, (event) => {
+        const { layer } = event;
+        this.currentLayer = layer;
+        this.answer = layer.getLatLngs();
+      });
+
+      this.map.on(L.Draw.Event.EDITSTOP, () => {
+        this.answers = this.defaultAnswer;
+      });
+
       this.skipQuery = false;
     });
   },
@@ -401,6 +423,9 @@ export default {
     border-left-color #F2C037
   .leaflet-tooltip-right.toolTip_polygon::before
     border-right-color #F2C037
+  .leaflet-draw-actions
+    // display none
+    // &:first-child
   .q-carousel-quick-nav
     background none
 </style>
