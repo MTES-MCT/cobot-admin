@@ -79,12 +79,12 @@
                      label="continuer avec cette image"
                      class="full-width"
                      style="margin-top: 10px;"
-                     color="positive" />
+                     color="pink" />
               <q-btn @click="onSave()"
                     label="passer à l'image suivante"
                     class="full-width"
                     style="margin-top: 10px;"
-                    color="positive" />
+                    color="dark" />
             </q-item-tile>
           </q-item-main>
         </q-item>
