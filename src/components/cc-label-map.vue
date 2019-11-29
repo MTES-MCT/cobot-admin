@@ -75,18 +75,24 @@ export default {
         });
       }
       this.image = `${process.env.API_URL}/img/${this.projectId}/${this.data.file}`;
-      if (metadata.originalOrientation && metadata.originalOrientation === 6) {
-        setTimeout(() => {
-          this.setVerticalMap();
-        }, 500);
-      } else {
-        setTimeout(() => {
-          this.setHorizontalMap();
-        }, 500);
-      }
+      setTimeout(() => {
+        this.setMapOrientation(metadata);
+      }, 500);
       _.each(this.data.usersAnswers, (answer) => {
         this.drawUserAnswer(answer.answers.origin);
       });
+      // if (metadata.originalOrientation && metadata.originalOrientation === 6) {
+      //   setTimeout(() => {
+      //     this.setVerticalMap();
+      //   }, 500);
+      // } else {
+      //   setTimeout(() => {
+      //     this.setHorizontalMap();
+      //   }, 500);
+      // }
+      // _.each(this.data.usersAnswers, (answer) => {
+      //   this.drawUserAnswer(answer.answers.origin);
+      // });
     },
     drawUserAnswer(coord) {
       const latlngs = [
@@ -128,6 +134,34 @@ export default {
         this.isLoading = false;
       }, 500);
     },
+
+    setMapOrientation(metadata) {
+      let height;
+      let width;
+      if (metadata.originalHeight) {
+        height = metadata.originalHeight;
+        width = metadata.originalWidth;
+      } else {
+        const { raw } = metadata;
+        if (raw.ImageHeight) {
+          height = raw.ImageHeight;
+          width = raw.ImageWidth;
+        }
+      }
+      this.imageHeight = height;
+      this.imageWidth = width;
+      this.map._onResize();
+      this.$refs.map.$el.style.height = `${height}px`;
+      this.$refs.map.$el.style.width = `${width}px`;
+      setTimeout(() => {
+        this.bounds = [[0, 0], [height, width]];
+        this.map.fitBounds(this.bounds);
+      }, 500);
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
+    },
+
   },
 };
 </script>

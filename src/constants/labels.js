@@ -7,17 +7,17 @@ export default [
     isNotSelected: false,
   },
   {
-    id: 'bitumen',
+    id: 'garbage',
     type: 'polygon',
-    label: 'pavés',
-    img: '../statics/pave.png',
+    label: 'Poubelle',
+    img: '../statics/poubelles.jpg',
     isNotSelected: false,
   },
   {
-    id: 'pieton',
+    id: 'stairs',
     type: 'polygon',
-    label: 'Passage piéton',
-    img: '../statics/pieton.png',
+    label: 'Escalier',
+    img: '../statics/stairs.png',
     isNotSelected: false,
   },
   // {

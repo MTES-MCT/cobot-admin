@@ -99,6 +99,8 @@ export default {
       map: null,
       drawControl: null,
       currentLayer: null,
+      imageHeight: null,
+      imageWidth: null,
       image: '',
       bounds: [[0, 0], [1080, 1440]],
       minZoom: -1,
@@ -160,6 +162,14 @@ export default {
         this.editableLayers.addLayer(layer);
       });
 
+      this.map.on(L.Draw.Event.EDITSTOP, (event) => {
+        const { layer } = event;
+        this.currentLayer = layer;
+        this.answer = layer.getLatLngs();
+        this.$store.commit('label/SET_CAN_CONTRIBUTE', true);
+        this.editableLayers.addLayer(layer);
+      });
+
       this.map.on(L.Draw.Event.EDITSTART, () => {
         this.defaultAnswer = this.answers;
         const el = this.$refs.map.$el.querySelectorAll('.leaflet-draw-actions-top');
@@ -213,6 +223,7 @@ export default {
           this.resetEditableLayer();
           break;
         case 'save':
+          this.prepareAnswer(this.answer[0], this.label);
           this.saveAnswer(this.label, () => {
             this.$store.commit('label/SET_ACTION', null);
             this.$store.commit('dataset/SET_IS_QUALIFIED', false);
@@ -235,10 +246,15 @@ export default {
       const drawPluginOptions = {
         position: 'topright',
         draw: {
-          polygon: false,
           polyline: false,
           circle: false,
           circlemarker: false,
+          polygon: {
+            shapeOptions: {
+              showArea: false,
+              color: this.colors.rectangle,
+            },
+          },
           rectangle: {
             shapeOptions: {
               showArea: false,
@@ -282,12 +298,13 @@ export default {
       }
     },
     prepareAnswer(coords, label) {
+      console.log(coords);
       const ymin = coords[0].lat;
       const ymax = coords[1].lat;
       const xmin = coords[0].lng;
       const xmax = coords[2].lng;
-      const yminVoc = 1080 - ymin;
-      const ymaxVoc = 1080 - ymax;
+      const yminVoc = this.imageHeight - ymin;
+      const ymaxVoc = this.imageHeight - ymax;
       const answer = {
         label,
         origin: coords,
@@ -298,6 +315,7 @@ export default {
           ymaxVoc,
         },
       };
+      console.log(answer);
       return JSON.stringify(answer);
     },
     drawUserAnswer(coord) {
@@ -310,12 +328,12 @@ export default {
       this.polygon = L.polygon(latlngs, { color: '#E91C63' }).addTo(this.map);
     },
     setVerticalMap() {
-      if (this.map.getBounds()._northEast.lat === 1080) {
+      if (this.map.getBounds()._northEast.lat === 225) {
         this.map._onResize();
-        this.$refs.map.$el.style.height = '720px';
-        this.$refs.map.$el.style.width = '540px';
+        this.$refs.map.$el.style.height = '400px';
+        this.$refs.map.$el.style.width = '225px';
         setTimeout(() => {
-          this.bounds = [[0, 0], [720, 540]];
+          this.bounds = [[0, 0], [800, 550]];
           this.map.fitBounds(this.bounds);
         }, 500);
         setTimeout(() => {
@@ -327,16 +345,45 @@ export default {
     },
     setHorizontalMap() {
       this.map._onResize();
-      this.$refs.map.$el.style.height = '540px';
-      this.$refs.map.$el.style.width = '720px';
+      this.$refs.map.$el.style.height = '225px';
+      this.$refs.map.$el.style.width = '400px';
       setTimeout(() => {
-        this.bounds = [[0, 0], [1080, 1440]];
+        this.bounds = [[0, 0], [225, 400]];
         this.map.fitBounds(this.bounds);
       }, 500);
       setTimeout(() => {
         this.isLoading = false;
       }, 500);
     },
+
+    setMapOrientation(metadata) {
+      let height;
+      let width;
+      if (metadata.originalHeight) {
+        height = metadata.originalHeight;
+        width = metadata.originalWidth;
+      } else {
+        const raw = JSON.parse(metadata.raw);
+        if (raw.ImageHeight) {
+          height = raw.ImageHeight;
+          width = raw.ImageWidth;
+        }
+      }
+      this.imageHeight = height;
+      this.imageWidth = width;
+      this.map._onResize();
+      this.$refs.map.$el.style.height = `${height}px`;
+      this.$refs.map.$el.style.width = `${width}px`;
+      setTimeout(() => {
+        this.bounds = [[0, 0], [height, width]];
+        this.map.fitBounds(this.bounds);
+      }, 500);
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
+    },
+
+
   },
   apollo: {
     Data: {
@@ -359,18 +406,22 @@ export default {
               this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
             }
           }
+          console.log(dataset.file);
           this.$store.dispatch('dataset/setData', dataset);
           this.$store.dispatch('dataset/setDatasetId', dataset._id);
           this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
-          if (metadata.originalOrientation && metadata.originalOrientation === 6) {
-            setTimeout(() => {
-              this.setVerticalMap();
-            }, 500);
-          } else {
-            setTimeout(() => {
-              this.setHorizontalMap();
-            }, 500);
-          }
+          setTimeout(() => {
+            this.setMapOrientation(metadata);
+          }, 500);
+          // if (metadata.originalOrientation && metadata.originalOrientation === 6) {
+          //   setTimeout(() => {
+          //     this.setVerticalMap();
+          //   }, 500);
+          // } else {
+          //   setTimeout(() => {
+          //     this.setHorizontalMap();
+          //   }, 500);
+          // }
         }
         this.skipQuery = true;
       },

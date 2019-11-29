@@ -34,7 +34,7 @@ export default ({
         id: data.id,
         name: data.name,
         email: data.email,
-        roele: data.role,
+        role: data.role,
       });
       if (app.projectId) {
         const currentProject = _.filter(data.projects, (project => project.id === app.projectId));

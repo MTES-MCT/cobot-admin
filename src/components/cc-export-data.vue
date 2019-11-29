@@ -110,12 +110,22 @@ export default {
   methods: {
     async exportData() {
       this.isLoading = true;
-      console.log(this.dataset);
-      // const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
-      // const query = `projectId=${this.project.id}&criteria=${criteria}`;
-      // const exportData = await this.axios.get(`/export?${query}`);
-      // console.log(exportData);
-      // this.isLoading = false;
+      const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
+      const query = `projectId=${this.project.id}&criteria=${criteria}`;
+      const exportData = await this.axios.request({
+        url: `/export?${query}`,
+        method: 'GET',
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([exportData.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'extract.zip');
+      document.body.appendChild(link);
+      link.click();
+
+      this.isLoading = false;
     },
     unSelectOptionWithLabel() {
       this.exportModeLabel = [];
