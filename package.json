@@ -31,7 +31,7 @@
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
     "leaflet-draw": "^1.0.4",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "omit-deep-lodash": "^1.0.0",
     "quasar-framework": "^0.17.19",
     "subscriptions-transport-ws": "^0.9.8",
