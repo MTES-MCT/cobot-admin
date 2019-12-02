@@ -64,6 +64,7 @@ import _ from 'lodash';
 import { mapState } from 'vuex';
 import { Loading, QSpinnerGears } from 'quasar';
 
+import { DATASET_NUM_LABEL_QUERY } from '../constants/graphql';
 import Labels from '../constants/labels';
 
 export default {
@@ -98,11 +99,18 @@ export default {
     };
   },
   mounted() {
-    _.each(Labels, (label) => {
+    _.each(Labels, async (label) => {
       if (label.id !== 'none') {
+        const num = await this.$apollo.query({
+          query: DATASET_NUM_LABEL_QUERY,
+          variables: {
+            projectId: this.project.id,
+            label: label.id,
+          },
+        });
         this.optionsWithLabel.push({
           value: label.id,
-          label: label.label,
+          label: `${label.label} (${num.data.DataSetNumLabel})`,
         });
       }
     });

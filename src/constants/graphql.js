@@ -86,6 +86,10 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($id: ID!) {
   }
 }`;
 
+export const DATASET_NUM_LABEL_QUERY = gql`query getDataSetNumLabel($projectId: ID!, $label: String!) {
+  DataSetNumLabel(projectId: $projectId, label: $label)
+}`;
+
 export const DATA_DELETE = gql`mutation dataDelete($id: ID!) {
   dataDelete(id: $id)
 }`;
