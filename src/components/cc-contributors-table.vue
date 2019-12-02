@@ -55,6 +55,10 @@ export default {
           value: 80,
         },
         {
+          label: 'Juicer',
+          value: 15,
+        },
+        {
           label: 'Contributeur',
           value: 1,
         },

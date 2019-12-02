@@ -215,6 +215,8 @@ export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
     name
     email
     lastConnection
+    labels
+    photos
     activity {
       lastAnswersAt
     }
@@ -223,6 +225,7 @@ export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
     }
   }
 }`;
+
 
 export const PROJECT_CREATE_CONTRIBUTOR = gql`mutation createProjectContributor($id: ID!, $email: String!, $role: Int!) {
   createProjectContributor(id: $id, email: $email, role: $role) {
