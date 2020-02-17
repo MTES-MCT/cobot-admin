@@ -3,7 +3,7 @@
     <cc-subheader-label :items="getElements()" />
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-label :labels="labels" />
+        <cc-left-panel-label :datasetId="datasetId" :labels="labels" />
       </div>
       <div class="col-9">
         <div class="main-card">
@@ -249,12 +249,13 @@ export default {
           polyline: false,
           circle: false,
           circlemarker: false,
-          polygon: {
-            shapeOptions: {
-              showArea: false,
-              color: this.colors.rectangle,
-            },
-          },
+          polygon: false,
+          // polygon: {
+          //   shapeOptions: {
+          //     showArea: false,
+          //     color: this.colors.rectangle,
+          //   },
+          // },
           rectangle: {
             shapeOptions: {
               showArea: false,
@@ -406,7 +407,6 @@ export default {
               this.drawUserAnswer(JSON.parse(userAnswer.answers).origin);
             }
           }
-          console.log(dataset.file);
           this.$store.dispatch('dataset/setData', dataset);
           this.$store.dispatch('dataset/setDatasetId', dataset._id);
           this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;

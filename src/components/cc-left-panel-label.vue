@@ -27,6 +27,13 @@
                 style="margin-top: 10px;"
                 color="dark" />
         </q-item-tile>
+        <q-item-tile>
+          <q-btn label="supprimer la photo"
+                @click="deleteData()"
+                class="full-width"
+                style="margin-top: 10px;"
+                color="dark" />
+        </q-item-tile>
       </q-item-main>
     </q-item>
     <q-item v-if="pickUpLabelConfirm"
@@ -72,11 +79,12 @@
 </template>
 
 <script>
+import { DATA_DELETE } from '../constants/graphql';
 import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'CcLeftPanel',
-  props: ['labels'],
+  props: ['datasetId', 'labels'],
   data() {
     return {
       label: null,
@@ -139,6 +147,33 @@ export default {
     },
     onNext() {
       this.$root.$emit('onNext');
+    },
+    deleteData() {
+      this.$q.dialog({
+        title: 'Suppression',
+        message: 'Etes-vous sûr de vouloir supprimer cette donnée ?',
+        ok: {
+          color: 'pink',
+          label: 'oui',
+        },
+        cancel: {
+          color: 'dark',
+          label: 'non',
+        },
+        preventClose: true,
+      }).then(() => {
+        this.$apollo.mutate({
+          mutation: DATA_DELETE,
+          variables: {
+            id: this.datasetId,
+          },
+        }).then(() => {
+          this.$root.$emit('onNext');
+        }).catch((error) => {
+          console.log(error);
+        });
+      }).catch(() => {
+      });
     },
   },
 };

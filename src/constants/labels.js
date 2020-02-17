@@ -20,6 +20,13 @@ export default [
     img: '../statics/stairs.png',
     isNotSelected: false,
   },
+  {
+    id: 'crosswalk',
+    type: 'polygon',
+    label: 'Passage piéton',
+    img: '../statics/pieton.png',
+    isNotSelected: false,
+  },
   // {
   //   id: 'bev',
   //   type: 'polygon',
