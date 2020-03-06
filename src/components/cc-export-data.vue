@@ -25,6 +25,11 @@
             v-model="exportModeLabel"
             :options="optionsWithLabel"
           />
+          <q-toggle
+            v-model="isGoogleVision"
+            color="pink"
+            label="Export data for Google Vision"
+          />
         </q-field>
       </div>
       <div v-if="exported" class="layout-padding" style="text-align: center;">
@@ -81,6 +86,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      isGoogleVision: false,
       exported: false,
       numFile: null,
       options: [
@@ -119,7 +125,7 @@ export default {
     async exportData() {
       this.isLoading = true;
       const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
-      const query = `projectId=${this.project.id}&criteria=${criteria}`;
+      const query = `projectId=${this.project.id}&criteria=${criteria}&isGoogleVision=${this.isGoogleVision}`;
       const exportData = await this.axios.request({
         url: `/export?${query}`,
         method: 'GET',
