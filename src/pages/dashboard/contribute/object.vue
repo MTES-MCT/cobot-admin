@@ -249,13 +249,13 @@ export default {
           polyline: false,
           circle: false,
           circlemarker: false,
-          polygon: false,
-          // polygon: {
-          //   shapeOptions: {
-          //     showArea: false,
-          //     color: this.colors.rectangle,
-          //   },
-          // },
+          // polygon: false,
+          polygon: {
+            shapeOptions: {
+              showArea: false,
+              color: this.colors.rectangle,
+            },
+          },
           rectangle: {
             shapeOptions: {
               showArea: false,
