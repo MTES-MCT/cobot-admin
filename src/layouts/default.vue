@@ -38,6 +38,17 @@
                      flat icon="ballot" label="Jeu de donnée" />
               <q-btn @click="openInfo()"
                      flat icon="info" label="A propos" />
+              <!-- <q-btn @click="openInfo()"
+                     class="ia-processing"
+                     flat icon="ion-logo-android" label="IA processing" /> -->
+                <q-icon
+                  v-if="iaOnProgress"
+                  class="ia-processing"
+                  name="ion-logo-android"
+                  style="padding-right: 10px;" />
+                <small
+                  v-if="iaOnProgress"
+                  class="ia-processing">IA processing : {{ processing }}</small>
             </div>
           </div>
         </q-toolbar-title>
@@ -63,6 +74,8 @@
 </template>
 
 <script>
+import { DATASET_UPLOAD_SUB } from '../constants/graphql';
+
 import CcHeaderUser from 'components/cc-header-user';
 import CcMenu from 'components/cc-menu';
 import CcInfo from 'components/cc-info';
@@ -79,6 +92,8 @@ export default {
       leftDrawerOpen: this.$q.platform.is.desktop,
       projectName: null,
       activeLeftPanel: null,
+      processing: null,
+      iaOnProgress: false,
     };
   },
   mounted() {
@@ -101,11 +116,37 @@ export default {
       this.$store.commit('users/SET_OPEN_INFO', true);
     },
   },
+  apollo: {
+    $subscribe: {
+      Progress: {
+        query: DATASET_UPLOAD_SUB,
+        variables() {
+          return {
+            uid: this.$auth.user().id,
+          };
+        },
+        result(data) {
+          this.iaOnProgress = true;
+          this.processing = data.data.uploadProgress.data;
+          console.log(this.processing);
+          // this.progress = data.data.uploadProgress.data;
+          // if (this.progress === 'eot') {
+          //   this.close();
+          // }
+        },
+      },
+    },
+  },
 };
 </script>
 
 <style lang="stylus">
   @import '~variables'
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
   .q-layout-drawer
     z-index 6200
   .q-toolbar
@@ -127,4 +168,7 @@ export default {
     width 80vw
     max-width 1200px
     font-size 12px
+  .ia-processing
+    color #E91E63
+    // animation blinker 3s linear infinite
 </style>

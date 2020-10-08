@@ -19,7 +19,7 @@ module.exports = function config(ctx) {
     extras: [
       ctx.theme.mat ? 'roboto-font' : null,
       'material-icons',
-      // 'ionicons',
+      'ionicons',
       // 'mdi',
       // 'fontawesome'
     ],

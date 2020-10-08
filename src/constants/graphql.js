@@ -86,6 +86,19 @@ export const DATASET_STATS_QUERY = gql`query getDataSetStats($id: ID!) {
   }
 }`;
 
+export const DATASET_EXPORT_TO_AUTOML = gql`query AutoMLExport($projectId: ID!, $label: String) {
+  AutoMLExport(projectId: $projectId, label: $label) {
+    file
+    metadata {
+      id
+      source
+    }
+    usersAnswers {
+      answers
+    }
+  }
+}`;
+
 export const DATASET_NUM_LABEL_QUERY = gql`query getDataSetNumLabel($projectId: ID!, $label: String!) {
   DataSetNumLabel(projectId: $projectId, label: $label)
 }`;

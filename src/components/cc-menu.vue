@@ -17,8 +17,8 @@
           </div>
         </div>
       </q-list-header>
-      <q-collapsible v-for="project in Me.projects"
-                    :key="project.id"
+      <q-collapsible v-for="(project, index) in Me.projects"
+                    :key="`project_${index}`"
                     :label="project.name"
                     group="project"
                     icon="receipt">

@@ -8,7 +8,7 @@
       </q-toolbar>
       <div v-if="!exported" class="layout-padding">
         <p style="font-weight: bold;">Merci de sélectionner les données à exporter</p>
-        <q-field>
+        <!-- <q-field>
           <q-option-group
             type="radio"
             color="pink"
@@ -16,8 +16,8 @@
             v-model="exportMode"
             :options="options"
           />
-        </q-field>
-         <q-field style="padding-top: 10px;" label="Uniquement les données qualifiées :">
+        </q-field> -->
+        <q-field style="padding-top: 10px;">
           <q-option-group
             type="checkbox"
             color="pink"
@@ -25,11 +25,11 @@
             v-model="exportModeLabel"
             :options="optionsWithLabel"
           />
-          <q-toggle
+          <!-- <q-toggle
             v-model="isGoogleVision"
             color="pink"
             label="Export data for Google Vision"
-          />
+          /> -->
         </q-field>
       </div>
       <div v-if="exported" class="layout-padding" style="text-align: center;">
@@ -43,7 +43,7 @@
           <div class="padding" v-if="!exported">
             <q-btn @click="exportData()"
                    color="pink"
-                   label="exporter" />
+                   label="exporter pour entraîner l'IA" />
             <q-btn color="grey"
                    @click="close()"
                    label="annuler"
@@ -69,7 +69,7 @@ import _ from 'lodash';
 import { mapState } from 'vuex';
 import { Loading, QSpinnerGears } from 'quasar';
 
-import { DATASET_NUM_LABEL_QUERY } from '../constants/graphql';
+import { DATASET_NUM_LABEL_QUERY, DATASET_EXPORT_TO_AUTOML } from '../constants/graphql';
 import Labels from '../constants/labels';
 
 export default {
@@ -123,23 +123,32 @@ export default {
   },
   methods: {
     async exportData() {
-      this.isLoading = true;
-      const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
-      const query = `projectId=${this.project.id}&criteria=${criteria}&isGoogleVision=${this.isGoogleVision}`;
-      const exportData = await this.axios.request({
-        url: `/export?${query}`,
-        method: 'GET',
-        responseType: 'blob',
+      // this.isLoading = true;
+      this.$apollo.query({
+        query: DATASET_EXPORT_TO_AUTOML,
+        variables: {
+          projectId: this.project.id,
+          label: this.exportModeLabel.join(','),
+        },
       });
+      this.close();
+      // const criteria = (this.exportMode) ? this.exportData : this.exportModeLabel.join(',');
+      // const query =
+      // `projectId=${this.project.id}&criteria=${criteria}&isGoogleVision=${this.isGoogleVision}`;
+      // const exportData = await this.axios.request({
+      //   url: `/export?${query}`,
+      //   method: 'GET',
+      //   responseType: 'blob',
+      // });
 
-      const url = window.URL.createObjectURL(new Blob([exportData.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'extract.zip');
-      document.body.appendChild(link);
-      link.click();
+      // const url = window.URL.createObjectURL(new Blob([exportData.data]));
+      // const link = document.createElement('a');
+      // link.href = url;
+      // link.setAttribute('download', 'extract.zip');
+      // document.body.appendChild(link);
+      // link.click();
 
-      this.isLoading = false;
+      // this.isLoading = false;
     },
     unSelectOptionWithLabel() {
       this.exportModeLabel = [];
