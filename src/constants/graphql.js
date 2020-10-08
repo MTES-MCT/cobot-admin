@@ -25,8 +25,8 @@ export const DATASET_ANSWERS = gql`mutation dataSetAnswers($id: ID!, $answer: St
   }
 }`;
 
-export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!) {
-  DataSetBySource(id: $id) {
+export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!, $offset: Int, $limit: Int) {
+  DataSetBySource(id: $id, offset: $offset, limit: $limit) {
     _id,
     file,
     numAnswers,
@@ -118,6 +118,10 @@ export const DATASET_UPLOAD_SUB = gql`subscription uploadProgress($uid: ID!) {
   uploadProgress(uid: $uid) {
    data
   }
+}`;
+
+export const DATASET_COUNT_BY_SOURCE = gql`query getDataSetCount($projectId: ID!) {
+  CountDataSetBySource(projectId: $projectId)
 }`;
 
 export const ME_QUERY = gql`query user {

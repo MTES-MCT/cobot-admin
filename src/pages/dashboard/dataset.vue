@@ -72,7 +72,7 @@
 <script>
 // import _ from 'lodash';
 import { mapState, mapGetters } from 'vuex';
-import { DATASET_BY_SOURCE_QUERY } from '../../constants/graphql';
+import { DATASET_BY_SOURCE_QUERY, DATASET_COUNT_BY_SOURCE } from '../../constants/graphql';
 
 import CcLeftPanelDataset from 'components/cc-left-panel-dataset';
 import CcSubheaderDataset from 'components/cc-subheader-dataset';
@@ -116,7 +116,6 @@ export default {
       if (this.$apollo.queries.Dataset) {
         this.$apollo.queries.Dataset.refresh();
       }
-      // this.skipDatasetQuery = false;
     });
   },
   methods: {
@@ -135,10 +134,17 @@ export default {
       this.setPage();
     },
     setPage() {
-      const offset = this.pagerLimit * this.pagerOffset;
-      const dataset = this.allDataset.slice(offset, offset + this.pagerLimit);
-      this.$store.dispatch('dataset/setData', dataset[0]);
-      this.$store.dispatch('dataset/setDataset', dataset);
+      this.$apollo.queries.Dataset.fetchMore({
+        variables: {
+          id: this.projectId,
+          offset: this.pagerLimit * this.pagerOffset,
+          limit: this.pagerLimit,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          this.$store.dispatch('dataset/setData', fetchMoreResult.DataSetBySource);
+          this.$store.dispatch('dataset/setDataset', fetchMoreResult.DataSetBySource);
+        },
+      });
     },
   },
   apollo: {
@@ -148,23 +154,34 @@ export default {
       variables() {
         return {
           id: this.projectId,
+          offset: 0,
+          limit: 20,
         };
       },
       update(data) {
         if (data.DataSetBySource.length > 0) {
-          this.allDataset = data.DataSetBySource;
-          this.datasetNum = this.allDataset.length;
-          this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
-          this.setPage();
-          this.skipDatasetQuery = true;
+          this.$store.dispatch('dataset/setData', data.DataSetBySource[0]);
+          this.$store.dispatch('dataset/setDataset', data.DataSetBySource);
           this.$store.commit('dataset/SET_REFRESH', false);
         } else {
-          this.datasetNum = 0;
+          // this.datasetNum = 0;
           this.$store.dispatch('dataset/setDataset', null);
         }
       },
-      skip() {
-        return this.skipDatasetQuery;
+    },
+    DatasetCount: {
+      query: DATASET_COUNT_BY_SOURCE,
+      fetchPolicy: 'no-cache',
+      variables() {
+        return {
+          projectId: this.projectId,
+        };
+      },
+      update(data) {
+        if (data.CountDataSetBySource > 0) {
+          this.datasetNum = data.CountDataSetBySource;
+          this.datasetNumPage = Math.ceil(this.datasetNum / this.pagerLimit);
+        }
       },
     },
   },
