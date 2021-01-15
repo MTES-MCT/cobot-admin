@@ -55,6 +55,27 @@ export default [
     img: '../statics/pave.png',
     isNotSelected: false,
   },
+  {
+    id: 'bike',
+    type: 'polygon',
+    label: 'Vélo',
+    img: '../statics/bike.jpg',
+    isNotSelected: false,
+  },
+  {
+    id: 'scooter',
+    type: 'polygon',
+    label: 'Trottinette',
+    img: '../statics/scooter.jpg',
+    isNotSelected: false,
+  },
+  {
+    id: 'streethole',
+    type: 'polygon',
+    label: 'Trou voirie',
+    img: '../statics/streethole.jpeg',
+    isNotSelected: false,
+  },
   // {
   //   id: 'bev',
   //   type: 'polygon',

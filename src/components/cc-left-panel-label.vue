@@ -1,41 +1,47 @@
 <template>
-  <q-list class="panelLabel" style="position: fixed; width:25%; height: 100vh;">
+  <q-list class="panelLabel" style="height: 100vh; position: fixed; width:25%;">
+    <q-window-resize-observable @resize="onResize" />
     <q-list-header>
       Si la photo ci-contre contient l'un des éléments suivants,
       sélectionnez l'objet que vous allez identifier sur l'image
     </q-list-header>
-    <q-item key="pickup" v-if="pickUpLabel" style="text-align: center;">
-      <q-item-main>
-        <q-item-tile v-for="(label, index) in labels"
-                      v-if="label.id !== 'none'"
-                      :key="index"
-                      label>
-          <q-btn :label="label.label"
-                @click="onSelect(label)"
-                class="full-width"
-                style="margin-top: 10px;"
-                color="pink">
-                <q-tooltip>
-                  <img :src="label.img" style="width: 200px;" />
-                </q-tooltip>
-          </q-btn>
-        </q-item-tile>
-        <q-item-tile>
-          <q-btn label="passer à la photo suivante"
-                @click="onNext()"
-                class="full-width"
-                style="margin-top: 10px;"
-                color="dark" />
-        </q-item-tile>
-        <q-item-tile>
-          <q-btn label="supprimer la photo"
-                @click="deleteData()"
-                class="full-width"
-                style="margin-top: 10px;"
-                color="dark" />
-        </q-item-tile>
-      </q-item-main>
-    </q-item>
+    <div id="labels" :style="{'height': `${size.height - 250}px`}" style="overflow-y: auto;">
+      <q-item
+        key="pickup"
+        v-if="pickUpLabel"
+        style="text-align: center;">
+        <q-item-main>
+          <q-item-tile v-for="(label, index) in labels"
+                        v-if="label.id !== 'none'"
+                        :key="index"
+                        label>
+            <q-btn :label="label.label"
+                  @click="onSelect(label)"
+                  class="full-width"
+                  style="margin-top: 10px;"
+                  color="pink">
+                  <q-tooltip>
+                    <img :src="label.img" style="width: 200px;" />
+                  </q-tooltip>
+            </q-btn>
+          </q-item-tile>
+          <q-item-tile>
+            <q-btn label="passer à la photo suivante"
+                  @click="onNext()"
+                  class="full-width"
+                  style="margin-top: 10px;"
+                  color="dark" />
+          </q-item-tile>
+          <q-item-tile>
+            <q-btn label="supprimer la photo"
+                  @click="deleteData()"
+                  class="full-width"
+                  style="margin-top: 10px;"
+                  color="dark" />
+          </q-item-tile>
+        </q-item-main>
+      </q-item>
+    </div>
     <q-item v-if="pickUpLabelConfirm"
             key="confirmBlock"
             style="text-align: center;">
@@ -92,6 +98,9 @@ export default {
       pickUpLabelConfirm: false,
       nextLabel: false,
       projectId: this.$route.params.id,
+      size: {
+        height: '500px',
+      },
     };
   },
   computed: {
@@ -121,6 +130,14 @@ export default {
     });
   },
   methods: {
+    onResize(size) {
+      this.size = size;
+      // console.log(size);
+      // const el = document.querySelector('#labels');
+      // if (el) {
+      //   el.style.height = `${size.height - 250}px`;
+      // }
+    },
     onSelect(selectedLabel) {
       this.label = selectedLabel;
       this.$store.commit('label/SET_LABEL', this.label);
