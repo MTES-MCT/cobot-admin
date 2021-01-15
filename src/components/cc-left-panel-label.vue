@@ -41,46 +41,46 @@
           </q-item-tile>
         </q-item-main>
       </q-item>
-    </div>
-    <q-item v-if="pickUpLabelConfirm"
-            key="confirmBlock"
-            style="text-align: center;">
-      <q-item-main>
-        <q-item-tile label>
-          vous avez sélectionné
-        </q-item-tile>
-        <q-item-tile style="margin-top: 10px;">
-          <q-chip @hide="onReset()" closable color="dark">
-            {{ label.label }}
-          </q-chip>
-        </q-item-tile>
-        <q-item-tile style="padding-top: 10px;">
-          Vous pouvez commencer à identifier l'objet dans l'image.
-        </q-item-tile>
-        <q-item-tile style="padding-top: 10px;">
-          <a @click="onNext()" class="next">passer à l'image suivante</a>
-        </q-item-tile>
-      </q-item-main>
-    </q-item>
-    <q-item key="nextLabel" v-if="nextLabel" style="text-align: center;">
-      <q-item-main>
-        <q-item-tile label>
-          <strong>Merci pour votre contribution !</strong>
-        </q-item-tile>
-        <q-item-tile style="margin-top: 10px;">
-          <q-btn @click="onSaveAndContinue()"
-                  label="continuer avec cette image"
+      <q-item v-if="pickUpLabelConfirm"
+              key="confirmBlock"
+              style="text-align: center;">
+        <q-item-main>
+          <q-item-tile label>
+            vous avez sélectionné
+          </q-item-tile>
+          <q-item-tile style="margin-top: 10px;">
+            <q-chip @hide="onReset()" closable color="dark">
+              {{ label.label }}
+            </q-chip>
+          </q-item-tile>
+          <q-item-tile style="padding-top: 10px;">
+            Vous pouvez commencer à identifier l'objet dans l'image.
+          </q-item-tile>
+          <q-item-tile style="padding-top: 10px;">
+            <a @click="onNext()" class="next">passer à l'image suivante</a>
+          </q-item-tile>
+        </q-item-main>
+      </q-item>
+      <q-item key="nextLabel" v-if="nextLabel" style="text-align: center;">
+        <q-item-main>
+          <q-item-tile label>
+            <strong>Merci pour votre contribution !</strong>
+          </q-item-tile>
+          <q-item-tile style="margin-top: 10px;">
+            <q-btn @click="onSaveAndContinue()"
+                    label="continuer avec cette image"
+                    class="full-width"
+                    style="margin-top: 10px;"
+                    color="pink" />
+            <q-btn @click="onSave()"
+                  label="passer à l'image suivante"
                   class="full-width"
                   style="margin-top: 10px;"
-                  color="pink" />
-          <q-btn @click="onSave()"
-                label="passer à l'image suivante"
-                class="full-width"
-                style="margin-top: 10px;"
-                color="dark" />
-        </q-item-tile>
-      </q-item-main>
-    </q-item>
+                  color="dark" />
+          </q-item-tile>
+        </q-item-main>
+      </q-item>
+    </div>
   </q-list>
 </template>
 
