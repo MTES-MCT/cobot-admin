@@ -249,13 +249,13 @@ export default {
           polyline: false,
           circle: false,
           circlemarker: false,
-          // polygon: false,
-          polygon: {
-            shapeOptions: {
-              showArea: false,
-              color: this.colors.rectangle,
-            },
-          },
+          polygon: false,
+          // polygon: {
+          //   shapeOptions: {
+          //     showArea: false,
+          //     color: this.colors.rectangle,
+          //   },
+          // },
           rectangle: {
             shapeOptions: {
               showArea: false,
@@ -357,18 +357,35 @@ export default {
       }, 500);
     },
 
-    setMapOrientation(metadata) {
+    async getImageSize(file) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function () {
+          resolve({
+            width: this.naturalWidth,
+            height: this.naturalHeight,
+          });
+        };
+        img.src = file;
+      });
+    },
+
+    async setMapOrientation(metadata, file) {
       let height;
       let width;
       if (metadata.originalHeight) {
         height = metadata.originalHeight;
         width = metadata.originalWidth;
-      } else {
+      } else if (metadata.raw) {
         const raw = JSON.parse(metadata.raw);
         if (raw.ImageHeight) {
           height = raw.ImageHeight;
           width = raw.ImageWidth;
         }
+      } else {
+        const imageSize = await this.getImageSize(file);
+        height = imageSize.height;
+        width = imageSize.width;
       }
       this.imageHeight = height;
       this.imageWidth = width;
@@ -383,7 +400,6 @@ export default {
         this.isLoading = false;
       }, 500);
     },
-
 
   },
   apollo: {
@@ -411,7 +427,7 @@ export default {
           this.$store.dispatch('dataset/setDatasetId', dataset._id);
           this.image = `${process.env.API_URL}/img/${this.projectId}/${dataset.file}`;
           setTimeout(() => {
-            this.setMapOrientation(metadata);
+            this.setMapOrientation(metadata, this.image);
           }, 500);
           // if (metadata.originalOrientation && metadata.originalOrientation === 6) {
           //   setTimeout(() => {

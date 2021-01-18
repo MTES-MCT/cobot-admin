@@ -30,7 +30,7 @@ export default [
   {
     id: 'tactiletap',
     type: 'polygon',
-    label: 'Bandes podotaciles',
+    label: 'Bandes podotactiles',
     img: '../statics/podotactile.jpg',
     isNotSelected: false,
   },
