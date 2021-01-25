@@ -371,8 +371,9 @@ export default {
     },
 
     async setMapOrientation(metadata, file) {
-      let height;
-      let width;
+      const imageSize = await this.getImageSize(file);
+      let height = imageSize.height;
+      let width = imageSize.width;
       if (metadata.originalHeight) {
         height = metadata.originalHeight;
         width = metadata.originalWidth;
@@ -382,18 +383,14 @@ export default {
           height = raw.ImageHeight;
           width = raw.ImageWidth;
         }
-      } else {
-        const imageSize = await this.getImageSize(file);
-        height = imageSize.height;
-        width = imageSize.width;
       }
-      this.imageHeight = height;
-      this.imageWidth = width;
+      this.imageHeight = (height > 300) ? 300 : height;
+      this.imageWidth = (width > 400) ? 400 : width;
       this.map._onResize();
-      this.$refs.map.$el.style.height = `${height}px`;
-      this.$refs.map.$el.style.width = `${width}px`;
+      this.$refs.map.$el.style.height = `${this.imageHeight}px`;
+      this.$refs.map.$el.style.width = `${this.imageWidth}px`;
       setTimeout(() => {
-        this.bounds = [[0, 0], [height, width]];
+        this.bounds = [[0, 0], [this.imageHeight, this.imageWidth]];
         this.map.fitBounds(this.bounds);
       }, 500);
       setTimeout(() => {
