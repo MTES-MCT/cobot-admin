@@ -76,6 +76,13 @@ export default [
     img: '../statics/streethole.jpeg',
     isNotSelected: false,
   },
+  {
+    id: 'bench',
+    type: 'polygon',
+    label: 'Banc',
+    img: '../statics/bench.jpeg',
+    isNotSelected: false,
+  },
   // {
   //   id: 'bev',
   //   type: 'polygon',
