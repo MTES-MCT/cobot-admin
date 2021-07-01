@@ -9,7 +9,7 @@
           </q-toolbar-title>
         </q-toolbar>
         <div class="layout-padding">
-          <q-stepper color="pink" ref="stepper" style="height: 355px;">
+          <q-stepper v-model="currentStep" color="pink" ref="stepper" style="height: 555px;">
             <q-step name="etape1" default title="Etape 1" subtitle="Projet">
               <q-field>
                 <q-input stack-label="Nom du projet" v-model="project.name" />
@@ -24,10 +24,27 @@
             </q-step>
 
             <q-step name="etape2" title="Etape 2" subtitle="Labels">
-              <q-chips-input v-model="labels"
+              <q-field>
+                <q-input stack-label="Ajouter un élément" v-model="label" />
+              </q-field>
+              <div class="row" style="padding-top: 12px;">
+                <q-chip v-for="(label, index) in project.labels"
+                        :key="`project_${index}`"
+                        icon="create"
+                        closable
+                        color="pink"
+                        @hide="onDeleteLabel"
+                        @click="onEditLabel"
+                        class="label">
+                  {{ label.text }}
+                </q-chip>
+              </div>
+              <!-- v-for="(project, index) in Me.projects"
+                    :key="`project_${index}`" -->
+              <!-- <q-chips-input v-model="labels"
                              @input="onLabel"
                              color="pink"
-                             float-label="Labels recherchés" />
+                             float-label="Labels recherchés" /> -->
             </q-step>
 
             <q-step title="Etape 3"
@@ -94,7 +111,10 @@ export default {
   data() {
     return {
       skipQuery: true,
+      label: null,
       labels: [],
+      currentStep: 'etape1',
+      currentProject: null,
       project: {
         name: null,
         details: null,
@@ -107,15 +127,20 @@ export default {
         this.$apollo.queries.project.skip = false;
       }
     },
+    project() {
+      if (!this.currentProject) {
+        this.currentProject = clone(this.project);
+      }
+    },
   },
   methods: {
-    getLabels(projectLabels) {
-      const labels = [];
-      _.each(projectLabels, (label) => {
-        labels.push(label.text);
-      });
-      return labels;
-    },
+    // getLabels(projectLabels) {
+    //   const labels = [];
+    //   _.each(projectLabels, (label) => {
+    //     labels.push(label.text);
+    //   });
+    //   return labels;
+    // },
     goTo(to, id) {
       this.$store.dispatch('dataset/setData', null);
       this.$store.dispatch('dataset/setDataset', null);
@@ -130,14 +155,28 @@ export default {
     },
     onNext() {
       if (this.projectId) {
-        this.update();
-        this.$refs.stepper.next();
+        switch (this.currentStep) {
+          case 'etape1':
+            if (this.project.name !== this.currentProject.name) {
+              this.update();
+            }
+            this.$refs.stepper.next();
+            break;
+          case 'etape2':
+            console.log(this.project.labels);
+            // this.update();
+            // this.$refs.stepper.next();
+            break;
+          default:
+            this.$refs.stepper.next();
+        }
       } else {
         this.save();
         this.$refs.stepper.next();
       }
     },
     onLabel() {
+      console.log('je passe');
       this.project.labels = [];
       _.each(this.labels, (label, index) => {
         this.project.labels.push({
@@ -145,7 +184,7 @@ export default {
           order: index,
         });
       });
-      this.update();
+      // this.update();
     },
     async save() {
       if (this.project.name) {
@@ -243,7 +282,7 @@ export default {
         if (data.Project) {
           let project = clone(data.Project);
           project = omitDeep(project, ['__typename']);
-          this.labels = this.getLabels(project.labels);
+          // this.labels = this.getLabels(project.labels);
           return project;
         }
         return false;
@@ -260,8 +299,12 @@ export default {
   .editProject
     .modal-content
       width 50vw
+      height 50vw
     .q-stepper-nav
       position absolute
       bottom 10px
       right 0px
+    .label
+      margin-right 12px
+      margin-bottom 12px
 </style>
