@@ -64,7 +64,8 @@
       <cc-menu></cc-menu>
     </q-layout-drawer>
 
-    <q-page-container>
+    <q-page-container
+      :class="{'project-container': isProjectPage}">
       <router-view />
     </q-page-container>
 
@@ -95,6 +96,11 @@ export default {
       processing: null,
       iaOnProgress: false,
     };
+  },
+  computed: {
+    isProjectPage() {
+      return this.$route.name === 'project.edit';
+    },
   },
   mounted() {
     this.$root.$on('projectChanged', () => {
@@ -171,4 +177,7 @@ export default {
   .ia-processing
     color #E91E63
     // animation blinker 3s linear infinite
+  .project-container
+    display flex
+    justify-content center
 </style>

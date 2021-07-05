@@ -228,6 +228,12 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
       text
       order
       img
+      properties {
+        name
+        val_1
+        val_2
+        val_3
+      }
     }
   }
 }`;

@@ -97,8 +97,8 @@ export default {
     },
     goToEditProject(projectId) {
       this.$store.commit('project/SET_PROJECT_ID', projectId);
-      this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
-      // this.$router.push(`/project/${id}`);
+      // this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
+      this.$router.push(`/project/${projectId}`);
     },
     goToNewProject() {
       this.$store.commit('project/SET_PROJECT_ID', null);

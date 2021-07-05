@@ -57,6 +57,11 @@
                     <img :src="`https://labelbot-api.wawy.io/img/${projectId}/labels/icons/${setLabelIcon(currentLabel.img)}`" />
                     <span>{{ currentLabel.text }}</span>
                   </div>
+                  <div class="col" style="text-align:right;">
+                    <q-btn @click="onCloseEditLabel" round size="sm" color="grey">
+                      <q-icon name="close" />
+                    </q-btn>
+                  </div>
                 </div>
                 <div class="row labelProps">
                   <div class="col">
@@ -68,8 +73,53 @@
                         row-key="name"
                       >
                         <template slot="top-right" slot-scope="props">
-                          <q-btn label="ajouter" />
+                          <q-btn @click="onAddLabelProperty()" label="ajouter" />
                         </template>
+
+                        <q-tr v-if="currentProperty" slot="bottom-row" slot-scope="props">
+                          <q-td colspan="100%" style="text-align: right;">
+                            <q-btn size="sm" color="grey" label="annuler"
+                                   @click="onCancelEditLabelProperty()"
+                                   style="margin-right: 12px;" />
+                            <q-btn size="sm" color="pink" label="valider" />
+                          </q-td>
+                        </q-tr>
+
+                        <q-tr @click.native="onEditLabelProperty(props.row)"
+                              slot="body" slot-scope="props" :props="props">
+                          <q-td key="name" :props="props">
+                            <template v-if="!props.row.edit">
+                              {{ props.row.name }}
+                            </template>
+                            <template v-else>
+                              <q-input v-model="props.row.name" />
+                            </template>
+                          </q-td>
+                          <q-td key="val_1" :props="props">
+                            <template v-if="!props.row.edit">
+                              {{ props.row.val_1 }}
+                            </template>
+                            <template v-else>
+                              <q-input v-model="props.row.val_1" />
+                            </template>
+                          </q-td>
+                          <q-td key="val_2" :props="props">
+                            <template v-if="!props.row.edit">
+                              {{ props.row.val_2 }}
+                            </template>
+                            <template v-else>
+                              <q-input v-model="props.row.val_2" />
+                            </template>
+                          </q-td>
+                          <q-td key="val_3" :props="props">
+                            <template v-if="!props.row.edit">
+                              {{ props.row.val_3 }}
+                            </template>
+                            <template v-else>
+                              <q-input v-model="props.row.val_3" />
+                            </template>
+                          </q-td>
+                        </q-tr>
                       </q-table>
                     </div>
                   </div>
@@ -157,6 +207,7 @@ export default {
           label: 'Nom',
           field: 'name',
           align: 'left',
+          style: 'width: 70%',
         },
         {
           name: 'val_1',
@@ -181,8 +232,10 @@ export default {
           val_1: '0 - 10',
           val_2: '10 - 20',
           val_3: '20+',
+          edit: false,
         },
       ],
+      currentProperty: null,
     };
   },
   watch: {
@@ -362,6 +415,27 @@ export default {
         return `${aImage[0]}.png`;
       }
       return image;
+    },
+    onCloseEditLabel() {
+      this.isEditLabel = false;
+      this.currentLabel = null;
+    },
+    onEditLabelProperty(property) {
+      this.currentProperty = property;
+      property.edit = true;
+    },
+    onCancelEditLabelProperty() {
+      this.currentProperty.edit = false;
+      this.currentProperty = null;
+    },
+    onAddLabelProperty() {
+      this.labelPropsRows.push({
+        name: '',
+        val_1: '',
+        val_2: '',
+        val_3: '',
+        edit: true,
+      });
     },
   },
   apollo: {
