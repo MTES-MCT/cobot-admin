@@ -227,6 +227,7 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
     labels {
       text
       order
+      img
     }
   }
 }`;

@@ -24,27 +24,57 @@
             </q-step>
 
             <q-step name="etape2" title="Etape 2" subtitle="Labels">
-              <q-field>
-                <q-input stack-label="Ajouter un élément" v-model="label" />
+              <q-field v-if="!isEditLabel">
+                <q-input
+                  v-model="label"
+                  @keyup="onKeyUp"
+                  stack-label="Ajouter un élément"
+                  :after="[
+                    {
+                      icon: 'send',
+                      error: false,
+                      handler: () => {
+                        this.onAddLabel();
+                      }
+                    }
+                  ]" />
               </q-field>
-              <div class="row" style="padding-top: 12px;">
+              <div v-if="!isEditLabel" class="row" style="padding-top: 12px;">
                 <q-chip v-for="(label, index) in project.labels"
                         :key="`project_${index}`"
                         icon="create"
                         closable
                         color="pink"
-                        @hide="onDeleteLabel"
-                        @click="onEditLabel"
+                        @hide="onDeleteLabel(label)"
+                        @click="onEditLabel(label)"
                         class="label">
                   {{ label.text }}
                 </q-chip>
               </div>
-              <!-- v-for="(project, index) in Me.projects"
-                    :key="`project_${index}`" -->
-              <!-- <q-chips-input v-model="labels"
-                             @input="onLabel"
-                             color="pink"
-                             float-label="Labels recherchés" /> -->
+              <div v-else>
+                <div class="row">
+                  <div class="col labelHeader">
+                    <img :src="`https://labelbot-api.wawy.io/img/${projectId}/labels/icons/${setLabelIcon(currentLabel.img)}`" />
+                    <span>{{ currentLabel.text }}</span>
+                  </div>
+                </div>
+                <div class="row labelProps">
+                  <div class="col">
+                    <div class="q-pa-md">
+                      <q-table
+                        title="Propriétés"
+                        :data="labelPropsRows"
+                        :columns="labelPropsColumns"
+                        row-key="name"
+                      >
+                        <template slot="top-right" slot-scope="props">
+                          <q-btn label="ajouter" />
+                        </template>
+                      </q-table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </q-step>
 
             <q-step title="Etape 3"
@@ -119,6 +149,40 @@ export default {
         name: null,
         details: null,
       },
+      isEditLabel: false,
+      currentLabel: null,
+      labelPropsColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
+          align: 'left',
+        },
+        {
+          name: 'val_1',
+          align: 'center',
+          label: 'Valeur 1',
+          field: 'val_1',
+        },
+        {
+          name: 'val_2',
+          label: 'Valeur 2',
+          field: 'val_2',
+        },
+        {
+          name: 'val_3',
+          label: 'Valeur 3',
+          field: 'val_3',
+        },
+      ],
+      labelPropsRows: [
+        {
+          name: 'Nombre de marches',
+          val_1: '0 - 10',
+          val_2: '10 - 20',
+          val_3: '20+',
+        },
+      ],
     };
   },
   watch: {
@@ -164,8 +228,8 @@ export default {
             break;
           case 'etape2':
             console.log(this.project.labels);
-            // this.update();
-            // this.$refs.stepper.next();
+            this.update();
+            this.$refs.stepper.next();
             break;
           default:
             this.$refs.stepper.next();
@@ -175,17 +239,17 @@ export default {
         this.$refs.stepper.next();
       }
     },
-    onLabel() {
-      console.log('je passe');
-      this.project.labels = [];
-      _.each(this.labels, (label, index) => {
-        this.project.labels.push({
-          text: label,
-          order: index,
-        });
-      });
-      // this.update();
-    },
+    // onLabel() {
+    //   console.log('je passe');
+    //   this.project.labels = [];
+    //   _.each(this.labels, (label, index) => {
+    //     this.project.labels.push({
+    //       text: label,
+    //       order: index,
+    //     });
+    //   });
+    //   // this.update();
+    // },
     async save() {
       if (this.project.name) {
         try {
@@ -269,6 +333,36 @@ export default {
         });
       });
     },
+    onKeyUp(event) {
+      if (event.key === 'Enter') {
+        this.onAddLabel();
+      }
+    },
+    onAddLabel() {
+      const lastIndex = this.project.labels.length;
+      this.project.labels.push({
+        text: this.label,
+        order: lastIndex,
+      });
+      this.label = '';
+      this.update();
+    },
+    onDeleteLabel(label) {
+      const labels = _.reject(this.project.labels, l => l.text === label.text);
+      this.project.labels = labels;
+      this.update();
+    },
+    onEditLabel(label) {
+      this.isEditLabel = true;
+      this.currentLabel = label;
+    },
+    setLabelIcon(image) {
+      const aImage = image.split('.');
+      if (aImage[1].indexOf('png') === -1) {
+        return `${aImage[0]}.png`;
+      }
+      return image;
+    },
   },
   apollo: {
     project: {
@@ -307,4 +401,20 @@ export default {
     .label
       margin-right 12px
       margin-bottom 12px
+      &:hover
+        cursor pointer
+    .labelHeader
+      align-items center
+      display flex
+      img
+        width 40px
+      span
+        font-size 24px
+        font-weight bold
+        padding-left 24px
+    .labelProps
+      .title
+        font-weight bold
+        padding-top 24px
+        font-size 18px
 </style>
