@@ -37,7 +37,7 @@
                       :key="`project_${index}`"
                       icon="create"
                       closable
-                      color="pink"
+                      :color="(label.text === 'no-detected') ? 'black' : 'pink'"
                       @hide="onDeleteLabel(label)"
                       @click="onEditLabel(label)"
                       class="label">
@@ -254,10 +254,14 @@ export default {
     },
     onGoBack() {
       if (this.currentStep === 'etape2') {
+        if (!this.isEditLabel) {
+          this.$refs.stepper.previous();
+        }
         this.onCancelEditLabelProperty();
         this.onCloseEditLabel();
+      } else {
+        this.$refs.stepper.previous();
       }
-      this.$refs.stepper.previous();
     },
     onNext() {
       if (this.projectId) {
