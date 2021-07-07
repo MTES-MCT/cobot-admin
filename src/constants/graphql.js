@@ -249,7 +249,13 @@ export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
       lastAnswersAt
     }
     projects {
+      id
       role
+      isPro
+    }
+    project {
+      role
+      isPro
     }
   }
 }`;

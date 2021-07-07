@@ -98,6 +98,7 @@ export default {
           align: 'left',
           field: 'email',
           sortable: true,
+          style: 'width: 250px; padding-left: 12px; padding-right: 12px;',
         },
         {
           name: 'role',
@@ -105,8 +106,19 @@ export default {
           label: 'Droits',
           align: 'left',
           action: this.onChangeRole,
-          field: row => row.projects[0].role,
+          // field: row => row.projects,
           sortable: true,
+          style: 'width: 210px; padding-left: 12px; padding-right: 12px;',
+        },
+        {
+          name: 'isPro',
+          required: true,
+          label: 'Shoot Pro',
+          align: 'left',
+          action: this.onChangeRole,
+          // field: row => row.currentProject.isPro,
+          sortable: true,
+          style: 'width: 100px; padding-left: 12px; padding-right: 12px;',
         },
         {
           name: 'lastConnection',
@@ -120,28 +132,32 @@ export default {
             return '-';
           },
           sortable: true,
+          style: 'padding-left: 12px; padding-right: 12px; width: 150px;',
         },
         {
           name: 'photos',
           required: true,
-          label: 'Nombre de prise de vue',
+          label: 'Nb photos',
           align: 'left',
           field: 'photos',
           sortable: true,
+          style: 'padding-left: 12px; padding-right: 12px; width: 150px;',
         },
         {
           name: 'labels',
           required: true,
-          label: 'Nombre de détourage',
+          label: 'Nb détourage',
           align: 'left',
           field: 'labels',
           sortable: true,
+          style: 'padding-left: 12px; padding-right: 12px; width: 150px;',
         },
         {
           name: 'action',
           align: 'right',
           filter: false,
           sort: false,
+          style: 'padding-left: 12px; padding-right: 12px; width: 150px;',
         },
       ],
       actions: [
@@ -179,7 +195,8 @@ export default {
             email: user.email,
             projects: {
               id: this.projectId,
-              role: user.projects[0].role,
+              role: user.project.role,
+              isPro: user.project.isPro,
             },
           },
         });
@@ -221,6 +238,7 @@ export default {
         };
       },
       update(data) {
+        console.log(data.ProjectContributors);
         return clone(data.ProjectContributors);
       },
     },

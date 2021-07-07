@@ -111,6 +111,7 @@ module.exports = function config(ctx) {
         'QCarouselControl',
         'QWindowResizeObservable',
         'QToggle',
+        'QCheckbox',
       ],
       directives: [
         'Ripple',

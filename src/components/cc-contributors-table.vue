@@ -8,19 +8,25 @@
       :columns="columns"
       :filter="filter"
       :pagination.sync="config.pagination">
-      <!-- <template slot="top-right" slot-scope="props">
-        <q-search
-          hide-underline
-          color="secondary"
-          v-model="filter"
-          class="col-6"
-        />
-      </template> -->
-      <q-td :style="{whiteSpace: 'normal'}"
+      <q-td :style="{
+              width: '100px',
+              whiteSpace: 'normal',
+              paddingLeft: '12px',
+              paddingRight: '12px' }"
+            class="text-left" slot="body-cell-isPro" slot-scope="props">
+            <q-checkbox @input="onChangePro(props)"
+                        v-model="props.row.project.isPro"
+                        color="pink" />
+      </q-td>
+      <q-td :style="{
+              width: '210px',
+              whiteSpace: 'normal',
+              paddingLeft: '12px',
+              paddingRight: '12px' }"
             class="text-left" slot="body-cell-role" slot-scope="props">
          <q-select
             @input="onChangeRole(props)"
-            v-model="props.row.projects[0].role"
+            v-model="props.row.project.role"
             :options="roles"
           />
       </q-td>
@@ -63,7 +69,24 @@ export default {
           value: 1,
         },
       ],
+      proOptions: [
+        {
+          label: 'Oui',
+          value: true,
+        },
+        {
+          label: 'Non',
+          value: false,
+        },
+      ],
     };
+  },
+  computed: {
+    isPro(val) {
+      console.log(val);
+      return true;
+      // props.row.project.isPro
+    },
   },
   methods: {
     onResize(size) {
@@ -76,6 +99,9 @@ export default {
       el[0].style.height = `${size.height - 270}px`;
     },
     onChangeRole(e) {
+      e.col.action(e.row);
+    },
+    onChangePro(e) {
       e.col.action(e.row);
     },
     setCTAColor(name) {
