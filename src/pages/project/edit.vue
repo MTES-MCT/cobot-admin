@@ -78,7 +78,10 @@
                                   @click="onCancelEditLabelProperty()"
                                   style="margin-right: 12px;" />
                           <q-btn size="sm" color="pink" label="valider"
-                                 @click="onSaveLabelProperty()" />
+                                 @click="onSaveLabelProperty()"
+                                 style="margin-right: 12px;"  />
+                          <q-btn size="sm" color="warning" label="supprimer"
+                                 @click="onDeleteLabelProperty()" />
                         </q-td>
                       </q-tr>
 
@@ -449,6 +452,15 @@ export default {
       // this.currentLabel.properties = this.labelPropsRows;
       this.update();
       this.currentProperty = null;
+    },
+    onDeleteLabelProperty() {
+      if (this.currentProperty) {
+        this.currentLabel.properties = _.reject(
+          this.currentLabel.properties,
+          properties => properties === this.currentProperty,
+        );
+        this.onSaveLabelProperty();
+      }
     },
   },
   apollo: {
