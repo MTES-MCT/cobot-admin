@@ -25,7 +25,8 @@
         <div class="links">
           <ul>
             <li @click="goToDashboard(project)">aller au projet</li>
-            <li @click="goToEditProject(project.id)">éditer le projet</li>
+            <li @click="goToEditProject(project)">éditer le projet</li>
+            <li @click="onDeleteProject(project)">supprimer le projet</li>
           </ul>
         </div>
       </q-collapsible>
@@ -41,7 +42,7 @@
 <script>
 import _ from 'lodash';
 import { clone } from 'quasar';
-import { ME_QUERY } from '../constants/graphql';
+import { ME_QUERY, PROJECT_DELETE } from '../constants/graphql';
 
 import CcEditProject from './cc-edit-project';
 
@@ -95,18 +96,66 @@ export default {
       this.$root.$emit('projectChanged', project);
       this.$router.push(`/dashboard/${project.id}`);
     },
-    goToEditProject(projectId) {
-      this.$store.commit('project/SET_PROJECT_ID', projectId);
+    goToEditProject(project) {
+      delete project.__typename;
+      this.$store.commit('project/SET_PROJECT_ID', project.id);
       // this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
-      this.$router.push(`/project/${projectId}`);
+      this.$store.commit('project/SET_PROJECT', project);
+      this.$localStorage.set('project', JSON.stringify(project));
+      this.$root.$emit('projectChanged', project);
+      this.$router.push(`/project/${project.id}`);
     },
     goToNewProject() {
       this.$store.commit('project/SET_PROJECT_ID', null);
-      this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
-      // this.$router.push('/project');
+      // this.$store.commit('users/SET_OPEN_EDIT_PROJECT', true);
+      this.$router.push('/project');
     },
     goToCobot() {
       this.$router.push('/crud');
+    },
+    onDeleteProject(project) {
+      this.$q.dialog({
+        title: 'Suppression',
+        message: `Pour définitivement supprimer ce projet saisissez son nom : ${project.name}`,
+        prompt: {
+          model: '',
+        },
+        ok: {
+          color: 'pink',
+          label: 'supprimer',
+        },
+        cancel: {
+          color: 'grey',
+          label: 'annuler',
+        },
+        preventClose: true,
+      }).then(async (name) => {
+        if (name === project.name) {
+          this.$root.$emit('projectDeleted', project);
+          try {
+            await this.$apollo.mutate({
+              mutation: PROJECT_DELETE,
+              variables: {
+                id: project.id,
+              },
+            });
+            if (this.$route.params.id === project.id) {
+              const projects = JSON.parse(this.$localStorage.get('projects'));
+              const newProjects = _.reject(projects, newProject => newProject.name === name);
+              this.$localStorage.set('projects', JSON.stringify(newProjects));
+              this.$localStorage.set('project', JSON.stringify(newProjects[0]));
+
+              this.$store.commit('project/SET_PROJECT_ID', newProjects[0].id);
+              this.$store.commit('project/SET_PROJECT', newProjects[0]);
+              this.$localStorage.set('project', JSON.stringify(newProjects[0]));
+              this.$root.$emit('projectChanged', newProjects[0]);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }).catch(() => {
+      });
     },
   },
   apollo: {

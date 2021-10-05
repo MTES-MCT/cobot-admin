@@ -58,7 +58,7 @@ export default [
           {
             path: '',
             name: 'project.add',
-            component: () => import('pages/project/add'),
+            component: () => import('pages/project/edit'),
           },
           {
             path: ':id',
@@ -72,7 +72,7 @@ export default [
           },
           {
             path: ':id',
-            name: 'project.edit',
+            name: 'project.data',
             component: () => import('pages/project/datas'),
           },
         ],

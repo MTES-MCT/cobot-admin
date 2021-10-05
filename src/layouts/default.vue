@@ -99,7 +99,7 @@ export default {
   },
   computed: {
     isProjectPage() {
-      return this.$route.name === 'project.edit';
+      return this.$route.name === 'project.edit' || this.$route.name === 'project.add';
     },
   },
   mounted() {

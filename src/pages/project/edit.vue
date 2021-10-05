@@ -126,31 +126,16 @@
               </div>
             </div>
           </q-step>
-
-          <!-- <q-step title="Etape 3"
-                  subtitle="Contributeurs et jeux de données"
-                  style="text-align: center;">
-              <q-btn
-              color="grey"
-              @click="goTo('dashboard.dataset', projectId)"
-              label="éditer mon jeu de données"
-              style="margin-right: 10px;"
-            />
-            <q-btn
-              color="grey"
-              @click="goTo('dashboard.contributors', projectId)"
-              label="gérer mes contributeurs"
-            />
-          </q-step> -->
-
           <q-stepper-navigation>
             <q-btn
+              v-if="currentStep !== 'etape1'"
               color="grey"
               @click="onGoBack()"
               label="retour"
               style="margin-right: 10px;"
             />
             <q-btn
+              v-if="currentStep !== 'etape2'"
               color="pink"
               @click="onNext()"
               label="suivant"
@@ -178,7 +163,7 @@ export default {
   },
   data() {
     return {
-      skipQuery: false,
+      skipQuery: true,
       label: null,
       labels: [],
       currentStep: 'etape1',
@@ -214,14 +199,6 @@ export default {
           field: 'val_3',
         },
       ],
-      // labelPropsRows: [
-      //   {
-      //     name: 'Nombre de marches',
-      //     val_1: '0 - 10',
-      //     val_2: '10 - 20',
-      //     val_3: '20+',
-      //   },
-      // ],
       currentProperty: null,
     };
   },
@@ -238,8 +215,9 @@ export default {
     },
   },
   mounted() {
-    if (!this.projectId) {
+    if (this.$route.params.id) {
       this.$store.commit('project/SET_PROJECT_ID', this.$route.params.id);
+      this.$apollo.queries.project.skip = false;
     }
   },
   methods: {
@@ -287,17 +265,6 @@ export default {
         this.$refs.stepper.next();
       }
     },
-    // onLabel() {
-    //   console.log('je passe');
-    //   this.project.labels = [];
-    //   _.each(this.labels, (label, index) => {
-    //     this.project.labels.push({
-    //       text: label,
-    //       order: index,
-    //     });
-    //   });
-    //   // this.update();
-    // },
     async save() {
       if (this.project.name) {
         try {
@@ -309,7 +276,23 @@ export default {
             },
           });
           if (newProject) {
+            console.log(newProject.data.createProject);
             this.$store.commit('project/SET_PROJECT_ID', newProject.data.createProject.id);
+            const project = {
+              id: newProject.data.createProject.id,
+              name: newProject.data.createProject.name,
+              role: 100,
+              question: null,
+              answers: [],
+            };
+            this.$store.commit('project/SET_PROJECT', project);
+            this.$root.$emit('projectChanged', project);
+            this.$localStorage.set('project', JSON.stringify(project));
+
+            const projects = JSON.parse(this.$localStorage.get('projects'));
+            projects.push(project);
+            this.$localStorage.set('projects', JSON.stringify(projects));
+
             this.$root.$emit('newProject', newProject.data.createProject);
           }
         } catch (error) {
