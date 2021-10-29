@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cc-subheader-label :items="getElements()" />
+    <cc-subheader-contribute :items="getElements()" />
     <div class="row main">
       <div class="col-3">
         <cc-left-panel-label :datasetId="datasetId" :labels="labels" />
@@ -9,7 +9,7 @@
         <div class="main-card">
           <div class="row justify-center">
             <div v-if="!complete" style="text-align: center;">
-              <p>Auteur: {{ data.user_doc[0].name || data.user_doc[0].email }}</p>
+              <p v-if="data">Auteur: {{ data.user_doc[0].name || data.user_doc[0].email }}</p>
               <l-map
                 ref="map"
                 :min-zoom="minZoom"
@@ -65,7 +65,7 @@ import labels from '../../../constants/labels';
 
 import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
-import CcSubheaderLabel from 'components/cc-subheader-label';
+import CcSubheaderContribute from 'components/cc-subheader-contribute';
 import CcPanelPhotoInfo from 'components/panel-photo-info';
 import CcHelp from 'components/cc-help';
 
@@ -83,7 +83,7 @@ export default {
     CcRightPanelLabel,
     CcPanelPhotoInfo,
     CcLeftPanelLabel,
-    CcSubheaderLabel,
+    CcSubheaderContribute,
     CcHelp,
   },
   data() {
