@@ -25,10 +25,14 @@ export const DATASET_ANSWERS = gql`mutation dataSetAnswers($id: ID!, $answer: St
   }
 }`;
 
-export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!, $offset: Int, $limit: Int) {
-  DataSetBySource(id: $id, offset: $offset, limit: $limit) {
+export const DATASET_BY_SOURCE_QUERY = gql`query DataSetBySource($id: ID!, $user: ID, $label: String, $offset: Int, $limit: Int) {
+  DataSetBySource(id: $id, user: $user, label: $label, offset: $offset, limit: $limit) {
     _id,
     file,
+    user_doc {
+      name
+      email
+    }
     numAnswers,
     metadata {
       geoData {
@@ -120,13 +124,13 @@ export const DATASET_UPLOAD_SUB = gql`subscription uploadProgress($uid: ID!) {
   }
 }`;
 
-export const DATASET_COUNT_BY_SOURCE = gql`query getDataSetCount($projectId: ID!) {
-  CountDataSetBySource(projectId: $projectId)
+export const DATASET_COUNT_BY_SOURCE = gql`query getDataSetCount($projectId: ID!, $user: ID, $label: String) {
+  CountDataSetBySource(projectId: $projectId, user: $user, label: $label)
 }`;
 
 export const ME_QUERY = gql`query user {
   Me {
-    id
+    _id
     name
     email
     projects {
@@ -138,6 +142,10 @@ export const ME_QUERY = gql`query user {
         _id
         text
         order
+      }
+      labels {
+        _id
+        text
       }
     }
   }
@@ -238,8 +246,9 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
   }
 }`;
 
-export const PROJECT_CONTRIBUTORS = gql`query contributors($id: ID!) {
-  ProjectContributors(id: $id) {
+export const PROJECT_CONTRIBUTORS = gql`query contributors($projectId: ID!) {
+  ProjectContributors(projectId: $projectId) {
+    _id
     name
     email
     lastConnection

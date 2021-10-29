@@ -8,7 +8,10 @@
     </q-list-header>
     <q-item>
       <q-item-main>
-        <q-item-tile label>{{ name }}</q-item-tile>
+        <q-item-tile label><strong>Fichier :</strong><br />{{ name }}</q-item-tile>
+        <q-item-tile label style="padding-top: 12px;">
+          <strong>Auteur :</strong><br />{{ owner.name||owner.email }}
+        </q-item-tile>
       </q-item-main>
     </q-item>
     <q-item>
@@ -88,7 +91,7 @@ import { DATA_DELETE } from '../constants/graphql';
 
 export default {
   name: 'CcPanelPhotoInfo',
-  props: ['id', 'name', 'side', 'metadata'],
+  props: ['id', 'name', 'side', 'metadata', 'owner'],
   data() {
     return {
       infoWindowPos: null,

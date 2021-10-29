@@ -234,7 +234,7 @@ export default {
       query: PROJECT_CONTRIBUTORS,
       variables() {
         return {
-          id: this.projectId,
+          projectId: this.projectId,
         };
       },
       update(data) {

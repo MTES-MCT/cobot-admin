@@ -3,6 +3,7 @@
                      side="left"
                      :id="data._id"
                      :name="data.file"
+                     :owner="data.user_doc[0]"
                      :metadata="data.metadata" />
 </template>
 
