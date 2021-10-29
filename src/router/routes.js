@@ -48,6 +48,11 @@ export default [
             name: 'dashboard.dataset',
             component: () => import('pages/dashboard/dataset'),
           },
+          {
+            path: 'labels/:id',
+            name: 'dashboard.labels',
+            component: () => import('pages/dashboard/labels'),
+          },
         ],
       },
       {

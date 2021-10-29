@@ -25,7 +25,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-7" style="padding-left: 20px;">
+            <div class="col-7 headerMenu" style="padding-left: 20px;">
               <q-btn @click="goTo('dashboard.contribute.object', $route.params.id)"
                      flat icon="public" label="Contribuer" />
               <q-btn v-if="$auth.check([80, 100])" @click="goTo('dashboard', $route.params.id)"
@@ -36,6 +36,9 @@
               <q-btn v-if="$auth.check([80, 100])"
                      @click="goTo('dashboard.dataset', $route.params.id)"
                      flat icon="ballot" label="Jeu de donnée" />
+               <q-btn v-if="$auth.check([80, 100])"
+                     @click="goTo('dashboard.labels', $route.params.id)"
+                     flat icon="local_offer" label="Labels" />
               <q-btn @click="openInfo()"
                      flat icon="info" label="A propos" />
               <!-- <q-btn @click="openInfo()"
@@ -152,6 +155,19 @@ export default {
     50% {
       opacity: 0;
     }
+  }
+  .headerMenu {
+    overflow-y: auto;
+  }
+  .headerMenu::-webkit-scrollbar {
+      height: 5px;
+  }
+  .headerMenu::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, .2)
+  }
+  .headerMenu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .2);
+    border-radius: 30px;
   }
   .q-layout-drawer
     z-index 6200

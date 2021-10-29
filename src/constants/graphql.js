@@ -322,3 +322,40 @@ export const PROJECT_DELETE = gql`mutation deleteProject($id: ID!) {
 export const DOWNLOAD_FROM_DROPBOX = gql`mutation dropbox($url: String, $project: ProjectInput) {
   dropbox(url: $url, project: $project)
 }`;
+
+export const LABELS = gql`query labels {
+  Labels {
+    _id
+    uid
+    text
+    photo
+    icon
+    isObstacle
+  }
+}`;
+
+export const LABELS_CREATE = gql`mutation createLabel($uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean) {
+  createLabel(uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle) {
+    _id
+    uid
+    text
+    photo
+    icon
+    isObstacle
+  }
+}`;
+
+export const LABELS_UPDATE = gql`mutation updateLabel($id: ID!, $uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean) {
+  updateLabel(id: $id, uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle) {
+    _id
+    uid
+    text
+    photo
+    icon
+    isObstacle
+  }
+}`;
+
+export const LABELS_DELETE = gql`mutation labelDelete($id: ID!) {
+  labelDelete(id: $id)
+}`;
