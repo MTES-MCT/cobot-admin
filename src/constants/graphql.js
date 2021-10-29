@@ -57,6 +57,10 @@ export const DATASET_QUERY = gql`query DataSet($projectId: ID!, $id: ID, $notAns
   DataSet(projectId: $projectId, id: $id, notAnswered: $notAnswered) {
     _id,
     file,
+    user_doc {
+      name
+      email
+    }
     numAnswers,
     metadata {
       geoData {

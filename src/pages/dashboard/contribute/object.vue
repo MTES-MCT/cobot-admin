@@ -9,6 +9,7 @@
         <div class="main-card">
           <div class="row justify-center">
             <div v-if="!complete" style="text-align: center;">
+              <p>Auteur: {{ data.user_doc[0].name || data.user_doc[0].email }}</p>
               <l-map
                 ref="map"
                 :min-zoom="minZoom"
