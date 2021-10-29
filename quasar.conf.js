@@ -112,6 +112,7 @@ module.exports = function config(ctx) {
         'QWindowResizeObservable',
         'QToggle',
         'QCheckbox',
+        'QAutocomplete',
       ],
       directives: [
         'Ripple',

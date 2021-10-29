@@ -237,9 +237,9 @@ export const PROJECT_QUERY = gql`query getProject($id: ID!) {
       order
     }
     labels {
+      _id
       text
       order
-      img
       properties {
         name
         val_1

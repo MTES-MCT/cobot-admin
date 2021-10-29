@@ -17,7 +17,15 @@
           </q-step>
 
           <q-step name="etape2" title="Labels">
-            <q-field v-if="!isEditLabel">
+            <q-search
+              v-model="label"
+              color="pink"
+              placeholder="Saisissez les premières lettres d'un objet">
+              <q-autocomplete
+                :static-data="{ field: 'label', list: availableLabels }"
+                @selected="onSelectedLabel" />
+            </q-search>
+            <!-- <q-field v-if="!isEditLabel">
               <q-input
                 v-model="label"
                 @keyup="onKeyUp"
@@ -31,7 +39,7 @@
                     }
                   }
                 ]" />
-            </q-field>
+            </q-field> -->
             <div v-if="!isEditLabel" class="row" style="padding-top: 12px;">
               <q-chip v-for="(label, index) in project.labels"
                       :key="`project_${index}`"
@@ -153,7 +161,7 @@ import _ from 'lodash';
 import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 
-import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE, PROJECT_DELETE } from '../../constants/graphql';
+import { PROJECT_QUERY, PROJECT_CREATE, PROJECT_UPDATE, PROJECT_DELETE, LABELS } from '../../constants/graphql';
 
 export default {
   name: 'CcEditProject',
@@ -166,6 +174,7 @@ export default {
       skipQuery: true,
       label: null,
       labels: [],
+      availableLabels: [],
       currentStep: 'etape1',
       currentProject: null,
       project: {
@@ -369,10 +378,12 @@ export default {
         this.onAddLabel();
       }
     },
-    onAddLabel() {
+    onAddLabel(label) {
+      console.log(label);
       const lastIndex = this.project.labels.length;
       this.project.labels.push({
-        text: this.label,
+        _id: label.value,
+        text: label.label,
         order: lastIndex,
         properties: [],
       });
@@ -432,7 +443,6 @@ export default {
       _.each(this.currentLabel.properties, (labelPropsRows) => {
         delete labelPropsRows.__index;
       });
-      // this.currentLabel.properties = this.labelPropsRows;
       this.update();
       this.currentProperty = null;
     },
@@ -443,6 +453,11 @@ export default {
           properties => properties === this.currentProperty,
         );
         this.onSaveLabelProperty();
+      }
+    },
+    onSelectedLabel(label, keyboard) {
+      if (!keyboard) {
+        this.onAddLabel(label);
       }
     },
   },
@@ -458,13 +473,26 @@ export default {
         if (data.Project) {
           let project = clone(data.Project);
           project = omitDeep(project, ['__typename']);
-          // this.labels = this.getLabels(project.labels);
           return project;
         }
         return false;
       },
       skip() {
         return this.skipQuery;
+      },
+    },
+    projectLabels: {
+      query: LABELS,
+      fetchPolicy: 'no-cache',
+      update(data) {
+        const availableLabels = [];
+        _.each(data.Labels, (label) => {
+          availableLabels.push({
+            label: label.text,
+            value: label._id,
+          });
+        });
+        this.availableLabels = availableLabels;
       },
     },
   },
