@@ -12,16 +12,16 @@
         style="text-align: center;">
         <q-item-main>
           <q-item-tile v-for="(label, index) in labels"
-                        v-if="label.id !== 'none'"
+                        v-if="label.text !== 'no-detected'"
                         :key="index"
                         label>
-            <q-btn :label="label.label"
+            <q-btn :label="label.text"
                   @click="onSelect(label)"
                   class="full-width"
                   style="margin-top: 10px;"
                   color="pink">
                   <q-tooltip>
-                    <img :src="label.img" style="width: 200px;" />
+                    <img :src="getPhoto(label.photo)" style="width: 200px;" />
                   </q-tooltip>
             </q-btn>
           </q-item-tile>
@@ -50,7 +50,7 @@
           </q-item-tile>
           <q-item-tile style="margin-top: 10px;">
             <q-chip @hide="onReset()" closable color="dark">
-              {{ label.label }}
+              {{ label.text }}
             </q-chip>
           </q-item-tile>
           <q-item-tile style="padding-top: 10px;">
@@ -132,11 +132,6 @@ export default {
   methods: {
     onResize(size) {
       this.size = size;
-      // console.log(size);
-      // const el = document.querySelector('#labels');
-      // if (el) {
-      //   el.style.height = `${size.height - 250}px`;
-      // }
     },
     onSelect(selectedLabel) {
       this.label = selectedLabel;
@@ -191,6 +186,9 @@ export default {
         });
       }).catch(() => {
       });
+    },
+    getPhoto(photo) {
+      return `${process.env.API_URL}/img/labels/photos/${photo}`;
     },
   },
 };

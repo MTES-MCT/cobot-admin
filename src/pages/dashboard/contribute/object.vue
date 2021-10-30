@@ -9,7 +9,9 @@
         <div class="main-card">
           <div class="row justify-center">
             <div v-if="!complete" style="text-align: center;">
-              <p v-if="data">Auteur: {{ data.user_doc[0].name || data.user_doc[0].email }}</p>
+              <p v-if="data && data.user_doc && data.user_doc.length > 0">
+                Auteur: {{ data.user_doc[0].name || data.user_doc[0].email }}
+              </p>
               <l-map
                 ref="map"
                 :min-zoom="minZoom"
@@ -29,7 +31,8 @@
             <CcPanelPhotoInfo v-if="panel === 'rightPanelInfo'"
                               side="right"
                               :name="data.file"
-                              :metadata="data.metadata"/>
+                              :metadata="data.metadata"
+                              :owner="data.user_doc[0]"/>
           </transition>
           <transition
             enter-active-class="animated slideInRight"
@@ -61,7 +64,7 @@ import 'leaflet/dist/images/marker-shadow.png';
 import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
 
 import { DATASET_QUERY, DATASET_ANSWERS } from '../../../constants/graphql';
-import labels from '../../../constants/labels';
+// import labels from '../../../constants/labels';
 
 import CcLeftPanelLabel from 'components/cc-left-panel-label';
 import CcRightPanelLabel from 'components/cc-right-panel-label';
@@ -110,7 +113,7 @@ export default {
         polygon: '#F2C037',
         rectangle: '#E91C63',
       },
-      labels,
+      labels: JSON.parse(this.$localStorage.get('project')).labels,
     };
   },
   computed: {
@@ -379,7 +382,10 @@ export default {
         height = metadata.originalHeight;
         width = metadata.originalWidth;
       } else if (metadata.raw) {
-        const raw = JSON.parse(metadata.raw);
+        let raw = metadata.raw;
+        if (!raw.ImageHeight) {
+          raw = JSON.parse(metadata.raw.replace(/\\/g, ''));
+        }
         if (raw.ImageHeight) {
           height = raw.ImageHeight;
           width = raw.ImageWidth;

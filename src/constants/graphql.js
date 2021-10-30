@@ -150,6 +150,15 @@ export const ME_QUERY = gql`query user {
       labels {
         _id
         text
+        photo
+        icon
+        properties {
+          name
+          val_1
+          val_2
+          val_3
+        }
+        order
       }
     }
   }
