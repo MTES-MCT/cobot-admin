@@ -137,7 +137,6 @@ export default {
         result(data) {
           this.iaOnProgress = true;
           this.processing = data.data.uploadProgress.data;
-          console.log(this.processing);
           // this.progress = data.data.uploadProgress.data;
           // if (this.progress === 'eot') {
           //   this.close();

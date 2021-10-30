@@ -238,7 +238,6 @@ export default {
         };
       },
       update(data) {
-        console.log(data.ProjectContributors);
         return clone(data.ProjectContributors);
       },
     },

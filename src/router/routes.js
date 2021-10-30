@@ -49,7 +49,7 @@ export default [
             component: () => import('pages/dashboard/dataset'),
           },
           {
-            path: 'labels/:id',
+            path: 'labels/:id/:label?',
             name: 'dashboard.labels',
             component: () => import('pages/dashboard/labels'),
           },

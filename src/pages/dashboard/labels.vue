@@ -1,9 +1,9 @@
 <template>
   <div>
-    <cc-subheader-label :numItem="labels.length" />
+    <cc-subheader-label v-if="labels" :numItem="labels.length" />
     <div class="row main">
       <div class="col-3">
-        <cc-left-panel-label-editor :labels="labels" />
+        <cc-left-panel-label-editor v-if="labels" :labels="labels" />
       </div>
       <div class="col-9">
         <div class="main-card row">
@@ -58,6 +58,69 @@
                   label="L'objet représente un obstacle"/>
               </div>
             </div>
+            <div class="col-12 q-pt-md">
+              <div class="q-pa-md">
+                <q-table
+                  title="Propriétés"
+                  :data="label.properties"
+                  :columns="labelPropsColumns"
+                  row-key="name"
+                >
+                  <template slot="top-right" slot-scope="props">
+                    <q-btn @click="onAddLabelProperty()" label="ajouter" />
+                  </template>
+
+                  <q-tr v-if="currentProperty" slot="bottom-row" slot-scope="props">
+                    <q-td colspan="100%" style="text-align: right;">
+                      <q-btn size="sm" color="grey" label="annuler"
+                              @click="onCancelEditLabelProperty()"
+                              style="margin-right: 12px;" />
+                      <q-btn size="sm" color="pink" label="valider"
+                              @click="onSaveLabelProperty()"
+                              style="margin-right: 12px;"  />
+                      <q-btn size="sm" color="warning" label="supprimer"
+                              @click="onDeleteLabelProperty()" />
+                    </q-td>
+                  </q-tr>
+
+                  <q-tr @click.native="onEditLabelProperty(props.row)"
+                        slot="body" slot-scope="props" :props="props">
+                    <q-td key="name" :props="props">
+                      <template v-if="!props.row.edit">
+                        {{ props.row.name }}
+                      </template>
+                      <template v-else>
+                        <q-input autofocus v-model="props.row.name" />
+                      </template>
+                    </q-td>
+                    <q-td key="val_1" :props="props">
+                      <template v-if="!props.row.edit">
+                        {{ props.row.val_1 }}
+                      </template>
+                      <template v-else>
+                        <q-input v-model="props.row.val_1" />
+                      </template>
+                    </q-td>
+                    <q-td key="val_2" :props="props">
+                      <template v-if="!props.row.edit">
+                        {{ props.row.val_2 }}
+                      </template>
+                      <template v-else>
+                        <q-input v-model="props.row.val_2" />
+                      </template>
+                    </q-td>
+                    <q-td key="val_3" :props="props">
+                      <template v-if="!props.row.edit">
+                        {{ props.row.val_3 }}
+                      </template>
+                      <template v-else>
+                        <q-input v-model="props.row.val_3" />
+                      </template>
+                    </q-td>
+                  </q-tr>
+                </q-table>
+              </div>
+            </div>
           </template>
         </div>
         <div class="col-12" style="text-align: center;">
@@ -80,13 +143,13 @@
 
 <script>
 /* eslint no-useless-escape: 0 */
+import omitDeep from 'omit-deep-lodash';
 import { clone } from 'quasar';
 import _ from 'lodash';
 import { mapGetters } from 'vuex';
 import slugify from 'slugify';
-import { LABELS, LABELS_CREATE, LABELS_UPDATE, LABELS_DELETE } from '../../constants/graphql';
 
-import labels from '../../constants/labels';
+import { LABELS, LABELS_CREATE, LABELS_UPDATE, LABELS_DELETE } from '../../constants/graphql';
 
 import CcLeftPanelLabelEditor from 'components/cc-left-panel-label-editor';
 import CcSubheaderLabel from 'components/cc-subheader-label';
@@ -101,7 +164,32 @@ export default {
     return {
       isObstacle: false,
       uploadUrl: `${process.env.API_URL}/upload-label`,
-      labels,
+      labelPropsColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
+          align: 'left',
+          style: 'width: 70%',
+        },
+        {
+          name: 'val_1',
+          align: 'center',
+          label: 'Valeur 1',
+          field: 'val_1',
+        },
+        {
+          name: 'val_2',
+          label: 'Valeur 2',
+          field: 'val_2',
+        },
+        {
+          name: 'val_3',
+          label: 'Valeur 3',
+          field: 'val_3',
+        },
+      ],
+      currentProperty: null,
     };
   },
   computed: {
@@ -130,6 +218,7 @@ export default {
               photo: this.label.photo,
               icon: this.label.icon,
               isObstacle: this.label.isObstacle,
+              properties: omitDeep(this.label.properties, ['__typename', '__index']),
             },
           });
         } else {
@@ -215,6 +304,51 @@ export default {
         const type = (response.type === 'photos') ? 'photo' : 'icon';
         this.label[type] = response.filename;
         this.onSave();
+      }
+    },
+    onEditLabelProperty(property) {
+      this.currentProperty = property;
+      property.edit = true;
+    },
+    onCancelEditLabelProperty() {
+      if (this.currentProperty) {
+        if (this.currentProperty.name.length === 0) {
+          this.label.properties = _.reject(
+            this.label.properties,
+            row => row === this.currentProperty,
+          );
+        }
+        delete this.currentProperty.edit;
+        this.currentProperty = null;
+      }
+    },
+    onAddLabelProperty() {
+      if (!this.currentProperty) {
+        this.label.properties.push({
+          name: '',
+          val_1: '',
+          val_2: '',
+          val_3: '',
+          edit: true,
+        });
+        this.currentProperty = _.last(this.label.properties);
+      }
+    },
+    onSaveLabelProperty() {
+      delete this.currentProperty.edit;
+      _.each(this.label.properties, (labelPropsRows) => {
+        delete labelPropsRows.__typename;
+        delete labelPropsRows.__index;
+      });
+      this.currentProperty = null;
+    },
+    onDeleteLabelProperty() {
+      if (this.currentProperty) {
+        this.label.properties = _.reject(
+          this.label.properties,
+          properties => properties === this.currentProperty,
+        );
+        this.onSaveLabelProperty();
       }
     },
   },

@@ -18,6 +18,7 @@
 
           <q-step name="etape2" title="Labels">
             <q-search
+              v-if="!isEditLabel"
               v-model="label"
               color="pink"
               placeholder="Saisissez les premières lettres d'un objet">
@@ -25,26 +26,11 @@
                 :static-data="{ field: 'label', list: availableLabels }"
                 @selected="onSelectedLabel" />
             </q-search>
-            <!-- <q-field v-if="!isEditLabel">
-              <q-input
-                v-model="label"
-                @keyup="onKeyUp"
-                stack-label="Ajouter un élément"
-                :after="[
-                  {
-                    icon: 'send',
-                    error: false,
-                    handler: () => {
-                      this.onAddLabel();
-                    }
-                  }
-                ]" />
-            </q-field> -->
             <div v-if="!isEditLabel" class="row" style="padding-top: 12px;">
               <q-chip v-for="(label, index) in project.labels"
                       :key="`project_${index}`"
                       icon="create"
-                      closable
+                      :closable="(label.text === 'no-detected') ? false : true"
                       :color="(label.text === 'no-detected') ? 'black' : 'pink'"
                       @hide="onDeleteLabel(label)"
                       @click="onEditLabel(label)"
@@ -76,11 +62,27 @@
                       :columns="labelPropsColumns"
                       row-key="name"
                     >
-                      <template slot="top-right" slot-scope="props">
+                      <q-tr
+                          v-if="!noDetectedLabel(currentLabel.text)"
+                          slot="top-row" slot-scope="props">
+                        <q-td colspan="100%">
+                          <strong>
+                            Note : pour éditer les propriétées d'un object cliquez sur
+                            <a class="edit-label"
+                               :href="`/#/dashboard/labels/${projectId}/${currentLabel._id}`">
+                              éditer les labels
+                            </a>
+                          </strong>
+                        </q-td>
+                      </q-tr>
+
+                      <template v-if="noDetectedLabel(currentLabel.text)"
+                                slot="top-right" slot-scope="props">
                         <q-btn @click="onAddLabelProperty()" label="ajouter" />
                       </template>
 
-                      <q-tr v-if="currentProperty" slot="bottom-row" slot-scope="props">
+                      <q-tr v-if="currentProperty && noDetectedLabel(currentLabel.text)"
+                            slot="bottom-row" slot-scope="props">
                         <q-td colspan="100%" style="text-align: right;">
                           <q-btn size="sm" color="grey" label="annuler"
                                   @click="onCancelEditLabelProperty()"
@@ -282,10 +284,14 @@ export default {
             variables: {
               name: this.project.name,
               details: this.project.details,
+              labels: [{
+                text: 'no-detected',
+                order: 100,
+                properties: [],
+              }],
             },
           });
           if (newProject) {
-            console.log(newProject.data.createProject);
             this.$store.commit('project/SET_PROJECT_ID', newProject.data.createProject.id);
             const project = {
               id: newProject.data.createProject.id,
@@ -295,7 +301,6 @@ export default {
               answers: [],
             };
             this.$store.commit('project/SET_PROJECT', project);
-            this.$root.$emit('projectChanged', project);
             this.$localStorage.set('project', JSON.stringify(project));
 
             const projects = JSON.parse(this.$localStorage.get('projects'));
@@ -303,6 +308,7 @@ export default {
             this.$localStorage.set('projects', JSON.stringify(projects));
 
             this.$root.$emit('newProject', newProject.data.createProject);
+            this.$root.$emit('projectChanged', project);
           }
         } catch (error) {
           this.$q.notify({ message: this.$t('global.error'), type: 'negative' });
@@ -366,6 +372,7 @@ export default {
             this.$localStorage.set('projects', JSON.stringify(projects));
             [this.project] = projects;
             this.$root.$emit('projectDeleted', { id: this.projectId });
+            this.$root.$emit('projectChanged', this.project);
             this.goTo('dashboard', this.project.id);
           }
         }).catch((error) => {
@@ -385,7 +392,7 @@ export default {
         _id: label.value,
         text: label.label,
         order: lastIndex,
-        properties: [],
+        properties: label.properties,
       });
       this.label = '';
       this.update();
@@ -411,8 +418,10 @@ export default {
       this.currentLabel = null;
     },
     onEditLabelProperty(property) {
-      this.currentProperty = property;
-      property.edit = true;
+      if (this.noDetectedLabel(this.currentLabel.text)) {
+        this.currentProperty = property;
+        property.edit = true;
+      }
     },
     onCancelEditLabelProperty() {
       if (this.currentProperty) {
@@ -460,6 +469,9 @@ export default {
         this.onAddLabel(label);
       }
     },
+    noDetectedLabel(label) {
+      return label === 'no-detected';
+    },
   },
   apollo: {
     project: {
@@ -490,6 +502,7 @@ export default {
           availableLabels.push({
             label: label.text,
             value: label._id,
+            properties: omitDeep(label.properties, ['__typename']),
           });
         });
         this.availableLabels = availableLabels;
@@ -521,6 +534,9 @@ export default {
         font-size 24px
         font-weight bold
         padding-left 24px
+    .edit-label
+      color #e91e63
+      text-decoration none
     .labelProps
       .title
         font-weight bold

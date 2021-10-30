@@ -34,6 +34,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import _ from 'lodash';
 
 export default {
   name: 'CcLeftPanel',
@@ -52,6 +53,14 @@ export default {
     }),
   },
   created() {
+  },
+  mounted() {
+    if (this.$route.params.label) {
+      const selectedLabel = _.find(this.labels, label => label._id === this.$route.params.label);
+      if (selectedLabel) {
+        this.$store.commit('label/SET_CURRENT_LABEL', selectedLabel);
+      }
+    }
   },
   methods: {
     onResize(size) {

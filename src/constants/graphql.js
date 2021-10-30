@@ -320,11 +320,22 @@ export const PROJECT_UPDATE = gql`mutation projectUpdate($id: ID!, $name: String
   }
 }`;
 
-export const PROJECT_CREATE = gql`mutation createProject($name: String, $details: String) {
-  createProject(name: $name, details: $details) {
+export const PROJECT_CREATE = gql`mutation createProject($name: String, $details: String, $labels: [LabelInput]) {
+  createProject(name: $name, details: $details, labels: $labels) {
     id
     name
     details
+    labels {
+      _id
+      text
+      order
+      properties {
+        name
+        val_1
+        val_2
+        val_3
+      }
+    }
   }
 }`;
 
@@ -344,6 +355,12 @@ export const LABELS = gql`query labels {
     photo
     icon
     isObstacle
+    properties {
+      name
+      val_1
+      val_2
+      val_3
+    }
   }
 }`;
 
@@ -358,14 +375,20 @@ export const LABELS_CREATE = gql`mutation createLabel($uid: String!, $text: Stri
   }
 }`;
 
-export const LABELS_UPDATE = gql`mutation updateLabel($id: ID!, $uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean) {
-  updateLabel(id: $id, uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle) {
+export const LABELS_UPDATE = gql`mutation updateLabel($id: ID!, $uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean, $properties: [PropertiesInput]) {
+  updateLabel(id: $id, uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle, properties: $properties) {
     _id
     uid
     text
     photo
     icon
     isObstacle
+    properties {
+      name
+      val_1
+      val_2
+      val_3
+    }
   }
 }`;
 

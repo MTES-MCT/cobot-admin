@@ -10,7 +10,7 @@
       <q-list-header>
         <div class="row">
           <div class="col-6">
-            Mes projects
+            Mes projets
           </div>
           <div class="col-6" style="text-align:right">
             <a href="javascript:void(0)" @click="goToNewProject()">ajouter un projet</a>
@@ -139,7 +139,7 @@ export default {
                 id: project.id,
               },
             });
-            if (this.$route.params.id === project.id) {
+            if (!this.$route.params.id || this.$route.params.id === project.id) {
               const projects = JSON.parse(this.$localStorage.get('projects'));
               const newProjects = _.reject(projects, newProject => newProject.name === name);
               this.$localStorage.set('projects', JSON.stringify(newProjects));
@@ -147,8 +147,8 @@ export default {
 
               this.$store.commit('project/SET_PROJECT_ID', newProjects[0].id);
               this.$store.commit('project/SET_PROJECT', newProjects[0]);
-              this.$localStorage.set('project', JSON.stringify(newProjects[0]));
               this.$root.$emit('projectChanged', newProjects[0]);
+              this.$router.push({ path: `/#/dashboard/${newProjects[0].id}` });
             }
           } catch (e) {
             console.log(e);
@@ -161,6 +161,7 @@ export default {
   apollo: {
     Me: {
       query: ME_QUERY,
+      fetchPolicy: 'no-cache',
       update(data) {
         return clone(data.Me);
       },

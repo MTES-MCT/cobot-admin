@@ -22,7 +22,9 @@
                   :bounds="bounds"/>
               </l-map>
             </div>
-            <div v-else>Complete</div>
+            <div v-else>
+              <h4>Bravo !<br/>Vous avez contribué sur l'ensemble des données du projet.</h4>
+            </div>
             <div class="mapLoading" v-if="isLoading"></div>
           </div>
           <transition
@@ -438,15 +440,9 @@ export default {
           setTimeout(() => {
             this.setMapOrientation(metadata, this.image);
           }, 500);
-          // if (metadata.originalOrientation && metadata.originalOrientation === 6) {
-          //   setTimeout(() => {
-          //     this.setVerticalMap();
-          //   }, 500);
-          // } else {
-          //   setTimeout(() => {
-          //     this.setHorizontalMap();
-          //   }, 500);
-          // }
+        } else {
+          this.complete = true;
+          this.isLoading = false;
         }
         this.skipQuery = true;
       },
