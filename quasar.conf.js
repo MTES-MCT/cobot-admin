@@ -115,6 +115,7 @@ module.exports = function config(ctx) {
         'QToggle',
         'QCheckbox',
         'QAutocomplete',
+        'QColor',
       ],
       directives: [
         'Ripple',

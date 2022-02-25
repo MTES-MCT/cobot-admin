@@ -7,17 +7,15 @@
       style="height: calc(100vh - 70px); width: calc(100vw - 15px);">
         <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
     </l-map>
-    <div class="custom-toolbox">
-      <div v-if="segment && segment.isEditable" @click="onDeleteSegment" class="delete">
-        <q-icon color="black" name="delete" />
-      </div>
-    </div>
+    <Toolbox
+      v-if="segment && segment.isEditable"
+      :segment="segment"
+      onDeleteSegment
+      @on-segment-color="onSegmentColor"
+      @on-delete-segment="onDeleteSegment"></Toolbox>
     <div class="toolbar">
       <span v-if="currentPosition">
         Coordonnées centre: {{roundedLat}}, {{roundedLng}}
-      </span>
-      <span v-if="segment">
-        {{segment.object.feature.properties.name}}: {{segment.object.feature.geometry.coordinates}}
       </span>
     </div>
   </div>
@@ -33,6 +31,8 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/images/marker-icon-2x.png';
 import 'leaflet/dist/images/marker-shadow.png';
 
+import Toolbox from '../../components/gis/toolbox.vue';
+
 import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue2-leaflet';
 
 const config = {
@@ -40,12 +40,6 @@ const config = {
 };
 
 const geojsonFeature = [];
-
-// const geojsonStyle = {
-//   color: '#FF7800',
-//   weight: 2,
-//   opacity: 0.65,
-// };
 
 export default {
   name: 'CcSegments',
@@ -56,6 +50,7 @@ export default {
     LMarker,
     LPopup,
     LPolyline,
+    Toolbox,
   },
   data() {
     return {
@@ -65,7 +60,8 @@ export default {
       segmentsGroup: null,
       map: null,
       // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      // url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      url: 'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
       attribution:
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 18,
@@ -87,6 +83,8 @@ export default {
       return this.currentPosition.lng.toFixed(4);
     },
   },
+  filters: {
+  },
   watch: {
   },
   async mounted() {
@@ -100,7 +98,9 @@ export default {
           properties: {
             id: segment.id,
             name: segment.name,
+            length: segment.length,
             radius: (segment.metadata) ? segment.metadata.radius : 0,
+            style: (segment.metadata) ? segment.metadata.style : null,
           },
           geometry: JSON.parse(segment.geomtext),
         });
@@ -151,7 +151,6 @@ export default {
         const { _latlng } = event.layers._layers[Object.keys(event.layers._layers)[0]];
         try {
           const closest = await this.$axiosSIG.get(`/gis/segments/closest?lat=${_latlng.lat}&lng=${_latlng.lng}`, config);
-          console.log(closest);
           if (closest && closest.data && closest.data.closestpoint) {
             const regExp = /\(([^)]+)\)/;
             const closestPointAll = regExp.exec(closest.data.closestpoint);
@@ -186,8 +185,10 @@ export default {
           }
         } else {
           const line = layer.getLatLngs();
-          line[0].lat = parseFloat(this.closestPoint[1]);
-          line[0].lng = parseFloat(this.closestPoint[0]);
+          if (this.closestPoint) {
+            line[0].lat = parseFloat(this.closestPoint[1]);
+            line[0].lng = parseFloat(this.closestPoint[0]);
+          }
           try {
             const segment = await this.$axiosSIG.post(`/gis/segments?id=${this.projectId}`, {
               name: `Segment ${lastSegmentID.id}`,
@@ -288,9 +289,9 @@ export default {
           weight: 5,
         });
       });
-      layer.on('mouseout', () => {
+      layer.on('mouseout', (e) => {
         layer.setStyle({
-          color: '#FF7800',
+          color: (e.target.feature.properties.style) ? e.target.feature.properties.style.color : '#FF7800',
           weight: 2,
         });
       });
@@ -307,7 +308,7 @@ export default {
     setSegmentStyle(feature) {
       if (feature.properties && feature.properties.radius) {
         return {
-          fillColor: '#E91C63',
+          fillColor: (feature.properties.style && feature.properties.style.color) ? feature.properties.style.color : '#E91C63',
           color: '#000',
           weight: 1,
           opacity: 1,
@@ -315,10 +316,39 @@ export default {
         };
       }
       return {
-        color: '#FF7800',
+        color: (feature.properties.style && feature.properties.style.color) ? feature.properties.style.color : '#FF7800',
         weight: 2,
         opacity: 0.65,
       };
+    },
+    async onSegmentColor(color) {
+      const geoFeature = _.find(
+        this.geojsonFeature,
+        feat => feat.properties.id === this.segment.id,
+      );
+      geoFeature.properties.style = {
+        color,
+      };
+      const metadata = {
+        radius: geoFeature.properties.radius,
+        style: {
+          color,
+        },
+      };
+      if (!geoFeature.properties.radius) {
+        await this.$axiosSIG.put(`/gis/segments/${this.segment.id}`, {
+          line: this.segment.object.getLatLngs(),
+          metadata,
+        }, config);
+      } else {
+        const point = this.segment.object.getLatLng();
+        await this.$axiosSIG.put(`/gis/segments/circle/${this.segment.id}`, {
+          point,
+          metadata,
+        }, config);
+      }
+      this.clearMap();
+      this.geojsonUpdate();
     },
     async onDeleteSegment() {
       if (this.segment.id) {
@@ -343,24 +373,6 @@ export default {
 
 <style lang="stylus">
   @import '~variables'
-  .custom-toolbox
-    position absolute
-    top 150px
-    right 26px
-    z-index 10000
-    .delete
-      display flex
-      justify-content center
-      align-items center
-      background-color #FFF
-      border 2px solid rgba(0,0,0,0.2)
-      background-clip padding-box
-      border-radius 4px
-      width 32px
-      height 32px
-      &:hover
-        cursor pointer
-        background-color #F4F4F4
   .toolbar
     position absolute
     bottom 0
