@@ -41,11 +41,11 @@ const config = {
 
 const geojsonFeature = [];
 
-const geojsonStyle = {
-  color: '#FF7800',
-  weight: 2,
-  opacity: 0.65,
-};
+// const geojsonStyle = {
+//   color: '#FF7800',
+//   weight: 2,
+//   opacity: 0.65,
+// };
 
 export default {
   name: 'CcSegments',
@@ -73,6 +73,7 @@ export default {
       colors: {
         polygon: '#F2C037',
         rectangle: '#E91C63',
+        circle: '#E91C63',
       },
       currentPosition: null,
       closestPoint: null,
@@ -99,6 +100,7 @@ export default {
           properties: {
             id: segment.id,
             name: segment.name,
+            radius: (segment.metadata) ? segment.metadata.radius : 0,
           },
           geometry: JSON.parse(segment.geomtext),
         });
@@ -117,7 +119,7 @@ export default {
         position: 'topright',
         draw: {
           polyline: true,
-          circle: false,
+          circle: true,
           circlemarker: false,
           polygon: false,
           rectangle: false,
@@ -158,23 +160,44 @@ export default {
       });
 
       this.map.on(L.Draw.Event.CREATED, async (event) => {
-        const { layer } = event;
+        const { layer, layerType } = event;
         this.currentLayer = layer;
-        const line = layer.getLatLngs();
-        line[0].lat = parseFloat(this.closestPoint[1]);
-        line[0].lng = parseFloat(this.closestPoint[0]);
-        try {
-          const segment = await this.$axiosSIG.post(`/gis/segments?id=${this.projectId}`, {
-            name: `Segment ${lastSegmentID.id}`,
-            projectID: this.projectId,
-            line,
-          }, config);
-          this.addSegment(`Segment ${lastSegmentID.id}`, line);
-          lastSegmentID.id = segment.data[0].id;
-          this.clearMap();
-          this.geojsonUpdate();
-        } catch (e) {
-          console.log(e);
+        if (layerType === 'circle') {
+          const point = layer.getLatLng();
+          const metadata = {
+            radius: layer.getRadius(),
+          };
+          try {
+            const circle = await this.$axiosSIG.post(`/gis/segments/circle?id=${this.projectId}`, {
+              name: `Circle ${lastSegmentID.id}`,
+              projectID: this.projectId,
+              point,
+              metadata,
+            }, config);
+            this.addSegment(circle.data[0].id, `Circle ${lastSegmentID.id}`, point, metadata);
+            lastSegmentID.id = circle.data[0].id;
+            this.clearMap();
+            this.geojsonUpdate();
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          const line = layer.getLatLngs();
+          line[0].lat = parseFloat(this.closestPoint[1]);
+          line[0].lng = parseFloat(this.closestPoint[0]);
+          try {
+            const segment = await this.$axiosSIG.post(`/gis/segments?id=${this.projectId}`, {
+              name: `Segment ${lastSegmentID.id}`,
+              projectID: this.projectId,
+              line,
+            }, config);
+            this.addSegment(segment.data[0].id, `Segment ${lastSegmentID.id}`, line);
+            lastSegmentID.id = segment.data[0].id;
+            this.clearMap();
+            this.geojsonUpdate();
+          } catch (e) {
+            console.log(e);
+          }
         }
       });
     });
@@ -186,26 +209,34 @@ export default {
       }
     },
     geojsonUpdate() {
+      console.log(this.geojsonFeature);
       const segments = L.geoJSON(this.geojsonFeature, {
-        style: geojsonStyle,
+        style: this.setSegmentStyle,
         onEachFeature: this.onSegmentAction,
+        pointToLayer: this.onPointToLayer,
       });
-      // .addTo(this.map);
+
       this.segmentsGroup = new L.FeatureGroup();
       this.segmentsGroup.addLayer(segments);
       this.map.addLayer(this.segmentsGroup);
     },
-    addSegment(name, line) {
+    addSegment(id, name, line, metadata) {
+      console.log(line);
       this.geojsonFeature.push({
         type: 'Feature',
         properties: {
+          id,
           name,
+          radius: (metadata) ? metadata.radius : 0,
         },
         geometry: {
-          type: 'LineString',
-          coordinates: [[line[0].lng, line[0].lat], [line[1].lng, line[1].lat]],
+          type: (metadata && metadata.radius) ? 'Point' : 'LineString',
+          coordinates: (metadata && metadata.radius) ?
+            [line.lng, line.lat] :
+            [[line[0].lng, line[0].lat], [line[1].lng, line[1].lat]],
         },
       });
+      console.log(this.geojsonFeature);
     },
     onSegmentAction(feature, layer) {
       layer.on('click', (e) => {
@@ -253,6 +284,31 @@ export default {
         });
       });
     },
+    onPointToLayer(feature, latlng) {
+      const { geometry, properties } = feature;
+      if (geometry.type === 'Point') {
+        return L.circleMarker(latlng, {
+          radius: properties.radius,
+        });
+      }
+      return null;
+    },
+    setSegmentStyle(feature) {
+      if (feature.properties && feature.properties.radius) {
+        return {
+          fillColor: '#E91C63',
+          color: '#000',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8,
+        };
+      }
+      return {
+        color: '#FF7800',
+        weight: 2,
+        opacity: 0.65,
+      };
+    },
     async onDeleteSegment() {
       if (this.segment.id) {
         try {
@@ -261,6 +317,7 @@ export default {
             this.geojsonFeature,
             feat => feat.properties.id === this.segment.id,
           );
+          this.segment.isEditable = false;
           this.geojsonFeature = geoFeature;
           this.clearMap();
           this.geojsonUpdate();
