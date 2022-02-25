@@ -10,7 +10,8 @@
       </span>
     </div>
     <div v-if="segment.object.feature.properties.length" class="distance">
-      <div>Distance: {{ distanceToMeter(segment.object.feature.properties.length) }} mètres</div>
+      <div>Distance:</div>
+      <div>{{ distanceToMeter(segment.object.feature.properties.length) }} mètres</div>
     </div>
     <div class="color">
       <div>Couleur</div>
@@ -82,6 +83,8 @@ export default {
     padding-top 15px
   .color
     padding-top 15px
+    .q-input-target
+      font-size 14px
   .title
     text-align center
     padding-bottom 15px
