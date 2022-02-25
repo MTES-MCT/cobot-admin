@@ -119,7 +119,11 @@ export default {
         position: 'topright',
         draw: {
           polyline: true,
-          circle: true,
+          circle: {
+            shapeOptions: {
+              showRadius: true,
+            },
+          },
           circlemarker: false,
           polygon: false,
           rectangle: false,
@@ -145,7 +149,6 @@ export default {
 
       this.map.on(L.Draw.Event.DRAWVERTEX, async (event) => {
         const { _latlng } = event.layers._layers[Object.keys(event.layers._layers)[0]];
-        console.log(event);
         try {
           const closest = await this.$axiosSIG.get(`/gis/segments/closest?lat=${_latlng.lat}&lng=${_latlng.lng}`, config);
           console.log(closest);
@@ -209,7 +212,6 @@ export default {
       }
     },
     geojsonUpdate() {
-      console.log(this.geojsonFeature);
       const segments = L.geoJSON(this.geojsonFeature, {
         style: this.setSegmentStyle,
         onEachFeature: this.onSegmentAction,
@@ -221,7 +223,6 @@ export default {
       this.map.addLayer(this.segmentsGroup);
     },
     addSegment(id, name, line, metadata) {
-      console.log(line);
       this.geojsonFeature.push({
         type: 'Feature',
         properties: {
@@ -236,7 +237,6 @@ export default {
             [[line[0].lng, line[0].lat], [line[1].lng, line[1].lat]],
         },
       });
-      console.log(this.geojsonFeature);
     },
     onSegmentAction(feature, layer) {
       layer.on('click', (e) => {
@@ -250,19 +250,30 @@ export default {
         }, 50);
         e.target.on('edit', async () => {
           try {
-            const line = layer.getLatLngs();
-            await this.$axiosSIG.put(`/gis/segments/${e.target.feature.properties.id}`, {
-              line,
-            }, config);
-            const geoFeature = _.find(
-              this.geojsonFeature,
-              feat => feat.properties.id === e.target.feature.properties.id,
-            );
-            if (geoFeature) {
-              geoFeature.geometry.coordinates = [];
-              _.each(line, (point) => {
-                geoFeature.geometry.coordinates.push([point.lng, point.lat]);
-              });
+            if (!feature.properties.radius) {
+              const line = layer.getLatLngs();
+              const geoFeature = _.find(
+                this.geojsonFeature,
+                feat => feat.properties.id === e.target.feature.properties.id,
+              );
+              if (geoFeature) {
+                geoFeature.geometry.coordinates = [];
+                _.each(line, (point) => {
+                  geoFeature.geometry.coordinates.push([point.lng, point.lat]);
+                });
+              }
+              await this.$axiosSIG.put(`/gis/segments/${e.target.feature.properties.id}`, {
+                line,
+              }, config);
+            } else {
+              const point = layer.getLatLng();
+              const metadata = {
+                radius: layer.getRadius(),
+              };
+              await this.$axiosSIG.put(`/gis/segments/circle/${e.target.feature.properties.id}`, {
+                point,
+                metadata,
+              }, config);
             }
             this.segment = null;
             e.target.editing.disable();
@@ -287,7 +298,7 @@ export default {
     onPointToLayer(feature, latlng) {
       const { geometry, properties } = feature;
       if (geometry.type === 'Point') {
-        return L.circleMarker(latlng, {
+        return L.circle(latlng, {
           radius: properties.radius,
         });
       }
@@ -334,7 +345,7 @@ export default {
   @import '~variables'
   .custom-toolbox
     position absolute
-    top 130px
+    top 150px
     right 26px
     z-index 10000
     .delete
