@@ -26,6 +26,7 @@
           <ul>
             <li @click="goToDashboard(project)">aller au projet</li>
             <li @click="goToEditProject(project)">éditer le projet</li>
+            <li @click="onEditSegment(project)">éditer les segments</li>
             <li @click="onDeleteProject(project)">supprimer le projet</li>
           </ul>
         </div>
@@ -156,6 +157,13 @@ export default {
         }
       }).catch(() => {
       });
+    },
+    onEditSegment(project) {
+      delete project.__typename;
+      this.$store.commit('project/SET_PROJECT', project);
+      this.$localStorage.set('project', JSON.stringify(project));
+      this.$root.$emit('projectChanged', project);
+      this.$router.push(`/gis/${project.id}`);
     },
   },
   apollo: {

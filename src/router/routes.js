@@ -84,6 +84,18 @@ export default [
       },
       {
         name: '',
+        path: 'gis',
+        component: () => import('pages/gis/index'),
+        children: [
+          {
+            path: ':id',
+            name: 'gis.segments',
+            component: () => import('pages/gis/segments'),
+          },
+        ],
+      },
+      {
+        name: '',
         path: 'crud',
         component: () => import('pages/crud/index'),
         children: [

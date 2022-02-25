@@ -132,7 +132,17 @@ export default {
   apollo: {
     Me: {
       query: ME_QUERY,
-      update(data) {
+      async update(data) {
+        try {
+          const apiSIGToken = await this.$axiosSIG.post('/auth/local', {
+            identifier: this.credentials.email,
+            password: this.credentials.password,
+          });
+          console.log(apiSIGToken);
+          this.$localStorage.set('sig_auth_token', apiSIGToken.data.jwt);
+        } catch (e) {
+          console.log('Bad SIG account');
+        }
         const user = data.Me;
         this.$store.commit('project/SET_PROJECTS', user.projects);
         this.$localStorage.set('projects', JSON.stringify(user.projects));

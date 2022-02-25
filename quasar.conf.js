@@ -6,6 +6,7 @@ module.exports = function config(ctx) {
     plugins: [
       'i18n',
       'axios',
+      'axiosSIG',
       'localStorage',
       'vueAuth',
       'apollo',
@@ -31,6 +32,7 @@ module.exports = function config(ctx) {
     build: {
       env: {
         API_URL: JSON.stringify(process.env.API_URL),
+        API_SIG_URL: JSON.stringify(process.env.API_SIG_URL),
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       },
       scopeHoisting: true,
