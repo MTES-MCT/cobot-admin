@@ -5,13 +5,17 @@
       :zoom="zoom"
       :center="center"
       style="height: calc(100vh - 70px); width: calc(100vw - 15px);">
-        <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+        <l-tile-layer
+          :url="url"
+          :attribution="attribution"
+          :options="{ maxZoom: 19 }"></l-tile-layer>
     </l-map>
     <Toolbox
       v-if="segment && segment.isEditable"
       :segment="segment"
       onDeleteSegment
       @on-segment-color="onSegmentColor"
+      @on-segment-connexion-highlight="onSegmentConnexionHighlight"
       @on-delete-segment="onDeleteSegment"></Toolbox>
     <div class="toolbar">
       <span v-if="currentPosition">
@@ -61,11 +65,10 @@ export default {
       map: null,
       // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       // url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      url: 'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
-      attribution:
-        '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      zoom: 18,
-      center: [45.0579, -0.3375],
+      url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      zoom: 19,
+      center: [44.837789, -0.57918],
       colors: {
         polygon: '#F2C037',
         rectangle: '#E91C63',
@@ -155,6 +158,8 @@ export default {
             const regExp = /\(([^)]+)\)/;
             const closestPointAll = regExp.exec(closest.data.closestpoint);
             this.closestPoint = closestPointAll[1].split(' ');
+          } else {
+            this.closestPoint = null;
           }
         } catch (e) {
           console.log(e);
@@ -241,6 +246,7 @@ export default {
     },
     onSegmentAction(feature, layer) {
       layer.on('click', (e) => {
+        console.log(feature.properties);
         setTimeout(() => {
           e.target.editing.enable();
           this.segment = {
@@ -253,6 +259,10 @@ export default {
           try {
             if (!feature.properties.radius) {
               const line = layer.getLatLngs();
+              const metadata = {
+                radius: feature.properties.radius,
+                style: feature.properties.style,
+              };
               const geoFeature = _.find(
                 this.geojsonFeature,
                 feat => feat.properties.id === e.target.feature.properties.id,
@@ -265,6 +275,7 @@ export default {
               }
               await this.$axiosSIG.put(`/gis/segments/${e.target.feature.properties.id}`, {
                 line,
+                metadata,
               }, config);
             } else {
               const point = layer.getLatLng();
@@ -366,6 +377,9 @@ export default {
           console.log(e);
         }
       }
+    },
+    onSegmentConnexionHighlight() {
+      console.log(this.segmentsGroup);
     },
   },
 };
