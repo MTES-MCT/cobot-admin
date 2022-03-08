@@ -10,7 +10,7 @@
       <q-item-main>
         <q-item-tile label><strong>Fichier :</strong><br />{{ name }}</q-item-tile>
         <q-item-tile label style="padding-top: 12px;">
-          <strong>Auteur :</strong><br />{{ owner.name||owner.email }}
+          <strong>Auteur :</strong><br />{{ ownerName }}
         </q-item-tile>
       </q-item-main>
     </q-item>
@@ -104,6 +104,14 @@ export default {
         },
       },
     };
+  },
+  computed: {
+    ownerName() {
+      if (this.owner) {
+        return this.owner.name || this.owner.email;
+      }
+      return 'dropbox';
+    },
   },
   methods: {
     toggleInfoWindow() {

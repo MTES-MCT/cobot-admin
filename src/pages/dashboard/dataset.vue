@@ -203,12 +203,14 @@ export default {
         },
       ];
       _.each(labels, (label) => {
-        objectsFilter.push({
-          label: label.text,
-          value: label.text,
-        });
+        if (label.text !== 'no-detected') {
+          objectsFilter.push({
+            label: label.text,
+            value: label.text,
+          });
+        }
       });
-      this.objectsFilter = objectsFilter;
+      this.objectsFilter = _.sortBy(objectsFilter, ['label']);
     },
     onFilter() {
       this.loading = true;
@@ -274,6 +276,10 @@ export default {
           {
             label: 'Tous les utilisateurs',
             value: null,
+          },
+          {
+            label: 'Dropbox',
+            value: '622777914c725e6ded11a81c',
           },
         ];
         const { ProjectContributors } = data;
