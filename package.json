@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "API_URL=http://localhost:3040 API_SIG_URL=http://localhost:1337/api quasar dev",
-    "build": "API_URL=https://labelbot-api.wawy.io quasar build",
+    "build": "API_URL=https://labelbot-api.wawy.io API_SIG_URL=https://strapi.wawy.io/api quasar build",
     "deploy": "npm run build && rsync -avz ./dist coconstruisons@91.121.77.104:/home/coconstruisons/console --delete-after",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
