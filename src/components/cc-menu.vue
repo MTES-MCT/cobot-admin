@@ -26,7 +26,7 @@
           <ul>
             <li @click="goToDashboard(project)">aller au projet</li>
             <li @click="goToEditProject(project)">éditer le projet</li>
-            <li @click="onEditSegment(project)">éditer les segments</li>
+            <li v-if="isSegmentEditor" @click="onEditSegment(project)">éditer les segments</li>
             <li @click="onDeleteProject(project)">supprimer le projet</li>
           </ul>
         </div>
@@ -51,6 +51,14 @@ export default {
   name: 'CcMenu',
   components: {
     CcEditProject,
+  },
+  computed: {
+    isSegmentEditor() {
+      if (localStorage.getItem('sig_auth_token')) {
+        return true;
+      }
+      return false;
+    },
   },
   data() {
     return {
