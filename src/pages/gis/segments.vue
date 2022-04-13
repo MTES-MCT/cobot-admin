@@ -15,7 +15,7 @@
       :segment="segment"
       onDeleteSegment
       @on-segment-color="onSegmentColor"
-      @on-segment-connexion-highlight="onSegmentConnexionHighlight"
+      @on-segment-connexion-toggle-highlight="onSegmentConnexionToggleHighlight"
       @on-delete-segment="onDeleteSegment"></Toolbox>
     <div class="toolbar">
       <span v-if="currentPosition">
@@ -68,7 +68,7 @@ export default {
       url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
       attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 19,
-      center: [44.837789, -0.57918],
+      center: [44.8394, -0.5802],
       colors: {
         polygon: '#F2C037',
         rectangle: '#E91C63',
@@ -91,23 +91,25 @@ export default {
   watch: {
   },
   async mounted() {
-    let lastSegmentID;
+    let lastSegmentID = {};
     try {
       const segments = await this.$axiosSIG.get(`/gis/segments?id=${this.projectId}`, config);
-      lastSegmentID = _.last(segments.data);
-      _.each(segments.data, (segment) => {
-        geojsonFeature.push({
-          type: 'Feature',
-          properties: {
-            id: segment.id,
-            name: segment.name,
-            length: segment.length,
-            radius: (segment.metadata) ? segment.metadata.radius : 0,
-            style: (segment.metadata) ? segment.metadata.style : null,
-          },
-          geometry: JSON.parse(segment.geomtext),
+      if (segments.data && segments.data !== 'no data') {
+        lastSegmentID = _.last(segments.data);
+        _.each(segments.data, (segment) => {
+          geojsonFeature.push({
+            type: 'Feature',
+            properties: {
+              id: segment.id,
+              name: segment.name,
+              length: segment.length,
+              radius: (segment.metadata) ? segment.metadata.radius : 0,
+              style: (segment.metadata) ? segment.metadata.style : null,
+            },
+            geometry: (segment.geomtext) ? JSON.parse(segment.geomtext) : null,
+          });
         });
-      });
+      }
       this.geojsonFeature = geojsonFeature;
     } catch (e) {
       console.log(e);
@@ -246,7 +248,6 @@ export default {
     },
     onSegmentAction(feature, layer) {
       layer.on('click', (e) => {
-        console.log(feature.properties);
         setTimeout(() => {
           e.target.editing.enable();
           this.segment = {
@@ -378,8 +379,23 @@ export default {
         }
       }
     },
-    onSegmentConnexionHighlight() {
-      console.log(this.segmentsGroup);
+    onSegmentConnexionToggleHighlight(args) {
+      console.log(args);
+      const segments = this.segmentsGroup.getLayers()[0]._layers;
+      const layer = _.find(segments, segment => segment.feature.properties.id === args.id);
+      if (layer) {
+        if (args.state === 'on') {
+          layer.setStyle({
+            color: 'red',
+            weight: 5,
+          });
+        } else {
+          layer.setStyle({
+            color: (layer.feature.properties.style) ? layer.feature.properties.style.color : '#FF7800',
+            weight: 2,
+          });
+        }
+      }
     },
   },
 };

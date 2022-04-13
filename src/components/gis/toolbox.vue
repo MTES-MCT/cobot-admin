@@ -9,6 +9,25 @@
         )">
       </span>
     </div>
+    <div class="connection">
+      <div>Connexion :</div>
+      <ul>
+        <li>
+          <a
+            @mouseover="$emit('on-segment-connexion-toggle-highlight', {id: '107', state: 'on'})"
+            @mouseleave="$emit('on-segment-connexion-toggle-highlight', {id: '107', state: 'off'})">
+            Segment 12
+          </a>
+        </li>
+        <li>
+          <a
+            @mouseover="$emit('on-segment-connexion-toggle-highlight', {id: '105', state: 'on'})"
+            @mouseleave="$emit('on-segment-connexion-toggle-highlight', {id: '105', state: 'off'})">
+            Segment 14
+          </a>
+        </li>
+      </ul>
+    </div>
     <div v-if="segment.object.feature.properties.length" class="distance">
       <div>Distance:</div>
       <div>{{ distanceToMeter(segment.object.feature.properties.length) }} mètres</div>
@@ -61,7 +80,6 @@ export default {
       }
       return toString;
     },
-
     distanceToMeter: distance => (distance * 1000 * 100).toFixed(2),
   },
 };
@@ -79,6 +97,18 @@ export default {
   border-radius 4px
   padding 15px
   font-size 14px
+  .connection
+    padding-top 15px
+    ul
+      margin-block-start 0em
+      margin-block-end 0em
+      padding-inline-start 30px
+      li
+        a
+          text-decoration: underline
+          &:hover
+            font-weight: bold
+
   .distance
     padding-top 15px
   .color
