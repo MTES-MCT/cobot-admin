@@ -43,8 +43,6 @@ const config = {
   headers: { Authorization: `Bearer ${localStorage.getItem('sig_auth_token')}` },
 };
 
-const geojsonFeature = [];
-
 export default {
   name: 'CcSegments',
   components: {
@@ -91,6 +89,7 @@ export default {
   watch: {
   },
   async mounted() {
+    const geojsonFeature = [];
     let lastSegmentID = {};
     try {
       const segments = await this.$axiosSIG.get(`/gis/segments?id=${this.projectId}`, config);
