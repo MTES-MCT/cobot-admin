@@ -30,6 +30,7 @@ export default {
       }).then(() => {
         this.$localStorage.remove('projects');
         this.$localStorage.remove('project');
+        this.$localStorage.remove('sig_auth_token');
         this.$auth.logout({
           makeRequest: false,
           redirect: '/auth/login',
