@@ -60,12 +60,17 @@ export default {
   data() {
     return {
       color: (this.segment.object.feature.properties.style && this.segment.object.feature.properties.style.color) ? this.segment.object.feature.properties.style.color : '#FF7800',
+      objects: null,
     };
   },
   watch: {
     segment(object) {
       console.log(object);
     },
+  },
+  async mounted() {
+    const objects = await this.$axiosSIG.get(`/object-to-segments?filters[segmentID][$eq]=${this.segment.id}`);
+    console.log(objects);
   },
   methods: {
     coordsToHumandReadable: (object) => {

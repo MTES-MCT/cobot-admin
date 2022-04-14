@@ -13,7 +13,6 @@
     <Toolbox
       v-if="segment && segment.isEditable"
       :segment="segment"
-      onDeleteSegment
       @on-segment-color="onSegmentColor"
       @on-segment-connexion-toggle-highlight="onSegmentConnexionToggleHighlight"
       @on-delete-segment="onDeleteSegment"></Toolbox>
@@ -41,6 +40,15 @@ import { LMap, LImageOverlay, LTileLayer, LMarker, LPopup, LPolyline } from 'vue
 
 const config = {
   headers: { Authorization: `Bearer ${localStorage.getItem('sig_auth_token')}` },
+};
+
+const setSegmentColor = (feature) => {
+  if (feature.properties.hasObject) {
+    return '#009900';
+  } else if (feature.properties.style && feature.properties.style.color) {
+    return feature.properties.style.color;
+  }
+  return '#FF7800';
 };
 
 export default {
@@ -104,6 +112,7 @@ export default {
               length: segment.length,
               radius: (segment.metadata) ? segment.metadata.radius : 0,
               style: (segment.metadata) ? segment.metadata.style : null,
+              hasObject: segment.hasobject,
             },
             geometry: (segment.geomtext) ? JSON.parse(segment.geomtext) : null,
           });
@@ -302,7 +311,7 @@ export default {
       });
       layer.on('mouseout', (e) => {
         layer.setStyle({
-          color: (e.target.feature.properties.style) ? e.target.feature.properties.style.color : '#FF7800',
+          color: setSegmentColor(e.target.feature),
           weight: 2,
         });
       });
@@ -319,7 +328,7 @@ export default {
     setSegmentStyle(feature) {
       if (feature.properties && feature.properties.radius) {
         return {
-          fillColor: (feature.properties.style && feature.properties.style.color) ? feature.properties.style.color : '#E91C63',
+          fillColor: setSegmentColor(feature),
           color: '#000',
           weight: 1,
           opacity: 1,
@@ -327,7 +336,7 @@ export default {
         };
       }
       return {
-        color: (feature.properties.style && feature.properties.style.color) ? feature.properties.style.color : '#FF7800',
+        color: setSegmentColor(feature),
         weight: 2,
         opacity: 0.65,
       };
