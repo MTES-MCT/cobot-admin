@@ -13,6 +13,7 @@ module.exports = function config(ctx) {
       'googleMap',
       'masonry',
       'pagination',
+      'vue-awesome-swiper',
     ],
     css: [
       'app.styl',
