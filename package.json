@@ -23,7 +23,7 @@
     "apollo-link-http": "^1.5.3",
     "apollo-link-ws": "^1.0.8",
     "apollo-utilities": "^1.0.12",
-    "axios": "^0.18.0",
+    "axios": "^0.21.2",
     "blueimp-load-image": "^2.20.1",
     "chart.js": "^2.7.2",
     "core-js": "^2.6.5",
