@@ -200,7 +200,7 @@ export default {
           }
         } else {
           const line = layer.getLatLngs();
-          if (this.closestPoint) {
+          if (this.closestPoint && line.length === 2) {
             line[0].lat = parseFloat(this.closestPoint[1]);
             line[0].lng = parseFloat(this.closestPoint[0]);
           }
@@ -210,8 +210,10 @@ export default {
               projectID: this.projectId,
               line,
             }, config);
-            this.addSegment(segment.data[0].id, `Segment ${lastSegmentID.id}`, line);
-            lastSegmentID.id = segment.data[0].id;
+            _.each(segment.data, (seg) => {
+              this.addSegment(seg.id, `Segment ${lastSegmentID.id}`, [seg.startPoint, seg.endPoint]);
+              lastSegmentID.id = seg.id;
+            });
             this.clearMap();
             this.geojsonUpdate();
           } catch (e) {
