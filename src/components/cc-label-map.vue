@@ -76,7 +76,7 @@ export default {
       }
       this.image = `${process.env.API_URL}/img/${this.projectId}/${this.data.file}`;
       setTimeout(() => {
-        this.setMapOrientation(metadata);
+        this.setMapOrientation(metadata, this.image);
       }, 500);
       _.each(this.data.usersAnswers, (answer) => {
         this.drawUserAnswer(answer.answers.origin);
@@ -135,15 +135,28 @@ export default {
       }, 500);
     },
 
-    setMapOrientation(metadata) {
-      let height;
-      let width;
+    async getImageSize(file) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function () {
+          resolve({
+            width: this.naturalWidth,
+            height: this.naturalHeight,
+          });
+        };
+        img.src = file;
+      });
+    },
+
+    async setMapOrientation(metadata, file) {
+      const imageSize = await this.getImageSize(file);
+      let { height, width } = imageSize;
       if (metadata.originalHeight) {
         height = metadata.originalHeight;
         width = metadata.originalWidth;
       } else {
         const { raw } = metadata;
-        if (raw.ImageHeight) {
+        if (raw && raw.ImageHeight) {
           height = raw.ImageHeight;
           width = raw.ImageWidth;
         }

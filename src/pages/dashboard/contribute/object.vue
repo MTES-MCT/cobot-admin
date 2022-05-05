@@ -397,8 +397,8 @@ export default {
         this.imageHeight = (height > 300) ? 300 : height;
         this.imageWidth = (width > 400) ? 400 : width;
       } else {
-        this.imageHeight = (height > 400) ? 400 : height;
-        this.imageWidth = (width > 300) ? 300 : width;
+        this.imageHeight = (height > 800) ? 800 : height;
+        this.imageWidth = (width > 600) ? 600 : width;
       }
       this.map._onResize();
       this.$refs.map.$el.style.height = `${this.imageHeight}px`;
