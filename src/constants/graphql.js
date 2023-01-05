@@ -352,6 +352,7 @@ export const LABELS = gql`query labels {
     _id
     uid
     text
+    ttl
     photo
     icon
     isObstacle
@@ -364,22 +365,24 @@ export const LABELS = gql`query labels {
   }
 }`;
 
-export const LABELS_CREATE = gql`mutation createLabel($uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean) {
-  createLabel(uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle) {
+export const LABELS_CREATE = gql`mutation createLabel($uid: String!, $text: String!, $ttl: Int, $photo: String, $icon: String, $isObstacle: Boolean) {
+  createLabel(uid: $uid, text: $text, ttl: $ttl, photo: $photo, icon: $icon, isObstacle: $isObstacle) {
     _id
     uid
     text
+    ttl
     photo
     icon
     isObstacle
   }
 }`;
 
-export const LABELS_UPDATE = gql`mutation updateLabel($id: ID!, $uid: String!, $text: String!, $photo: String, $icon: String, $isObstacle: Boolean, $properties: [PropertiesInput]) {
-  updateLabel(id: $id, uid: $uid, text: $text, photo: $photo, icon: $icon, isObstacle: $isObstacle, properties: $properties) {
+export const LABELS_UPDATE = gql`mutation updateLabel($id: ID!, $uid: String!, $text: String!, $ttl: Int, $photo: String, $icon: String, $isObstacle: Boolean, $properties: [PropertiesInput]) {
+  updateLabel(id: $id, uid: $uid, text: $text, ttl: $ttl, photo: $photo, icon: $icon, isObstacle: $isObstacle, properties: $properties) {
     _id
     uid
     text
+    ttl
     photo
     icon
     isObstacle

@@ -15,6 +15,12 @@
                 stack-label="Nom du label"
                 @input="onLabelTextChange"
                 v-model="label.text" />
+              <q-select
+                class="q-mt-md"
+                v-model="label.ttl"
+                stack-label="Durée de vie"
+                :options="ttlList"
+              />
             </q-field>
           </div>
           <template v-if="label._id">
@@ -189,6 +195,16 @@ export default {
           field: 'val_3',
         },
       ],
+      ttlList: [
+        {
+          label: '24h',
+          value: 86400,
+        },
+        {
+          label: 'Permanent',
+          value: 0,
+        },
+      ],
       currentProperty: null,
     };
   },
@@ -215,6 +231,7 @@ export default {
               id: this.label._id,
               uid: this.label.uid,
               text: this.label.text,
+              ttl: this.label.ttl,
               photo: this.label.photo,
               icon: this.label.icon,
               isObstacle: this.label.isObstacle,
@@ -227,6 +244,7 @@ export default {
             variables: {
               uid: this.label.uid,
               text: this.label.text,
+              ttl: this.label.ttl,
             },
           });
           const { data } = newLabel;

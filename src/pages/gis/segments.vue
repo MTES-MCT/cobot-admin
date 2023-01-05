@@ -17,9 +17,14 @@
       @on-segment-connexion-toggle-highlight="onSegmentConnexionToggleHighlight"
       @on-delete-segment="onDeleteSegment"></Toolbox>
     <div class="toolbar">
-      <span v-if="currentPosition">
+      <!-- <span v-if="currentPosition">
         Coordonnées centre: {{roundedLat}}, {{roundedLng}}
-      </span>
+      </span> -->
+      <q-btn @click="onImportOSM()"
+             :disabled="importOSMCInProgress"
+             color="pink"
+             icon="cloud_download"
+             :label="importOSMCtaLabel" />
     </div>
   </div>
 </template>
@@ -48,7 +53,7 @@ const setSegmentColor = (feature) => {
   } else if (feature.properties.style && feature.properties.style.color) {
     return feature.properties.style.color;
   }
-  return '#FF7800';
+  return '#2E54FE';
 };
 
 export default {
@@ -71,10 +76,11 @@ export default {
       map: null,
       // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       // url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      // url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      zoom: 19,
-      center: [44.8394, -0.5802],
+      zoom: 16,
+      center: [48.8326046, 2.3684351],
       colors: {
         polygon: '#F2C037',
         rectangle: '#E91C63',
@@ -82,6 +88,8 @@ export default {
       },
       currentPosition: null,
       closestPoint: null,
+      importOSMCtaLabel: 'importer le fillaire OSM dans cette zone',
+      importOSMCInProgress: false,
     };
   },
   computed: {
@@ -314,7 +322,7 @@ export default {
       layer.on('mouseout', (e) => {
         layer.setStyle({
           color: setSegmentColor(e.target.feature),
-          weight: 2,
+          weight: 5,
         });
       });
     },
@@ -332,14 +340,14 @@ export default {
         return {
           fillColor: setSegmentColor(feature),
           color: '#000',
-          weight: 1,
+          weight: 5,
           opacity: 1,
           fillOpacity: 0.8,
         };
       }
       return {
         color: setSegmentColor(feature),
-        weight: 2,
+        weight: 5,
         opacity: 0.65,
       };
     },
@@ -405,6 +413,40 @@ export default {
             weight: 2,
           });
         }
+      }
+    },
+    async onImportOSM() {
+      this.importOSMCInProgress = true;
+      this.importOSMCtaLabel = 'Importation en cours...';
+      const bbox = [
+        this.map.getBounds().getSouth(),
+        this.map.getBounds().getWest(),
+        this.map.getBounds().getNorth(),
+        this.map.getBounds().getEast(),
+      ];
+      try {
+        const results = await this.$axiosSIG.post('/gis/segments/import-from-osm', {
+          projectID: this.projectId,
+          bbox: bbox.join(','),
+        }, config);
+        this.importOSMCInProgress = false;
+        this.importOSMCtaLabel = 'importer le fillaire OSM dans cette zone';
+        const { geojsonFeature } = this;
+        _.each(results.data, (segment) => {
+          geojsonFeature.push({
+            type: 'Feature',
+            properties: {
+              id: segment.id,
+              name: segment.properties.id,
+            },
+            geometry: segment.geometry,
+          });
+        });
+        this.geojsonFeature = geojsonFeature;
+        this.clearMap();
+        this.geojsonUpdate();
+      } catch (e) {
+        console.log(e);
       }
     },
   },
