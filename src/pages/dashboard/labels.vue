@@ -201,6 +201,10 @@ export default {
           value: 86400,
         },
         {
+          label: '1 mois',
+          value: 86400 * 30,
+        },
+        {
           label: 'Permanent',
           value: 0,
         },
