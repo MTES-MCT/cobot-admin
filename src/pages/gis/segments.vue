@@ -74,6 +74,7 @@ export default {
       segment: null,
       segmentsGroup: null,
       map: null,
+      lastSegmentID: null,
       // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       // url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       // url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
@@ -104,37 +105,12 @@ export default {
   },
   watch: {
   },
-  async mounted() {
-    const geojsonFeature = [];
-    let lastSegmentID = {};
-    try {
-      const segments = await this.$axiosSIG.get(`/gis/segments?id=${this.projectId}`, config);
-      if (segments.data && segments.data !== 'no data') {
-        lastSegmentID = _.last(segments.data);
-        _.each(segments.data, (segment) => {
-          geojsonFeature.push({
-            type: 'Feature',
-            properties: {
-              id: segment.id,
-              name: segment.name,
-              length: segment.length,
-              radius: (segment.metadata) ? segment.metadata.radius : 0,
-              style: (segment.metadata) ? segment.metadata.style : null,
-              hasObject: segment.hasobject,
-            },
-            geometry: (segment.geomtext) ? JSON.parse(segment.geomtext) : null,
-          });
-        });
-      }
-      this.geojsonFeature = geojsonFeature;
-    } catch (e) {
-      console.log(e);
-    }
-    this.$nextTick(() => {
+  mounted() {
+    this.$nextTick(async () => {
       this.map = this.$refs.map.mapObject;
       this.map._onResize();
-
-      this.map.scrollWheelZoom.disable();
+      await this.getSegments(this.map.getBounds());
+      // this.map.scrollWheelZoom.disable();
 
       const drawPluginOptions = {
         position: 'topright',
@@ -159,6 +135,12 @@ export default {
 
       this.map.on('move', (event) => {
         this.currentPosition = event.target.getCenter();
+      });
+
+      this.map.on('moveend', async () => {
+        this.clearMap();
+        await this.getSegments(this.map.getBounds());
+        this.geojsonUpdate();
       });
 
       this.map.on('click', () => {
@@ -194,13 +176,13 @@ export default {
           };
           try {
             const circle = await this.$axiosSIG.post(`/gis/segments/circle?id=${this.projectId}`, {
-              name: `Circle ${lastSegmentID.id}`,
+              name: `Circle ${this.lastSegmentID.id}`,
               projectID: this.projectId,
               point,
               metadata,
             }, config);
-            this.addSegment(circle.data[0].id, `Circle ${lastSegmentID.id}`, point, metadata);
-            lastSegmentID.id = circle.data[0].id;
+            this.addSegment(circle.data[0].id, `Circle ${this.lastSegmentID.id}`, point, metadata);
+            this.lastSegmentID.id = circle.data[0].id;
             this.clearMap();
             this.geojsonUpdate();
           } catch (e) {
@@ -214,13 +196,13 @@ export default {
           }
           try {
             const segment = await this.$axiosSIG.post(`/gis/segments?id=${this.projectId}`, {
-              name: `Segment ${lastSegmentID.id}`,
+              name: `Segment ${this.lastSegmentID.id}`,
               projectID: this.projectId,
               line,
             }, config);
             _.each(segment.data, (seg) => {
-              this.addSegment(seg.id, `Segment ${lastSegmentID.id}`, [seg.startPoint, seg.endPoint]);
-              lastSegmentID.id = seg.id;
+              this.addSegment(seg.id, `Segment ${this.lastSegmentID.id}`, [seg.startPoint, seg.endPoint]);
+              this.lastSegmentID.id = seg.id;
             });
             this.clearMap();
             this.geojsonUpdate();
@@ -232,6 +214,33 @@ export default {
     });
   },
   methods: {
+    async getSegments(bbox) {
+      const strBbox = `${bbox._southWest.lng},${bbox._southWest.lat},${bbox._northEast.lng},${bbox._northEast.lat}`;
+      const geojsonFeature = [];
+      try {
+        const segments = await this.$axiosSIG.get(`/gis/segments?bbox=${strBbox}`, config);
+        if (segments.data && segments.data !== 'no data') {
+          this.lastSegmentID = _.last(segments.data);
+          _.each(segments.data, (segment) => {
+            geojsonFeature.push({
+              type: 'Feature',
+              properties: {
+                id: segment.id,
+                name: segment.name,
+                length: segment.length,
+                radius: (segment.metadata) ? segment.metadata.radius : 0,
+                style: (segment.metadata) ? segment.metadata.style : null,
+                hasObject: segment.hasobject,
+              },
+              geometry: (segment.geomtext) ? JSON.parse(segment.geomtext) : null,
+            });
+          });
+        }
+        this.geojsonFeature = geojsonFeature;
+      } catch (e) {
+        console.log(e);
+      }
+    },
     clearMap() {
       if (this.segmentsGroup) {
         this.segmentsGroup.clearLayers();
